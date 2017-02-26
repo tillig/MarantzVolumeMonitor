@@ -80,6 +80,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DFRobotLCDShield.h" />
     <ClInclude Include="StatDisplay.h" />
     <ClInclude Include="__vm\.MarantzVolumeMonitor.vsarduino.h" />
   </ItemGroup>
