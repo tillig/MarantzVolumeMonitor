@@ -10,7 +10,7 @@ void StatDisplayClass::init(LiquidCrystal* lcd, uint8_t backlight)
 {
     _lcd = lcd;
     _backlight = backlight;
-    disable();
+    enable();
 }
 
 bool StatDisplayClass::isEnabled()

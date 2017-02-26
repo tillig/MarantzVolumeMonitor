@@ -1,21 +1,109 @@
-#include "StatDisplay.h"
 #include "DFRobotLCDShield.h"
+#include "StatDisplay.h"
 #include <LiquidCrystal.h>
+#include <Dhcp.h>
+#include <Dns.h>
+#include <Ethernet.h>
+#include <EthernetClient.h>
+#include <EthernetServer.h>
+#include <EthernetUdp.h>
 
+byte mac[] = {
+    0x00, 0xAB, 0xBA, 0xC1, 0xDD, 0x03
+};
 LiquidCrystal lcd(LCD_RS, LCD_ENABLE, LCD_DB4, LCD_DB5, LCD_DB6, LCD_DB7);
-
 bool receiverOn;
 
 void setup()
 {
+    // Initialize application state
+    receiverOn = false;
+
+    // Serial used for debug messages
+    Serial.begin(9600);
+
+    // Initialize display
     pinMode(LCD_BACKLIGHT, OUTPUT);
     lcd.begin(16, 2);
     StatDisplay.init(&lcd, LCD_BACKLIGHT);
-    receiverOn = false;
+
+    lcd.setCursor(0, 0);
+    lcd.print("DHCP starting...");
+    Serial.println("DHCP starting...");
+
+    // Initialize Ethernet connection
+    if (Ethernet.begin(mac) == 0)
+    {
+        Serial.println("No DHCP lease.");
+        showDhcpError("No DHCP lease.", "Reset to retry.");
+        while (true)
+        {
+            // Block until reset to try again.
+        }
+    }
+
+    Serial.println("DHCP success");
+    resetLine(0);
+    lcd.print("IP address:");
+    printIPAddress();
+}
+
+void showDhcpError(String line1, String line2)
+{
+    digitalWrite(LCD_BACKLIGHT, HIGH);
+    lcd.clear();
+    lcd.display();
+    lcd.setCursor(0, 0);
+    lcd.print(line1);
+    Serial.println(line1);
+
+    if (line2.length() > 0)
+    {
+        lcd.setCursor(0, 1);
+        lcd.print(line2);
+        Serial.println(line2);
+    }
 }
 
 void loop()
 {
+    // Ethernet.maintain() ensures the DHCP lease is
+    // renewed as needed. It only does work if it has
+    // to so call it on every loop.
+    switch (Ethernet.maintain())
+    {
+    case 1:
+        // Failed to renew DHCP lease
+        showDhcpError("DHCP renew fail", "");
+        break;
+
+    case 2:
+        //renewed success
+        Serial.println("Renew success");
+        resetLine(0);
+        lcd.print("Renew success");
+        printIPAddress();
+        break;
+
+    case 3:
+        // Failed to rebind to DHCP
+        Serial.println("Rebind fail");
+        showDhcpError("DHCP rebind fail", "");
+        break;
+
+    case 4:
+        // Rebind success
+        Serial.println("Rebind success");
+        printIPAddress();
+        break;
+
+    default:
+        //nothing happened
+        break;
+    }
+
+
+    /*
     receiverOn = getReceiverPower();
     if (receiverOn)
     {
@@ -48,6 +136,36 @@ void loop()
         // back on.
         delay(5000);
     }
+    */
+}
+
+void resetLine(int lineNumber)
+{
+    lcd.setCursor(0, lineNumber);
+    lcd.print("                ");
+    lcd.setCursor(0, lineNumber);
+}
+
+String getIPAddress()
+{
+    String address = "";
+    for (byte thisByte = 0; thisByte < 4; thisByte++) {
+        address.concat(String(Ethernet.localIP()[thisByte], DEC));
+        if (thisByte < 3)
+        {
+            address.concat(".");
+        }
+    }
+
+    return address;
+}
+
+void printIPAddress()
+{
+    String address = getIPAddress();
+    Serial.println(address);
+    resetLine(1);
+    lcd.print(address);
 }
 
 int getButton()

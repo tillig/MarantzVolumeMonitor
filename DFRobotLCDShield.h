@@ -15,7 +15,10 @@ D10      -> Backlight control
 #define LCD_DB7 7
 #define LCD_RS 8
 #define LCD_ENABLE 9
-#define LCD_BACKLIGHT 10
+
+// Pin 10 is used by the Ethernet shield
+// so I had to rewire it to pin 3.
+#define LCD_BACKLIGHT 3
 #define NUM_BUTTONS 6
 #define BUTTON_PIN A0
 
