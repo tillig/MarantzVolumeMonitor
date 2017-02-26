@@ -1,3 +1,4 @@
+#include "StatDisplay.h"
 #include <LiquidCrystal.h>
 
 /*
@@ -21,22 +22,21 @@ D10      -> Backlight control
 LiquidCrystal lcd(LCD_RS, LCD_ENABLE, LCD_DB4, LCD_DB5, LCD_DB6, LCD_DB7);
 
 bool receiverOn;
-bool displayOn;
 
 void setup() {
-    receiverOn = false;
     pinMode(LCD_BACKLIGHT, OUTPUT);
     lcd.begin(16, 2);
-    turnDisplayOff();
+    StatDisplay.init(&lcd, LCD_BACKLIGHT);
+    receiverOn = false;
 }
 
 void loop() {
     receiverOn = getReceiverPower();
     if (receiverOn)
     {
-        if (!displayOn)
+        if (!StatDisplay.isEnabled())
         {
-            turnDisplayOn();
+            StatDisplay.enable();
         }
 
         // The receiver is on, so get the updated
@@ -45,84 +45,19 @@ void loop() {
         String vol = getVolume();
         String surround = getSurround();
 
-        showStats(vol, input, surround);
+        StatDisplay.show(vol, input, surround);
         delay(1000);
     }
     else
     {
-        if (displayOn)
+        if (StatDisplay.isEnabled())
         {
-            turnDisplayOff();
+            StatDisplay.disable();
         }
 
         delay(5000);
     }
 }
-
-void showStats(String volume, String input, String surround)
-{
-    // Display is
-    //
-    // {input} [{vol}]
-    // {surround}
-    //
-    // like
-    //
-    // Xbox One  [10.5]
-    // Multi Ch Input 7
-    //
-    // input truncated to 9
-    // volume gets padded to 4
-    // surround truncated to 16
-
-    // Clear the display because the values
-    // may be different lengths and you don't
-    // want overlaps.
-    lcd.clear();
-
-    // Display the input info.
-    lcd.setCursor(0, 0);
-    if (input.length() > 9)
-    {
-        input.remove(9, input.length() - 9);
-    }
-    lcd.print(input);
-    lcd.setCursor(10, 0);
-
-    // Display the volume info.
-    lcd.print("[");
-    if (volume.length() < 4)
-    {
-        // Pad short values on the left.
-        lcd.print(" ");
-    }
-    lcd.print(volume);
-    lcd.print("]");
-
-    lcd.setCursor(0, 1);
-    lcd.print(surround);
-}
-
-void turnDisplayOn()
-{
-    displayOn = true;
-    digitalWrite(LCD_BACKLIGHT, HIGH);
-    lcd.clear();
-    lcd.display();
-    lcd.setCursor(1, 0);
-    lcd.print("Input:");
-    lcd.setCursor(0, 1);
-    lcd.print("Volume:");
-}
-
-void turnDisplayOff()
-{
-    displayOn = false;
-    digitalWrite(LCD_BACKLIGHT, LOW);
-    lcd.clear();
-    lcd.noDisplay();
-}
-
 
 // Getting the input and volume will probably be
 // a single HTTP call to the receiver API.

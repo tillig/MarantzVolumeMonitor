@@ -80,7 +80,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="StatDisplay.h" />
     <ClInclude Include="__vm\.MarantzVolumeMonitor.vsarduino.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="StatDisplay.cpp" />
   </ItemGroup>
   <PropertyGroup>
     <DebuggerFlavor>VisualMicroDebugger</DebuggerFlavor>
