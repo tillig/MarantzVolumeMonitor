@@ -1,24 +1,7 @@
 #include "StatDisplay.h"
+#include "DFRobotLCDShield.h"
 #include <LiquidCrystal.h>
 
-/*
-DFRobot LCD Shield
-https://www.dfrobot.com/product-51.html
-D4-D7    -> LCD Data transmission
-D8       -> Register Select
-D9       -> Enable pin
-D10      -> Backlight control
-*/
-// Constants for pins
-#define LCD_DB4 4
-#define LCD_DB5 5
-#define LCD_DB6 6
-#define LCD_DB7 7
-#define LCD_RS 8
-#define LCD_ENABLE 9
-#define LCD_BACKLIGHT 10
-#define NUM_BUTTONS 6
-#define BUTTON_PIN 0
 LiquidCrystal lcd(LCD_RS, LCD_ENABLE, LCD_DB4, LCD_DB5, LCD_DB6, LCD_DB7);
 
 bool receiverOn;
@@ -46,7 +29,10 @@ void loop() {
         String surround = getSurround();
 
         StatDisplay.show(vol, input, surround);
-        delay(1000);
+
+        // While the receiver is on, refresh
+        // twice a second.
+        delay(500);
     }
     else
     {
@@ -55,10 +41,14 @@ void loop() {
             StatDisplay.disable();
         }
 
+        // If the receiver is off, only check
+        // every five seconds to see if it's turned
+        // back on.
         delay(5000);
     }
 }
 
+// STUBS!
 // Getting the input and volume will probably be
 // a single HTTP call to the receiver API.
 
