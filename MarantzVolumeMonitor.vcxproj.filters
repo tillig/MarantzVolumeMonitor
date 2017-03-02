@@ -21,15 +21,15 @@
     <ClInclude Include="__vm\.MarantzVolumeMonitor.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="StatDisplay.h">
+    <ClInclude Include="DFRobotLCDShield.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DFRobotLCDShield.h">
+    <ClInclude Include="DisplayManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="StatDisplay.cpp">
+    <ClCompile Include="DisplayManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

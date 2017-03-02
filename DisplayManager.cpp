@@ -2,23 +2,23 @@
 // 
 // 
 
-#include "StatDisplay.h"
+#include "DisplayManager.h"
 
-StatDisplayClass StatDisplay;
+DisplayManagerClass DisplayManager;
 
-void StatDisplayClass::init(LiquidCrystal* lcd, uint8_t backlight)
+void DisplayManagerClass::init(LiquidCrystal* lcd, uint8_t backlight)
 {
     _lcd = lcd;
     _backlight = backlight;
-    enable();
+    enableDisplay();
 }
 
-bool StatDisplayClass::isEnabled()
+bool DisplayManagerClass::isDisplayEnabled()
 {
     return _enabled;
 }
 
-void StatDisplayClass::enable()
+void DisplayManagerClass::enableDisplay()
 {
     _enabled = true;
     digitalWrite(_backlight, HIGH);
@@ -26,7 +26,7 @@ void StatDisplayClass::enable()
     _lcd->display();
 }
 
-void StatDisplayClass::disable()
+void DisplayManagerClass::disableDisplay()
 {
     _enabled = false;
     digitalWrite(_backlight, LOW);
@@ -34,7 +34,14 @@ void StatDisplayClass::disable()
     _lcd->noDisplay();
 }
 
-void StatDisplayClass::show(String volume, String input, String surround)
+void DisplayManagerClass::resetLine(uint8_t line)
+{
+    _lcd->setCursor(0, line);
+    _lcd->print("                ");
+    _lcd->setCursor(0, line);
+}
+
+void DisplayManagerClass::showStats(String volume, String input, String surround)
 {
     // Display is
     //
@@ -76,4 +83,30 @@ void StatDisplayClass::show(String volume, String input, String surround)
 
     _lcd->setCursor(0, 1);
     _lcd->print(surround);
+}
+
+void DisplayManagerClass::showMessage(String line)
+{
+    if (!this->isDisplayEnabled())
+    {
+        this->enableDisplay();
+    }
+
+    _lcd->clear();
+    _lcd->setCursor(0, 0);
+    _lcd->print(line);
+}
+
+void DisplayManagerClass::showMessage(String line1, String line2)
+{
+    if (!this->isDisplayEnabled())
+    {
+        this->enableDisplay();
+    }
+
+    _lcd->clear();
+    _lcd->setCursor(0, 0);
+    _lcd->print(line1);
+    _lcd->setCursor(0, 1);
+    _lcd->print(line2);
 }

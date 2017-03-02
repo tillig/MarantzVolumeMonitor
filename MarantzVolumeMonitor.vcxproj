@@ -81,11 +81,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DFRobotLCDShield.h" />
-    <ClInclude Include="StatDisplay.h" />
+    <ClInclude Include="DisplayManager.h" />
     <ClInclude Include="__vm\.MarantzVolumeMonitor.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="StatDisplay.cpp" />
+    <ClCompile Include="DisplayManager.cpp" />
   </ItemGroup>
   <PropertyGroup>
     <DebuggerFlavor>VisualMicroDebugger</DebuggerFlavor>

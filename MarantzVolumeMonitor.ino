@@ -1,5 +1,5 @@
 #include "DFRobotLCDShield.h"
-#include "StatDisplay.h"
+#include "DisplayManager.h"
 #include <LiquidCrystal.h>
 #include <Dhcp.h>
 #include <Dns.h>
@@ -25,91 +25,67 @@ void setup()
     // Initialize display
     pinMode(LCD_BACKLIGHT, OUTPUT);
     lcd.begin(16, 2);
-    StatDisplay.init(&lcd, LCD_BACKLIGHT);
+    DisplayManager.init(&lcd, LCD_BACKLIGHT);
 
-    lcd.setCursor(0, 0);
-    lcd.print("DHCP starting...");
+    DisplayManager.showMessage("DHCP starting...");
     Serial.println("DHCP starting...");
 
     // Initialize Ethernet connection
     if (Ethernet.begin(mac) == 0)
     {
         Serial.println("No DHCP lease.");
-        showDhcpError("No DHCP lease.", "Reset to retry.");
+        DisplayManager.showMessage("No DHCP lease.", "Reset to retry.");
         while (true)
         {
             // Block until reset to try again.
         }
     }
 
-    Serial.println("DHCP success");
-    resetLine(0);
-    lcd.print("IP address:");
-    printIPAddress();
-}
+    Serial.println("DHCP initialization success");
+    Serial.println(getIPAddress());
+    DisplayManager.showMessage("IP address:", getIPAddress());
+    delay(2000);
 
-void showDhcpError(String line1, String line2)
-{
-    digitalWrite(LCD_BACKLIGHT, HIGH);
-    lcd.clear();
-    lcd.display();
-    lcd.setCursor(0, 0);
-    lcd.print(line1);
-    Serial.println(line1);
-
-    if (line2.length() > 0)
+    bool runSetup = false;
+    DisplayManager.showMessage("Push SELECT to", "run setup");
+    unsigned long currentMillis = millis();
+    while (millis() - currentMillis < 5000)
     {
-        lcd.setCursor(0, 1);
-        lcd.print(line2);
-        Serial.println(line2);
+        if (getButton() == BUTTON_SELECT)
+        {
+            Serial.println("User pushed SELECT to start setup");
+            runSetup = true;
+            break;
+        }
+    }
+
+    if (!runSetup)
+    {
+        // TODO: Read saved IP address of Marantz receiver.
+        // TODO: If there is no saved IP address, initiate setup.
+    }
+
+    if (runSetup)
+    {
+        Serial.println("Initiating setup");
+        DisplayManager.showMessage("Running Setup");
+
+        delay(5000);
+    }
+    else
+    {
+        Serial.println("Skipping setup");
     }
 }
 
 void loop()
 {
-    // Ethernet.maintain() ensures the DHCP lease is
-    // renewed as needed. It only does work if it has
-    // to so call it on every loop.
-    switch (Ethernet.maintain())
-    {
-    case 1:
-        // Failed to renew DHCP lease
-        showDhcpError("DHCP renew fail", "");
-        break;
-
-    case 2:
-        //renewed success
-        Serial.println("Renew success");
-        resetLine(0);
-        lcd.print("Renew success");
-        printIPAddress();
-        break;
-
-    case 3:
-        // Failed to rebind to DHCP
-        Serial.println("Rebind fail");
-        showDhcpError("DHCP rebind fail", "");
-        break;
-
-    case 4:
-        // Rebind success
-        Serial.println("Rebind success");
-        printIPAddress();
-        break;
-
-    default:
-        //nothing happened
-        break;
-    }
-
-
-    /*
     receiverOn = getReceiverPower();
     if (receiverOn)
     {
-        if (!StatDisplay.isEnabled())
+        if (!DisplayManager.isDisplayEnabled())
         {
-            StatDisplay.enable();
+            DisplayManager.enableDisplay();
         }
 
         // The receiver is on, so get the updated
@@ -118,7 +94,7 @@ void loop()
         String vol = getVolume();
         String surround = getSurround();
 
-        StatDisplay.show(vol, input, surround);
+        DisplayManager.showStats(vol, input, surround);
 
         // While the receiver is on, refresh
         // twice a second.
@@ -126,9 +102,9 @@ void loop()
     }
     else
     {
-        if (StatDisplay.isEnabled())
+        if (DisplayManager.isDisplayEnabled())
         {
-            StatDisplay.disable();
+            DisplayManager.disableDisplay();
         }
 
         // If the receiver is off, only check
@@ -136,14 +112,43 @@ void loop()
         // back on.
         delay(5000);
     }
-    */
+
+    refreshDHCP();
 }
 
-void resetLine(int lineNumber)
+void refreshDHCP()
 {
-    lcd.setCursor(0, lineNumber);
-    lcd.print("                ");
-    lcd.setCursor(0, lineNumber);
+    // Ethernet.maintain() ensures the DHCP lease is
+    // renewed as needed. It only does work if it has
+    // to so call it on every loop.
+    switch (Ethernet.maintain())
+    {
+    case 1:
+        // Failed to renew DHCP lease
+        Serial.println("DHCP renew fail");
+        break;
+
+    case 2:
+        // DHCP lease renewed
+        Serial.println("DHCP renew success");
+        Serial.println(getIPAddress());
+        break;
+
+    case 3:
+        // Failed to rebind to DHCP
+        Serial.println("DHCP rebind fail");
+        break;
+
+    case 4:
+        // DHCP rebind success
+        Serial.println("DHCP rebind success");
+        Serial.println(getIPAddress());
+        break;
+
+    default:
+        //nothing happened
+        break;
+    }
 }
 
 String getIPAddress()
@@ -158,14 +163,6 @@ String getIPAddress()
     }
 
     return address;
-}
-
-void printIPAddress()
-{
-    String address = getIPAddress();
-    Serial.println(address);
-    resetLine(1);
-    lcd.print(address);
 }
 
 int getButton()
