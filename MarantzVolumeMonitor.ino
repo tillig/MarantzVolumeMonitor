@@ -14,6 +14,13 @@ byte mac[] = {
 LiquidCrystal lcd(LCD_RS, LCD_ENABLE, LCD_DB4, LCD_DB5, LCD_DB6, LCD_DB7);
 bool receiverOn;
 
+// For discovery...
+char packetBuffer[UDP_TX_PACKET_MAX_SIZE];
+int discoveryPort = 1900;
+int localPort = 8888;
+IPAddress discoveryAddress(239, 255, 255, 250);
+EthernetUDP Udp;
+
 void setup()
 {
     // Initialize application state
@@ -69,8 +76,7 @@ void setup()
     {
         Serial.println("Initiating setup");
         DisplayManager.showMessage("Running Setup");
-
-        delay(5000);
+        runDiscovery();
     }
     else
     {
@@ -114,6 +120,23 @@ void loop()
     }
 
     refreshDHCP();
+}
+
+void runDiscovery()
+{
+    Udp.begin(localPort);
+    memset(packetBuffer, 0, UDP_TX_PACKET_MAX_SIZE);
+    //"M-SEARCH * HTTP/1.1\r\nContent-Length: 0\r\nST: urn:schemas-upnp-org:device:MediaRenderer:1\r\nMX: 3\r\nMAN: \"ssdp:discover\"\r\nHOST: 239.255.255.250:1900\r\n"
+/*
+M-SEARCH * HTTP/1.1
+Content-Length: 0
+ST: urn:schemas-upnp-org:device:MediaRenderer:1
+MX: 3
+MAN: "ssdp:discover"
+HOST: 239.255.255.250:1900
+*/
+    // TODO: Send UDP search to get UPnP devices.
+    // TODO: Find Marantz receivers.
 }
 
 void refreshDHCP()
