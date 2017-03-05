@@ -15,7 +15,7 @@ LiquidCrystal lcd(LCD_RS, LCD_ENABLE, LCD_DB4, LCD_DB5, LCD_DB6, LCD_DB7);
 bool receiverOn;
 
 // For discovery...
-char packetBuffer[UDP_TX_PACKET_MAX_SIZE];
+char packetBuffer[1024];
 int discoveryPort = 1900;
 int localPort = 8888;
 IPAddress discoveryAddress(239, 255, 255, 250);
@@ -49,8 +49,8 @@ void setup()
     }
 
     Serial.println("DHCP initialization success");
-    Serial.println(getIPAddress());
-    DisplayManager.showMessage("IP address:", getIPAddress());
+    Serial.println(getIPAddressString());
+    DisplayManager.showMessage("IP address:", getIPAddressString());
     delay(2000);
 
     bool runSetup = false;
@@ -76,6 +76,7 @@ void setup()
     {
         Serial.println("Initiating setup");
         DisplayManager.showMessage("Running Setup");
+        delay(1000);
         runDiscovery();
     }
     else
@@ -124,9 +125,53 @@ void loop()
 
 void runDiscovery()
 {
-    Udp.begin(localPort);
-    memset(packetBuffer, 0, UDP_TX_PACKET_MAX_SIZE);
-    //"M-SEARCH * HTTP/1.1\r\nContent-Length: 0\r\nST: urn:schemas-upnp-org:device:MediaRenderer:1\r\nMX: 3\r\nMAN: \"ssdp:discover\"\r\nHOST: 239.255.255.250:1900\r\n"
+    // https://tkkrlab.nl/wiki/Arduino_UDP_multicast
+    Serial.println("Sending multicast UPnP search request.");
+    int success = 0;
+    success = Udp.beginMulticast(discoveryAddress, localPort);
+    Serial.print("beginMulticast: ");
+    Serial.println(success);
+    success = Udp.beginPacket(discoveryAddress, discoveryPort);
+    Serial.print("beginPacket: ");
+    Serial.println(success);
+    success = Udp.write("M-SEARCH * HTTP/1.1\r\nContent-Length: 0\r\nST: urn:schemas-upnp-org:device:MediaRenderer:1\r\nMX: 3\r\nMAN: \"ssdp:discover\"\r\nHOST: 239.255.255.250:1900\r\n");
+    Serial.print("write: ");
+    Serial.println(success);
+    success = Udp.endPacket();
+    Serial.print("endPacket: ");
+    Serial.println(success);
+    Serial.println("Search sent. Waiting for response.");
+    unsigned long currentMillis = millis();
+    int packetSize;
+    while (millis() - currentMillis < 3000)
+    {
+        packetSize = 0;
+        packetSize = Udp.parsePacket();
+        //int n = 0;
+        if (packetSize)
+        {
+            Serial.print("Received packet of size ");
+            Serial.println(packetSize);
+            Serial.print("From ");
+            Serial.print(getIPAddressString(Udp.remoteIP()));
+            Serial.print(", port ");
+            Serial.println(Udp.remotePort());
+            /*
+
+            // read the packet into packetBufffer
+            n = Udp.read(packetBuffer, 1024);
+            packetBuffer[n] = 0;
+
+            Serial.println("Contents:");
+            Serial.println(packetBuffer);
+            */
+        }
+    }
+
+    Serial.println("Done processing responses.");
+
+    //memset(packetBuffer, 0, 1024);
+
 /*
 M-SEARCH * HTTP/1.1
 Content-Length: 0
@@ -154,7 +199,7 @@ void refreshDHCP()
     case 2:
         // DHCP lease renewed
         Serial.println("DHCP renew success");
-        Serial.println(getIPAddress());
+        Serial.println(getIPAddressString());
         break;
 
     case 3:
@@ -165,7 +210,7 @@ void refreshDHCP()
     case 4:
         // DHCP rebind success
         Serial.println("DHCP rebind success");
-        Serial.println(getIPAddress());
+        Serial.println(getIPAddressString());
         break;
 
     default:
@@ -174,11 +219,16 @@ void refreshDHCP()
     }
 }
 
-String getIPAddress()
+String getIPAddressString()
+{
+    return getIPAddressString(Ethernet.localIP());
+}
+
+String getIPAddressString(IPAddress ip)
 {
     String address = "";
     for (byte thisByte = 0; thisByte < 4; thisByte++) {
-        address.concat(String(Ethernet.localIP()[thisByte], DEC));
+        address.concat(String(ip[thisByte], DEC));
         if (thisByte < 3)
         {
             address.concat(".");
