@@ -80,11 +80,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ButtonManager.h" />
     <ClInclude Include="DFRobotLCDShield.h" />
     <ClInclude Include="DisplayManager.h" />
     <ClInclude Include="__vm\.MarantzVolumeMonitor.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ButtonManager.cpp" />
     <ClCompile Include="DisplayManager.cpp" />
   </ItemGroup>
   <PropertyGroup>

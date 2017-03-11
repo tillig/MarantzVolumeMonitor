@@ -1,5 +1,3 @@
-// DisplayManager.h
-
 #ifndef _DISPLAYMANAGER_h
 #define _DISPLAYMANAGER_h
 

@@ -1,3 +1,4 @@
+#include "ButtonManager.h"
 #include "DFRobotLCDShield.h"
 #include "DisplayManager.h"
 #include <LiquidCrystal.h>
@@ -52,7 +53,7 @@ void setup()
     unsigned long currentMillis = millis();
     while (millis() - currentMillis < 5000)
     {
-        if (getButton() == BUTTON_SELECT)
+        if (ButtonManager.readButton() == BUTTON_SELECT)
         {
             Serial.println("User pushed SELECT to start setup");
             setupShouldRun = true;
@@ -116,17 +117,7 @@ IPAddress readIPAddressFromConsole(IPAddress start)
     while (buttonPressed != BUTTON_SELECT)
     {
         // TODO: Handle button movements and changing the updated address.
-
-        Serial.println("Waiting for button press...");
-        while ((buttonPressed = getButton()) == BUTTON_NONE)
-        {
-            // Wait for button press.
-        }
-
-        while (getButton() != BUTTON_NONE)
-        {
-            // Wait for button release.
-        }
+        buttonPressed = ButtonManager.waitForButtonPress();
 
         switch (buttonPressed)
         {
@@ -350,41 +341,6 @@ String getPaddedIPAddressString(IPAddress ip)
     }
 
     return address;
-}
-
-int getButton()
-{
-    int adc_key_in = analogRead(0);
-    if (adc_key_in > 1000) {
-        return BUTTON_NONE;
-    }
-
-    if (adc_key_in < BUTTON_RIGHT_TOLERANCE)
-    {
-        return BUTTON_RIGHT;
-    }
-
-    if (adc_key_in < BUTTON_UP_TOLERANCE)
-    {
-        return BUTTON_UP;
-    }
-
-    if (adc_key_in < BUTTON_DOWN_TOLERANCE)
-    {
-        return BUTTON_DOWN;
-    }
-
-    if (adc_key_in < BUTTON_LEFT_TOLERANCE)
-    {
-        return BUTTON_LEFT;
-    }
-
-    if (adc_key_in < BUTTON_SELECT_TOLERANCE)
-    {
-        return BUTTON_SELECT;
-    }
-
-    return BUTTON_NONE;
 }
 
 // STUBS!
