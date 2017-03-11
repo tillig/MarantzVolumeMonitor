@@ -36,3 +36,15 @@ String IPAddressConverterClass::toPaddedString(IPAddress ip)
 
     return address;
 }
+
+String IPAddressConverterClass::segmentToPaddedString(IPAddress ip, int segmentIndex)
+{
+    String segment = String(ip[segmentIndex], DEC);
+    String prepend = "";
+    for (byte toPrepend = 3; toPrepend > segment.length(); toPrepend--)
+    {
+        prepend.concat("0");
+    }
+
+    return prepend + segment;
+}

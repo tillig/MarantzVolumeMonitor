@@ -14,6 +14,7 @@ class IPAddressConverterClass
  public:
      String toString(IPAddress ip);
      String toPaddedString(IPAddress ip);
+     String segmentToPaddedString(IPAddress ip, int segmentIndex);
 };
 
 extern IPAddressConverterClass IPAddressConverter;

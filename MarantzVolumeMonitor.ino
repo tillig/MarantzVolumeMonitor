@@ -124,10 +124,11 @@ IPAddress readIPAddressFromConsole(IPAddress start)
         {
         case BUTTON_UP:
             Serial.println("Increasing value at cursor.");
-            incrementSegment(cursorPosition, address);
+            address = incrementSegment(cursorPosition, address);
             break;
         case BUTTON_DOWN:
             Serial.println("Decreasing value at cursor.");
+            address = decrementSegment(cursorPosition, address);
             break;
         case BUTTON_LEFT:
             if(cursorPosition > 1)
@@ -175,7 +176,7 @@ int getAddressIndexToUpdate(int cursorPosition)
     return cursorPosition / 4;
 }
 
-int getSegmentQuantityToUpdate(int cursorPosition)
+int getAmountToChangeSegment(int cursorPosition)
 {
     if (cursorPosition < 1)
     {
@@ -206,21 +207,61 @@ int getSegmentQuantityToUpdate(int cursorPosition)
     return quantity;
 }
 
-void incrementSegment(int cursorPosition, IPAddress address)
+IPAddress incrementSegment(int cursorPosition, IPAddress address)
 {
     if (cursorPosition < 1)
     {
-        return;
+        return address;
     }
 
-    int amount = getSegmentQuantityToUpdate(cursorPosition);
-    int index = getAddressIndexToUpdate(cursorPosition);
+    int amount = getAmountToChangeSegment(cursorPosition);
+    return changeSegment(cursorPosition, address, amount);
+}
 
-    int value = address[index];
-    Serial.print("Incrementing ");
-    Serial.print(value);
+IPAddress decrementSegment(int cursorPosition, IPAddress address)
+{
+    if (cursorPosition < 1)
+    {
+        return address;
+    }
+
+    int amount = getAmountToChangeSegment(cursorPosition);
+    return changeSegment(cursorPosition, address, -amount);
+}
+
+IPAddress changeSegment(int cursorPosition, IPAddress address, int quantity)
+{
+    if (cursorPosition < 1)
+    {
+        return address;
+    }
+
+    int ipindex = getAddressIndexToUpdate(cursorPosition);
+    int currentValue = address[ipindex];
+    Serial.print("Changing value ");
+    Serial.print(currentValue);
+    Serial.print(" at address index ");
+    Serial.print(ipindex);
     Serial.print(" by ");
-    Serial.println(amount);
+    Serial.println(quantity);
+
+    if (currentValue + quantity <= 255 && currentValue + quantity >= 0)
+    {
+        currentValue = currentValue + quantity;
+    }
+
+    address[ipindex] = currentValue;
+
+    Serial.print("Updated address is ");
+    Serial.println(IPAddressConverter.toString(address));
+    lcd.noCursor();
+    lcd.setCursor(0, 1);
+    lcd.print(" ");
+    lcd.print(IPAddressConverter.toPaddedString(address));
+    lcd.setCursor(cursorPosition, 1);
+    lcd.cursor();
+
+    return address;
 }
 
 void moveUnderscore(int column)
