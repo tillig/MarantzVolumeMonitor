@@ -30,12 +30,18 @@
     <ClInclude Include="ButtonManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IPAddressConverter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DisplayManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ButtonManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IPAddressConverter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

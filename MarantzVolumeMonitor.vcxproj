@@ -83,11 +83,13 @@
     <ClInclude Include="ButtonManager.h" />
     <ClInclude Include="DFRobotLCDShield.h" />
     <ClInclude Include="DisplayManager.h" />
+    <ClInclude Include="IPAddressConverter.h" />
     <ClInclude Include="__vm\.MarantzVolumeMonitor.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ButtonManager.cpp" />
     <ClCompile Include="DisplayManager.cpp" />
+    <ClCompile Include="IPAddressConverter.cpp" />
   </ItemGroup>
   <PropertyGroup>
     <DebuggerFlavor>VisualMicroDebugger</DebuggerFlavor>

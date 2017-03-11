@@ -1,3 +1,4 @@
+#include "IPAddressConverter.h"
 #include "ButtonManager.h"
 #include "DFRobotLCDShield.h"
 #include "DisplayManager.h"
@@ -44,8 +45,8 @@ void setup()
     }
 
     Serial.println("DHCP initialization success");
-    Serial.println(getIPAddressString());
-    DisplayManager.showMessage("IP address:", getIPAddressString());
+    Serial.println(IPAddressConverter.toString(Ethernet.localIP()));
+    DisplayManager.showMessage("IP address:", IPAddressConverter.toString(Ethernet.localIP()));
     delay(2000);
 
     bool setupShouldRun = false;
@@ -80,7 +81,7 @@ void setup()
     }
 
     Serial.print("Receiver IP address: ");
-    Serial.println(getIPAddressString(receiverAddress));
+    Serial.println(IPAddressConverter.toString(receiverAddress));
 }
 
 IPAddress configureReceiver(IPAddress start)
@@ -88,7 +89,7 @@ IPAddress configureReceiver(IPAddress start)
     DisplayManager.showMessage("Receiver IP:");
     IPAddress address = readIPAddressFromConsole(start);
     Serial.print("Updating receiver IP address to: ");
-    Serial.println(getIPAddressString(address));
+    Serial.println(IPAddressConverter.toString(address));
     // TODO: Store IP address in memory
     return address;
 }
@@ -96,12 +97,12 @@ IPAddress configureReceiver(IPAddress start)
 IPAddress readIPAddressFromConsole(IPAddress start)
 {
     Serial.print("Reading IP address from console starting at: ");
-    Serial.println(getIPAddressString(start));
+    Serial.println(IPAddressConverter.toString(start));
     lcd.setCursor(0, 1);
     lcd.print(" ");
 
     IPAddress address = start;
-    lcd.print(getPaddedIPAddressString(address));
+    lcd.print(IPAddressConverter.toPaddedString(address));
 
     byte cursorPosition = 1;
     lcd.setCursor(cursorPosition, 1);
@@ -283,7 +284,7 @@ void refreshDHCP()
     case 2:
         // DHCP lease renewed
         Serial.println("DHCP renew success");
-        Serial.println(getIPAddressString());
+        Serial.println(IPAddressConverter.toString(Ethernet.localIP()));
         break;
 
     case 3:
@@ -294,53 +295,13 @@ void refreshDHCP()
     case 4:
         // DHCP rebind success
         Serial.println("DHCP rebind success");
-        Serial.println(getIPAddressString());
+        Serial.println(IPAddressConverter.toString(Ethernet.localIP()));
         break;
 
     default:
         //nothing happened
         break;
     }
-}
-
-String getIPAddressString()
-{
-    return getIPAddressString(Ethernet.localIP());
-}
-
-String getIPAddressString(IPAddress ip)
-{
-    String address = "";
-    for (byte thisByte = 0; thisByte < 4; thisByte++) {
-        address.concat(String(ip[thisByte], DEC));
-        if (thisByte < 3)
-        {
-            address.concat(".");
-        }
-    }
-
-    return address;
-}
-
-String getPaddedIPAddressString(IPAddress ip)
-{
-    String address = "";
-    for (byte thisByte = 0; thisByte < 4; thisByte++) {
-        String segment = String(ip[thisByte], DEC);
-        String prepend = "";
-        for (byte toPrepend = 3; toPrepend > segment.length(); toPrepend--)
-        {
-            prepend.concat("0");
-        }
-        address.concat(prepend);
-        address.concat(segment);
-        if (thisByte < 3)
-        {
-            address.concat(".");
-        }
-    }
-
-    return address;
 }
 
 // STUBS!

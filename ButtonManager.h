@@ -1,5 +1,3 @@
-// ButtonManager.h
-
 #ifndef _BUTTONMANAGER_h
 #define _BUTTONMANAGER_h
 
