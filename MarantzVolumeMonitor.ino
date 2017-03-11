@@ -87,6 +87,8 @@ void setup()
 
     Serial.print("Receiver IP address: ");
     Serial.println(IPAddressConverter.toString(receiverAddress));
+    DisplayManager.showMessage("Receiver IP:", IPAddressConverter.toString(receiverAddress));
+    delay(2000);
 }
 
 
