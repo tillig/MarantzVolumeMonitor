@@ -7,6 +7,8 @@
     #include "WProgram.h"
 #endif
 
+#include "DFRobotLCDShield.h"
+
 class ButtonManagerClass
 {
  public:

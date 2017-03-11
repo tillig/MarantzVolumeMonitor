@@ -9,6 +9,11 @@ void DisplayManagerClass::init(LiquidCrystal* lcd, uint8_t backlight)
     enableDisplay();
 }
 
+LiquidCrystal* DisplayManagerClass::lcd()
+{
+    return this->_lcd;
+}
+
 bool DisplayManagerClass::isDisplayEnabled()
 {
     return _enabled;
@@ -28,6 +33,13 @@ void DisplayManagerClass::disableDisplay()
     digitalWrite(_backlight, LOW);
     _lcd->clear();
     _lcd->noDisplay();
+}
+
+void DisplayManagerClass::moveCursor(uint8_t column, uint8_t row)
+{
+    _lcd->noCursor();
+    _lcd->setCursor(column, row);
+    _lcd->cursor();
 }
 
 void DisplayManagerClass::resetLine(uint8_t line)

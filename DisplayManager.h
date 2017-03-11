@@ -16,10 +16,12 @@ public:
     bool isDisplayEnabled();
     void enableDisplay();
     void disableDisplay();
+    void moveCursor(uint8_t column, uint8_t row);
     void resetLine(uint8_t line);
     void showStats(String volume, String input, String surround);
     void showMessage(String line);
     void showMessage(String line1, String line2);
+    LiquidCrystal* lcd();
 private:
     LiquidCrystal* _lcd;
     uint8_t _backlight;

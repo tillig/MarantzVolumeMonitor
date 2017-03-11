@@ -33,6 +33,9 @@
     <ClInclude Include="IPAddressConverter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ConfigurationInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DisplayManager.cpp">
@@ -42,6 +45,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="IPAddressConverter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigurationInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

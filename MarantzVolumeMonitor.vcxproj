@@ -81,6 +81,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ButtonManager.h" />
+    <ClInclude Include="ConfigurationInterface.h" />
     <ClInclude Include="DFRobotLCDShield.h" />
     <ClInclude Include="DisplayManager.h" />
     <ClInclude Include="IPAddressConverter.h" />
@@ -88,6 +89,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ButtonManager.cpp" />
+    <ClCompile Include="ConfigurationInterface.cpp" />
     <ClCompile Include="DisplayManager.cpp" />
     <ClCompile Include="IPAddressConverter.cpp" />
   </ItemGroup>

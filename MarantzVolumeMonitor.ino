@@ -1,3 +1,4 @@
+#include "ConfigurationInterface.h"
 #include "IPAddressConverter.h"
 #include "ButtonManager.h"
 #include "DFRobotLCDShield.h"
@@ -73,7 +74,11 @@ void setup()
         Serial.println("Initiating setup");
         DisplayManager.showMessage("Running Setup");
         delay(1000);
-        receiverAddress = configureReceiver(receiverAddress);
+        ConfigurationInterface.init(&DisplayManager);
+        receiverAddress = ConfigurationInterface.readConfigurationFromUser(receiverAddress);
+        Serial.print("Updating receiver IP address to: ");
+        Serial.println(IPAddressConverter.toString(receiverAddress));
+        // TODO: Store IP address in memory
     }
     else
     {
@@ -82,193 +87,6 @@ void setup()
 
     Serial.print("Receiver IP address: ");
     Serial.println(IPAddressConverter.toString(receiverAddress));
-}
-
-IPAddress configureReceiver(IPAddress start)
-{
-    DisplayManager.showMessage("Receiver IP:");
-    IPAddress address = readIPAddressFromConsole(start);
-    Serial.print("Updating receiver IP address to: ");
-    Serial.println(IPAddressConverter.toString(address));
-    // TODO: Store IP address in memory
-    return address;
-}
-
-IPAddress readIPAddressFromConsole(IPAddress start)
-{
-    Serial.print("Reading IP address from console starting at: ");
-    Serial.println(IPAddressConverter.toString(start));
-    lcd.setCursor(0, 1);
-    lcd.print(" ");
-
-    IPAddress address = start;
-    lcd.print(IPAddressConverter.toPaddedString(address));
-
-    byte cursorPosition = 1;
-    lcd.setCursor(cursorPosition, 1);
-    lcd.cursor();
-
-    // Setup occurs on the bottom line of the display and looks like
-    // " 000.000.000.000"
-    //  0123456789012345 (cursor positioning)
-    // We skip the leading space, then the user can move the cursor
-    // to increment/decrement individual positions. Hitting select
-    // ends the process and returns the entered address.
-    int buttonPressed = BUTTON_NONE;
-    while (buttonPressed != BUTTON_SELECT)
-    {
-        // TODO: Handle button movements and changing the updated address.
-        buttonPressed = ButtonManager.waitForButtonPress();
-
-        switch (buttonPressed)
-        {
-        case BUTTON_UP:
-            Serial.println("Increasing value at cursor.");
-            address = incrementSegment(cursorPosition, address);
-            break;
-        case BUTTON_DOWN:
-            Serial.println("Decreasing value at cursor.");
-            address = decrementSegment(cursorPosition, address);
-            break;
-        case BUTTON_LEFT:
-            if(cursorPosition > 1)
-            {
-                Serial.println("Moving left.");
-                cursorPosition--;
-                if (cursorPosition % 4 == 0)
-                {
-                    // Skip the dots.
-                    cursorPosition--;
-                }
-
-                moveUnderscore(cursorPosition);
-            }
-            break;
-        case BUTTON_RIGHT:
-            if (cursorPosition < 15)
-            {
-                Serial.println("Moving right.");
-                cursorPosition++;
-                if (cursorPosition % 4 == 0)
-                {
-                    // Skip the dots.
-                    cursorPosition++;
-                }
-
-                moveUnderscore(cursorPosition);
-            }
-            break;
-        default:
-            break;
-        }
-
-        Serial.print("Cursor position: ");
-        Serial.println(cursorPosition);
-    };
-
-    lcd.noCursor();
-
-    return address;
-}
-
-int getAddressIndexToUpdate(int cursorPosition)
-{
-    return cursorPosition / 4;
-}
-
-int getAmountToChangeSegment(int cursorPosition)
-{
-    if (cursorPosition < 1)
-    {
-        return;
-    }
-
-    // Figure out how much to add based on
-    // cursor position
-    // " 000.000.000.000"
-    //  0123456789012345
-    int quantity = 0;
-    switch (cursorPosition % 4)
-    {
-    case 1:
-        quantity = 100;
-        break;
-    case 2:
-        quantity = 10;
-        break;
-    case 3:
-        quantity = 1;
-        break;
-    default:
-        // Skip the dots.
-        break;
-    }
-
-    return quantity;
-}
-
-IPAddress incrementSegment(int cursorPosition, IPAddress address)
-{
-    if (cursorPosition < 1)
-    {
-        return address;
-    }
-
-    int amount = getAmountToChangeSegment(cursorPosition);
-    return changeSegment(cursorPosition, address, amount);
-}
-
-IPAddress decrementSegment(int cursorPosition, IPAddress address)
-{
-    if (cursorPosition < 1)
-    {
-        return address;
-    }
-
-    int amount = getAmountToChangeSegment(cursorPosition);
-    return changeSegment(cursorPosition, address, -amount);
-}
-
-IPAddress changeSegment(int cursorPosition, IPAddress address, int quantity)
-{
-    if (cursorPosition < 1)
-    {
-        return address;
-    }
-
-    int ipindex = getAddressIndexToUpdate(cursorPosition);
-    int currentValue = address[ipindex];
-    Serial.print("Changing value ");
-    Serial.print(currentValue);
-    Serial.print(" at address index ");
-    Serial.print(ipindex);
-    Serial.print(" by ");
-    Serial.println(quantity);
-
-    if (currentValue + quantity <= 255 && currentValue + quantity >= 0)
-    {
-        currentValue = currentValue + quantity;
-    }
-
-    address[ipindex] = currentValue;
-
-    Serial.print("Updated address is ");
-    Serial.println(IPAddressConverter.toString(address));
-    lcd.noCursor();
-    lcd.setCursor(0, 1);
-    lcd.print(" ");
-    lcd.print(IPAddressConverter.toPaddedString(address));
-    lcd.setCursor(cursorPosition, 1);
-    lcd.cursor();
-
-    return address;
-}
-
-void moveUnderscore(int column)
-{
-    lcd.noCursor();
-    lcd.setCursor(column, 1);
-    lcd.cursor();
 }
 
 
