@@ -11,15 +11,9 @@
 byte mac[] = {
     0x00, 0xAB, 0xBA, 0xC1, 0xDD, 0x03
 };
+IPAddress receiverAddress;
 LiquidCrystal lcd(LCD_RS, LCD_ENABLE, LCD_DB4, LCD_DB5, LCD_DB6, LCD_DB7);
 bool receiverOn;
-
-// For discovery...
-char packetBuffer[1024];
-int discoveryPort = 1900;
-int localPort = 8888;
-IPAddress discoveryAddress(239, 255, 255, 250);
-EthernetUDP Udp;
 
 void setup()
 {
@@ -53,7 +47,7 @@ void setup()
     DisplayManager.showMessage("IP address:", getIPAddressString());
     delay(2000);
 
-    bool runSetup = false;
+    bool setupShouldRun = false;
     DisplayManager.showMessage("Push SELECT to", "run setup");
     unsigned long currentMillis = millis();
     while (millis() - currentMillis < 5000)
@@ -61,29 +55,132 @@ void setup()
         if (getButton() == BUTTON_SELECT)
         {
             Serial.println("User pushed SELECT to start setup");
-            runSetup = true;
+            setupShouldRun = true;
             break;
         }
     }
 
-    if (!runSetup)
+    if (!setupShouldRun)
     {
-        // TODO: Read saved IP address of Marantz receiver.
+        // TODO: Read saved IP address of Marantz receiver into receiverAddress
         // TODO: If there is no saved IP address, initiate setup.
     }
 
-    if (runSetup)
+    if (setupShouldRun)
     {
         Serial.println("Initiating setup");
         DisplayManager.showMessage("Running Setup");
         delay(1000);
-        runDiscovery();
+        receiverAddress = configureReceiver(receiverAddress);
     }
     else
     {
         Serial.println("Skipping setup");
     }
+
+    Serial.print("Receiver IP address: ");
+    Serial.println(getIPAddressString(receiverAddress));
 }
+
+IPAddress configureReceiver(IPAddress start)
+{
+    DisplayManager.showMessage("Receiver IP:");
+    IPAddress address = readIPAddressFromConsole(start);
+    Serial.print("Updating receiver IP address to: ");
+    Serial.println(getIPAddressString(address));
+    // TODO: Store IP address in memory
+    return address;
+}
+
+IPAddress readIPAddressFromConsole(IPAddress start)
+{
+    Serial.print("Reading IP address from console starting at: ");
+    Serial.println(getIPAddressString(start));
+    lcd.setCursor(0, 1);
+    lcd.print(" ");
+
+    IPAddress address = start;
+    lcd.print(getPaddedIPAddressString(address));
+
+    byte cursorPosition = 1;
+    lcd.setCursor(cursorPosition, 1);
+    lcd.cursor();
+
+    // Setup occurs on the bottom line of the display and looks like
+    // " 000.000.000.000"
+    //  0123456789012345 (cursor positioning)
+    // We skip the leading space, then the user can move the cursor
+    // to increment/decrement individual positions. Hitting select
+    // ends the process and returns the entered address.
+    int buttonPressed = BUTTON_NONE;
+    while (buttonPressed != BUTTON_SELECT)
+    {
+        // TODO: Handle button movements and changing the updated address.
+
+        Serial.println("Waiting for button press...");
+        while ((buttonPressed = getButton()) == BUTTON_NONE)
+        {
+            // Wait for button press.
+        }
+
+        while (getButton() != BUTTON_NONE)
+        {
+            // Wait for button release.
+        }
+
+        switch (buttonPressed)
+        {
+        case BUTTON_UP:
+            Serial.println("Increasing value at cursor.");
+            break;
+        case BUTTON_DOWN:
+            Serial.println("Decreasing value at cursor.");
+            break;
+        case BUTTON_LEFT:
+            if(cursorPosition > 1)
+            {
+                Serial.println("Moving left.");
+                cursorPosition--;
+                if (cursorPosition == 4 || cursorPosition == 8 || cursorPosition == 12)
+                {
+                    // Skip the dots.
+                    cursorPosition--;
+                }
+
+                lcd.noCursor();
+                lcd.setCursor(cursorPosition, 1);
+                lcd.cursor();
+            }
+            break;
+        case BUTTON_RIGHT:
+            if (cursorPosition < 15)
+            {
+                Serial.println("Moving right.");
+                cursorPosition++;
+                if (cursorPosition == 4 || cursorPosition == 8 || cursorPosition == 12)
+                {
+                    // Skip the dots.
+                    cursorPosition++;
+                }
+
+                lcd.noCursor();
+                lcd.setCursor(cursorPosition, 1);
+                lcd.cursor();
+            }
+            break;
+        default:
+            break;
+        }
+
+        Serial.print("Cursor position: ");
+        Serial.println(cursorPosition);
+    };
+
+    lcd.noCursor();
+
+    return address;
+}
+
 
 void loop()
 {
@@ -121,67 +218,6 @@ void loop()
     }
 
     refreshDHCP();
-}
-
-void runDiscovery()
-{
-    // https://tkkrlab.nl/wiki/Arduino_UDP_multicast
-    Serial.println("Sending multicast UPnP search request.");
-    int success = 0;
-    success = Udp.beginMulticast(discoveryAddress, localPort);
-    Serial.print("beginMulticast: ");
-    Serial.println(success);
-    success = Udp.beginPacket(discoveryAddress, discoveryPort);
-    Serial.print("beginPacket: ");
-    Serial.println(success);
-    success = Udp.write("M-SEARCH * HTTP/1.1\r\nContent-Length: 0\r\nST: urn:schemas-upnp-org:device:MediaRenderer:1\r\nMX: 3\r\nMAN: \"ssdp:discover\"\r\nHOST: 239.255.255.250:1900\r\n");
-    Serial.print("write: ");
-    Serial.println(success);
-    success = Udp.endPacket();
-    Serial.print("endPacket: ");
-    Serial.println(success);
-    Serial.println("Search sent. Waiting for response.");
-    unsigned long currentMillis = millis();
-    int packetSize;
-    while (millis() - currentMillis < 3000)
-    {
-        packetSize = 0;
-        packetSize = Udp.parsePacket();
-        //int n = 0;
-        if (packetSize)
-        {
-            Serial.print("Received packet of size ");
-            Serial.println(packetSize);
-            Serial.print("From ");
-            Serial.print(getIPAddressString(Udp.remoteIP()));
-            Serial.print(", port ");
-            Serial.println(Udp.remotePort());
-            /*
-
-            // read the packet into packetBufffer
-            n = Udp.read(packetBuffer, 1024);
-            packetBuffer[n] = 0;
-
-            Serial.println("Contents:");
-            Serial.println(packetBuffer);
-            */
-        }
-    }
-
-    Serial.println("Done processing responses.");
-
-    //memset(packetBuffer, 0, 1024);
-
-/*
-M-SEARCH * HTTP/1.1
-Content-Length: 0
-ST: urn:schemas-upnp-org:device:MediaRenderer:1
-MX: 3
-MAN: "ssdp:discover"
-HOST: 239.255.255.250:1900
-*/
-    // TODO: Send UDP search to get UPnP devices.
-    // TODO: Find Marantz receivers.
 }
 
 void refreshDHCP()
@@ -229,6 +265,27 @@ String getIPAddressString(IPAddress ip)
     String address = "";
     for (byte thisByte = 0; thisByte < 4; thisByte++) {
         address.concat(String(ip[thisByte], DEC));
+        if (thisByte < 3)
+        {
+            address.concat(".");
+        }
+    }
+
+    return address;
+}
+
+String getPaddedIPAddressString(IPAddress ip)
+{
+    String address = "";
+    for (byte thisByte = 0; thisByte < 4; thisByte++) {
+        String segment = String(ip[thisByte], DEC);
+        String prepend = "";
+        for (byte toPrepend = 3; toPrepend > segment.length(); toPrepend--)
+        {
+            prepend.concat("0");
+        }
+        address.concat(prepend);
+        address.concat(segment);
         if (thisByte < 3)
         {
             address.concat(".");
