@@ -132,6 +132,7 @@ IPAddress readIPAddressFromConsole(IPAddress start)
         {
         case BUTTON_UP:
             Serial.println("Increasing value at cursor.");
+            incrementSegment(cursorPosition, address);
             break;
         case BUTTON_DOWN:
             Serial.println("Decreasing value at cursor.");
@@ -141,15 +142,13 @@ IPAddress readIPAddressFromConsole(IPAddress start)
             {
                 Serial.println("Moving left.");
                 cursorPosition--;
-                if (cursorPosition == 4 || cursorPosition == 8 || cursorPosition == 12)
+                if (cursorPosition % 4 == 0)
                 {
                     // Skip the dots.
                     cursorPosition--;
                 }
 
-                lcd.noCursor();
-                lcd.setCursor(cursorPosition, 1);
-                lcd.cursor();
+                moveUnderscore(cursorPosition);
             }
             break;
         case BUTTON_RIGHT:
@@ -157,15 +156,13 @@ IPAddress readIPAddressFromConsole(IPAddress start)
             {
                 Serial.println("Moving right.");
                 cursorPosition++;
-                if (cursorPosition == 4 || cursorPosition == 8 || cursorPosition == 12)
+                if (cursorPosition % 4 == 0)
                 {
                     // Skip the dots.
                     cursorPosition++;
                 }
 
-                lcd.noCursor();
-                lcd.setCursor(cursorPosition, 1);
-                lcd.cursor();
+                moveUnderscore(cursorPosition);
             }
             break;
         default:
@@ -179,6 +176,66 @@ IPAddress readIPAddressFromConsole(IPAddress start)
     lcd.noCursor();
 
     return address;
+}
+
+int getAddressIndexToUpdate(int cursorPosition)
+{
+    return cursorPosition / 4;
+}
+
+int getSegmentQuantityToUpdate(int cursorPosition)
+{
+    if (cursorPosition < 1)
+    {
+        return;
+    }
+
+    // Figure out how much to add based on
+    // cursor position
+    // " 000.000.000.000"
+    //  0123456789012345
+    int quantity = 0;
+    switch (cursorPosition % 4)
+    {
+    case 1:
+        quantity = 100;
+        break;
+    case 2:
+        quantity = 10;
+        break;
+    case 3:
+        quantity = 1;
+        break;
+    default:
+        // Skip the dots.
+        break;
+    }
+
+    return quantity;
+}
+
+void incrementSegment(int cursorPosition, IPAddress address)
+{
+    if (cursorPosition < 1)
+    {
+        return;
+    }
+
+    int amount = getSegmentQuantityToUpdate(cursorPosition);
+    int index = getAddressIndexToUpdate(cursorPosition);
+
+    int value = address[index];
+    Serial.print("Incrementing ");
+    Serial.print(value);
+    Serial.print(" by ");
+    Serial.println(amount);
+}
+
+void moveUnderscore(int column)
+{
+    lcd.noCursor();
+    lcd.setCursor(column, 1);
+    lcd.cursor();
 }
 
 
