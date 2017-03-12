@@ -7,11 +7,16 @@
     #include "WProgram.h"
 #endif
 
+const String MARANTZ_STATUS_PATH = "/goform/formMainZone_MainZoneXml.xml";
+
 #include <Ethernet.h>
+#include "MicroXPath.h"
+#include "IPAddressConverter.h"
 
 class MarantzClientClass
 {
  public:
+    MarantzClientClass();
     void init(IPAddress address);
     void updateStatistics();
     bool isReceiverOn();
@@ -20,6 +25,8 @@ class MarantzClientClass
     String getReceiverVolume();
  private:
     IPAddress _address;
+    EthernetClient _client;
+    MicroXPath _xPath;
     bool _receiverOn;
     String _receiverInput;
     String _receiverChannels;

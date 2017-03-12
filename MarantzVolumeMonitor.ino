@@ -19,6 +19,7 @@ byte mac[] = {
 };
 IPAddress receiverAddress;
 LiquidCrystal lcd(LCD_RS, LCD_ENABLE, LCD_DB4, LCD_DB5, LCD_DB6, LCD_DB7);
+EthernetClient client;
 bool receiverOn;
 
 void setup()

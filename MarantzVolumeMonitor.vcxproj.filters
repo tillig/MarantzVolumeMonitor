@@ -45,6 +45,9 @@
     <ClInclude Include="MarantzClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MicroXPath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DisplayManager.cpp">
@@ -63,6 +66,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MarantzClient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MicroXPath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
