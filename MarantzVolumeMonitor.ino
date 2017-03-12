@@ -1,9 +1,11 @@
+#include "MarantzClient.h"
 #include "ConfigurationManager.h"
 #include "ConfigurationInterface.h"
 #include "IPAddressConverter.h"
 #include "ButtonManager.h"
 #include "DFRobotLCDShield.h"
 #include "DisplayManager.h"
+#include "MarantzClient.h"
 #include <LiquidCrystal.h>
 #include <Dhcp.h>
 #include <Dns.h>
@@ -87,6 +89,7 @@ void setup()
         Serial.println("Skipping setup");
     }
 
+    MarantzClient.init(receiverAddress);
     Serial.print("Receiver IP address: ");
     Serial.println(IPAddressConverter.toString(receiverAddress));
     DisplayManager.showMessage("Receiver IP:", IPAddressConverter.toString(receiverAddress));
@@ -95,7 +98,8 @@ void setup()
 
 void loop()
 {
-    receiverOn = getReceiverPower();
+    MarantzClient.updateStatistics();
+    receiverOn = MarantzClient.isReceiverOn();
     if (receiverOn)
     {
         if (!DisplayManager.isDisplayEnabled())
@@ -105,11 +109,7 @@ void loop()
 
         // The receiver is on, so get the updated
         // values to display and refresh.
-        String input = getInput();
-        String vol = getVolume();
-        String surround = getSurround();
-
-        DisplayManager.showStats(vol, input, surround);
+        DisplayManager.showStats(MarantzClient.getReceiverVolume(), MarantzClient.getReceiverInput(), MarantzClient.getReceiverChannels());
 
         // While the receiver is on, refresh
         // twice a second.
@@ -164,44 +164,4 @@ void refreshDHCP()
         //nothing happened
         break;
     }
-}
-
-// STUBS!
-// Getting the input and volume will probably be
-// a single HTTP call to the receiver API.
-
-bool getReceiverPower()
-{
-    return random(1, 100) > 20;
-}
-
-String getInput()
-{
-    if (random(1, 100) % 2 == 0)
-    {
-        return "Roku";
-    }
-
-    return "XboxOneSuperLong";
-}
-
-String getSurround()
-{
-    if (random(1, 100) % 2 == 0)
-    {
-        return "Stereo";
-    }
-
-    return "Multi Ch Input 7.1";
-}
-
-String getVolume()
-{
-    if (random(1, 100) % 5 == 0)
-    {
-        return "MUTE";
-    }
-
-    float roundedVol = float(int((random(0, 1000) / 10.0) * 10) / 10.0);
-    return String(roundedVol, 1);
 }
