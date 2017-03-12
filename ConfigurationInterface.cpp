@@ -121,7 +121,7 @@ IPAddress ConfigurationInterfaceClass::runUserInputLoop(IPAddress start)
     // to increment/decrement individual positions. Hitting select
     // ends the process and returns the entered address.
     int buttonPressed = BUTTON_NONE;
-    while (buttonPressed != BUTTON_SELECT)
+    while (buttonPressed != BUTTON_SELECT || address[0] == 0)
     {
         buttonPressed = ButtonManager.waitForButtonPress();
 

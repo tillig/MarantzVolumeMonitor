@@ -52,6 +52,7 @@ void setup()
     delay(2000);
 
     bool setupShouldRun = false;
+    receiverAddress = ConfigurationManager.getConfiguration();
     DisplayManager.showMessage("Push SELECT to", "run setup");
     unsigned long currentMillis = millis();
     while (millis() - currentMillis < 5000)
@@ -64,14 +65,10 @@ void setup()
         }
     }
 
-    if (!setupShouldRun)
+    if (receiverAddress == INADDR_NONE)
     {
-        receiverAddress = ConfigurationManager.getConfiguration();
-        if (receiverAddress == INADDR_NONE)
-        {
-            Serial.println("No configured receiver address found.");
-            setupShouldRun = true;
-        }
+        Serial.println("No configured receiver address found.");
+        setupShouldRun = true;
     }
 
     if (setupShouldRun)
