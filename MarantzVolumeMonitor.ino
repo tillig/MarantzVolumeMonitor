@@ -1,3 +1,4 @@
+#include "ConfigurationManager.h"
 #include "ConfigurationInterface.h"
 #include "IPAddressConverter.h"
 #include "ButtonManager.h"
@@ -65,8 +66,12 @@ void setup()
 
     if (!setupShouldRun)
     {
-        // TODO: Read saved IP address of Marantz receiver into receiverAddress
-        // TODO: If there is no saved IP address, initiate setup.
+        receiverAddress = ConfigurationManager.getConfiguration();
+        if (receiverAddress == INADDR_NONE)
+        {
+            Serial.println("No configured receiver address found.");
+            setupShouldRun = true;
+        }
     }
 
     if (setupShouldRun)
@@ -78,7 +83,7 @@ void setup()
         receiverAddress = ConfigurationInterface.readConfigurationFromUser(receiverAddress);
         Serial.print("Updating receiver IP address to: ");
         Serial.println(IPAddressConverter.toString(receiverAddress));
-        // TODO: Store IP address in memory
+        ConfigurationManager.setConfiguration(receiverAddress);
     }
     else
     {
@@ -90,7 +95,6 @@ void setup()
     DisplayManager.showMessage("Receiver IP:", IPAddressConverter.toString(receiverAddress));
     delay(2000);
 }
-
 
 void loop()
 {
