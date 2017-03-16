@@ -92,7 +92,6 @@
     <ClInclude Include="DisplayManager.h" />
     <ClInclude Include="IPAddressConverter.h" />
     <ClInclude Include="MarantzClient.h" />
-    <ClInclude Include="MicroXPath.h" />
     <ClInclude Include="__vm\.MarantzVolumeMonitor.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
@@ -102,7 +101,6 @@
     <ClCompile Include="DisplayManager.cpp" />
     <ClCompile Include="IPAddressConverter.cpp" />
     <ClCompile Include="MarantzClient.cpp" />
-    <ClCompile Include="MicroXPath.cpp" />
   </ItemGroup>
   <PropertyGroup>
     <DebuggerFlavor>VisualMicroDebugger</DebuggerFlavor>

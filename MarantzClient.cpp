@@ -4,7 +4,6 @@ MarantzClientClass MarantzClient;
 
 MarantzClientClass::MarantzClientClass()
 {
-    _xPath = MicroXPath();
     _client = EthernetClient();
     _client.setTimeout(500);
 }
@@ -38,37 +37,51 @@ void MarantzClientClass::updateStatistics()
             Serial.println(IPAddressConverter.toString(_address));
             _client.stop();
             _client.flush();
+            _receiverOn = false;
             return;
         }
     }
 
-    bool read = false;
-    String response = "";
-    // TODO: client.connected seems to return false too soon. Why is it disconnecting so early?
-    while (_client.available() || _client.connected())
+    if (_client.connected())
     {
-        if (_client.available())
+        char elementName[XML_ELEMENT_NAME_LENGTH + 1];
+        this->readToContentStart();
+
+        while (strcmp("item", elementName) != 0)
         {
-            char c = _client.read();
-            if (!read && c == '<')
+            // Read the opening "item" tag.
+            this->readElement(elementName);
+        }
+
+        bool finished = false;
+        while (!finished && (_client.connected() || _client.available()))
+        {
+            this->readElement(elementName);
+            if (strcmp("ZonePower", elementName) == 0)
             {
-                read = true; //Ready to start reading the part 
+                Serial.println("ZonePower");
             }
-            if (read)
+            else if (strcmp("InputFuncSelect", elementName) == 0)
             {
-                response.concat(c);
+                Serial.println("InputFuncSelect");
+            }
+            if (strcmp("selectSurround", elementName) == 0)
+            {
+                Serial.println("selectSurround");
+            }
+            if (strcmp("MasterVolume", elementName) == 0)
+            {
+                Serial.println("MasterVolume");
+            }
+            if (strcmp("Mute", elementName) == 0)
+            {
+                Serial.println("Mute");
             }
         }
     }
 
-    Serial.print("Client available: ");
-    Serial.println(_client.available());
-    Serial.print("Client connected: ");
-    Serial.println(_client.connected());
-
     _client.stop();
     _client.flush();
-    Serial.println(response);
 
     Serial.println();
     Serial.println("Finished processing XML.");
@@ -102,6 +115,104 @@ void MarantzClientClass::updateStatistics()
     {
         float roundedVol = float(int((random(0, 1000) / 10.0) * 10) / 10.0);
         _receiverVolume = String(roundedVol, 1);
+    }
+}
+
+void MarantzClientClass::readElement(char* name)
+{
+    bool matchedOpenBracket = false;
+    bool readToElementEnd = false;
+    int index = 0;
+
+    while (_client.available() || _client.connected())
+    {
+        if (_client.available())
+        {
+            char c = _client.read();
+            if (c == '<')
+            {
+                // We hit the beginning of a tag
+                // which may be an opener or a closer.
+                matchedOpenBracket = true;
+                memset(name, 0, XML_ELEMENT_NAME_LENGTH + 1);
+                readToElementEnd = false;
+                index = 0;
+                continue;
+            }
+
+            if (!matchedOpenBracket)
+            {
+                // Read until we make it to an open bracket;
+                continue;
+            }
+
+            if (c == '/')
+            {
+                if (index == 0)
+                {
+                    // This is the first character since reading an open
+                    // bracket so this is a closing tag:
+                    // </SomeTag>
+                    // Reset and read until we get to an open tag.
+                    memset(name, 0, XML_ELEMENT_NAME_LENGTH + 1);
+                    index = 0;
+                    matchedOpenBracket = false;
+                }
+
+                // Allow reading to the close bracket.
+                continue;
+            }
+
+            if (c == ' ')
+            {
+                // You can't have a space in an element
+                // name so let's just enable reading through
+                // to the end.
+                readToElementEnd = true;
+            }
+
+            if (c == '>')
+            {
+                if (matchedOpenBracket)
+                {
+                    // This ended an opening tag, so we're done!
+                    return;
+                }
+
+                // This ended a closing tag, so continue reading
+                // until we find a start element.
+                continue;
+            }
+
+            if (index >= XML_ELEMENT_NAME_LENGTH)
+            {
+                // We haven't hit the end but we have enough
+                // so just keep reading until we hit the end.
+                readToElementEnd = true;
+            }
+
+            if (readToElementEnd)
+            {
+                // We need to just get to the closing bracket.
+                continue;
+            }
+
+            name[index++] = c;
+        }
+    }
+}
+
+void MarantzClientClass::readToContentStart()
+{
+    while (_client.available() || _client.connected())
+    {
+        if (_client.available())
+        {
+            if (_client.read() == '<')
+            {
+                break;
+            }
+        }
     }
 }
 

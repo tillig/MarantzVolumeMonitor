@@ -7,10 +7,10 @@
     #include "WProgram.h"
 #endif
 
-const String MARANTZ_STATUS_PATH = "/goform/formMainZone_MainZoneXml.xml";
+const char MARANTZ_STATUS_PATH[] = "/goform/formMainZone_MainZoneXml.xml";
+#define XML_ELEMENT_NAME_LENGTH 24
 
 #include <Ethernet.h>
-#include "MicroXPath.h"
 #include "IPAddressConverter.h"
 
 class MarantzClientClass
@@ -26,11 +26,12 @@ class MarantzClientClass
  private:
     IPAddress _address;
     EthernetClient _client;
-    MicroXPath _xPath;
     bool _receiverOn;
     String _receiverInput;
     String _receiverChannels;
     String _receiverVolume;
+    void readToContentStart();
+    void readElement(char* name);
 };
 
 extern MarantzClientClass MarantzClient;

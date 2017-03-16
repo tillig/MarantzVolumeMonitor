@@ -110,11 +110,10 @@ void loop()
 
         // The receiver is on, so get the updated
         // values to display and refresh.
+        // The refresh process takes about 500ms (yay
+        // for XML string processing!) so we
+        // don't have to delay between refreshes.
         DisplayManager.showStats(MarantzClient.getReceiverVolume(), MarantzClient.getReceiverInput(), MarantzClient.getReceiverChannels());
-
-        // While the receiver is on, refresh
-        // twice a second.
-        delay(500);
     }
     else
     {
