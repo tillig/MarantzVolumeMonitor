@@ -101,7 +101,7 @@ void MarantzClientClass::updateStatistics()
             char muteValue[3];
             memset(muteValue, 0, 3);
             this->readValue(muteValue, 2);
-            _receiverOn = strcasecmp("on", muteValue) == 0;
+            mute = strcasecmp("on", muteValue) == 0;
             Serial.print("Mute: ");
             Serial.print(muteValue);
             Serial.print(" (");
