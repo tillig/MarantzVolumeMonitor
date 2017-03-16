@@ -15,6 +15,10 @@ void MarantzClientClass::init(IPAddress address)
 
 void MarantzClientClass::updateStatistics()
 {
+    _receiverOn = false;
+    memset(_receiverInput, 0, RECEIVER_INPUT_MAXLENGTH + 1);
+    memset(_receiverChannels, 0, RECEIVER_CHANNELS_MAXLENGTH + 1);
+
     if (!_client.connected())
     {
         // If something goes awry and the client is still connected,
@@ -37,84 +41,118 @@ void MarantzClientClass::updateStatistics()
             Serial.println(IPAddressConverter.toString(_address));
             _client.stop();
             _client.flush();
-            _receiverOn = false;
             return;
         }
     }
 
-    if (_client.connected())
+    bool mute = false;
+    float volume = 0.0;
+    char elementName[XML_ELEMENT_NAME_LENGTH + 1];
+    this->readToContentStart();
+
+    while (strcmp("item", elementName) != 0)
     {
-        char elementName[XML_ELEMENT_NAME_LENGTH + 1];
-        this->readToContentStart();
+        // Read the opening "item" tag.
+        this->readElement(elementName);
+    }
 
-        while (strcmp("item", elementName) != 0)
+    bool finished = false;
+    while (!finished && (_client.connected() || _client.available()))
+    {
+        this->readElement(elementName);
+        if (strcmp("ZonePower", elementName) == 0)
         {
-            // Read the opening "item" tag.
-            this->readElement(elementName);
+            char powerValue[3];
+            memset(powerValue, 0, 3);
+            this->readValue(powerValue, 2);
+            _receiverOn = strcasecmp("ON", powerValue) == 0;
+            Serial.print("ZonePower: ");
+            Serial.print(powerValue);
+            Serial.print(" (");
+            Serial.print(_receiverOn);
+            Serial.println(")");
         }
-
-        bool finished = false;
-        while (!finished && (_client.connected() || _client.available()))
+        else if (strcmp("InputFuncSelect", elementName) == 0)
         {
-            this->readElement(elementName);
-            if (strcmp("ZonePower", elementName) == 0)
-            {
-                Serial.println("ZonePower");
-            }
-            else if (strcmp("InputFuncSelect", elementName) == 0)
-            {
-                Serial.println("InputFuncSelect");
-            }
-            if (strcmp("selectSurround", elementName) == 0)
-            {
-                Serial.println("selectSurround");
-            }
-            if (strcmp("MasterVolume", elementName) == 0)
-            {
-                Serial.println("MasterVolume");
-            }
-            if (strcmp("Mute", elementName) == 0)
-            {
-                Serial.println("Mute");
-            }
+            this->readValue(_receiverInput, RECEIVER_INPUT_MAXLENGTH);
+            Serial.print("InputFuncSelect: ");
+            Serial.println(_receiverInput);
+        }
+        if (strcmp("selectSurround", elementName) == 0)
+        {
+            this->readValue(_receiverChannels, RECEIVER_CHANNELS_MAXLENGTH);
+            Serial.print("selectSurround: ");
+            Serial.println(_receiverChannels);
+        }
+        if (strcmp("MasterVolume", elementName) == 0)
+        {
+            char volValue[8];
+            memset(volValue, 0, 8);
+            this->readValue(volValue, 7);
+            volume = float(int(String(volValue).toFloat() * 10) / 10.0);
+            Serial.print("MasterVolume: ");
+            Serial.print(volValue);
+            Serial.print(" (");
+            Serial.print(volume);
+            Serial.println(")");
+        }
+        if (strcmp("Mute", elementName) == 0)
+        {
+            char muteValue[3];
+            memset(muteValue, 0, 3);
+            this->readValue(muteValue, 2);
+            _receiverOn = strcasecmp("on", muteValue) == 0;
+            Serial.print("Mute: ");
+            Serial.print(muteValue);
+            Serial.print(" (");
+            Serial.print(mute);
+            Serial.println(")");
         }
     }
 
     _client.stop();
     _client.flush();
 
-    Serial.println();
-    Serial.println("Finished processing XML.");
-
-    // STUBS!
-    _receiverOn = random(1, 100) > 20;
-
-    if (random(1, 100) % 2 == 0)
-    {
-        _receiverInput = "Roku";
-    }
-    else
-    {
-        _receiverInput = "XboxOneSuperLong";
-    }
-
-    if (random(1, 100) % 2 == 0)
-    {
-        _receiverChannels = "Stereo";
-    }
-    else
-    {
-        _receiverChannels = "Multi Ch Input 7.1";
-    }
-
-    if (random(1, 100) % 5 == 0)
+    if (mute)
     {
         _receiverVolume = "MUTE";
     }
     else
     {
-        float roundedVol = float(int((random(0, 1000) / 10.0) * 10) / 10.0);
-        _receiverVolume = String(roundedVol, 1);
+        _receiverVolume = String(volume + 80.0, 1);
+    }
+
+    Serial.print("Resolved volume: ");
+    Serial.println(_receiverVolume);
+    Serial.println("Finished processing XML.");
+    Serial.println();
+}
+
+void MarantzClientClass::readValue(char *value, int maxlength)
+{
+    char elementName[XML_ELEMENT_NAME_LENGTH + 1];
+    memset(elementName, 0, XML_ELEMENT_NAME_LENGTH + 1);
+    while (strcmp("value", elementName) != 0)
+    {
+        // Read the opening "value" tag.
+        this->readElement(elementName);
+    }
+
+    int index = 0;
+    while ((_client.available() || _client.connected()) && index < maxlength)
+    {
+        if (_client.available())
+        {
+            char c = _client.read();
+            if (c != '<')
+            {
+                value[index++] = c;
+            }
+            else
+            {
+                break;
+            }
+        }
     }
 }
 
@@ -221,12 +259,12 @@ bool MarantzClientClass::isReceiverOn()
     return _receiverOn;
 }
 
-String MarantzClientClass::getReceiverInput()
+char* MarantzClientClass::getReceiverInput()
 {
     return _receiverInput;
 }
 
-String MarantzClientClass::getReceiverChannels()
+char* MarantzClientClass::getReceiverChannels()
 {
     return _receiverChannels;
 }

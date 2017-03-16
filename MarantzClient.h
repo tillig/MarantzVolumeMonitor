@@ -9,6 +9,8 @@
 
 const char MARANTZ_STATUS_PATH[] = "/goform/formMainZone_MainZoneXml.xml";
 #define XML_ELEMENT_NAME_LENGTH 24
+#define RECEIVER_INPUT_MAXLENGTH 9
+#define RECEIVER_CHANNELS_MAXLENGTH 16
 
 #include <Ethernet.h>
 #include "IPAddressConverter.h"
@@ -20,18 +22,19 @@ class MarantzClientClass
     void init(IPAddress address);
     void updateStatistics();
     bool isReceiverOn();
-    String getReceiverInput();
-    String getReceiverChannels();
+    char* getReceiverInput();
+    char* getReceiverChannels();
     String getReceiverVolume();
  private:
     IPAddress _address;
     EthernetClient _client;
     bool _receiverOn;
-    String _receiverInput;
-    String _receiverChannels;
+    char _receiverInput[RECEIVER_INPUT_MAXLENGTH + 1];
+    char _receiverChannels[RECEIVER_CHANNELS_MAXLENGTH + 1];
     String _receiverVolume;
     void readToContentStart();
     void readElement(char* name);
+    void readValue(char * value, int maxlength);
 };
 
 extern MarantzClientClass MarantzClient;
