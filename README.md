@@ -8,6 +8,9 @@ My Marantz receiver sits in a cabinet, which is fine, but when handling 4K conte
 
 My solution to this is a small Arduino-based volume monitor that uses the Marantz HTTP API to get info about the receiver and display it on an LCD.
 
+- [Blog entry with additional details](http://www.paraesthesia.com/archive/2017/03/27/arduino-volume-monitor-for-marantz-receiver/)
+- [YouTube video with the monitor in action](https://www.youtube.com/watch?v=8WN-ZNZASWc)
+
 # Software
 
 I used the [Visual Micro](http://www.visualmicro.com/) Arduino integration for Visual Studio when building this so you'll see VS solution and project files in there, but you shouldn't need that to use the code.
