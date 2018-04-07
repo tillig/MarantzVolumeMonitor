@@ -5,7 +5,7 @@ MarantzClientClass MarantzClient;
 MarantzClientClass::MarantzClientClass()
 {
     _client = EthernetClient();
-    _client.setTimeout(500);
+    _client.setTimeout(20000);
 }
 
 void MarantzClientClass::init(IPAddress address)
