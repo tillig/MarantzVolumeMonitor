@@ -56,8 +56,8 @@ void MarantzClientClass::updateStatistics()
         this->readElement(elementName);
     }
 
-    bool finished = false;
-    while (!finished && (_client.connected() || _client.available()))
+    int numReadElements = 0;
+    while (numReadElements < 5 && (_client.connected() || _client.available()))
     {
         this->readElement(elementName);
         if (strcmp("ZonePower", elementName) == 0)
@@ -71,18 +71,21 @@ void MarantzClientClass::updateStatistics()
             Serial.print(" (");
             Serial.print(_receiverOn);
             Serial.println(")");
+            numReadElements++;
         }
         else if (strcmp("InputFuncSelect", elementName) == 0)
         {
             this->readValue(_receiverInput, RECEIVER_INPUT_MAXLENGTH);
             Serial.print("InputFuncSelect: ");
             Serial.println(_receiverInput);
+            numReadElements++;
         }
         if (strcmp("selectSurround", elementName) == 0)
         {
             this->readValue(_receiverChannels, RECEIVER_CHANNELS_MAXLENGTH);
             Serial.print("selectSurround: ");
             Serial.println(_receiverChannels);
+            numReadElements++;
         }
         if (strcmp("MasterVolume", elementName) == 0)
         {
@@ -95,6 +98,7 @@ void MarantzClientClass::updateStatistics()
             Serial.print(" (");
             Serial.print(volume);
             Serial.println(")");
+            numReadElements++;
         }
         if (strcmp("Mute", elementName) == 0)
         {
@@ -107,11 +111,11 @@ void MarantzClientClass::updateStatistics()
             Serial.print(" (");
             Serial.print(mute);
             Serial.println(")");
+            numReadElements++;
         }
     }
 
     _client.stop();
-    _client.flush();
 
     if (mute)
     {
