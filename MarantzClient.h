@@ -32,7 +32,7 @@ class MarantzClientClass
     char _receiverInput[RECEIVER_INPUT_MAXLENGTH + 1];
     char _receiverChannels[RECEIVER_CHANNELS_MAXLENGTH + 1];
     String _receiverVolume;
-    void readToContentStart();
+    bool readToContentStart();
     void readElement(char* name);
     void readValue(char * value, int maxlength);
 };

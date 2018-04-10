@@ -5,7 +5,9 @@ MarantzClientClass MarantzClient;
 MarantzClientClass::MarantzClientClass()
 {
     _client = EthernetClient();
-    _client.setTimeout(20000);
+
+    // Timeout is for connect() and stop()
+    _client.setTimeout(1000);
 }
 
 void MarantzClientClass::init(IPAddress address)
@@ -34,28 +36,42 @@ void MarantzClientClass::updateStatistics()
             _client.println(IPAddressConverter.toString(_address));
             _client.println("Connection: close");
             _client.println();
+            _client.flush();
+            Serial.println("Sent GET.");
         }
         else
         {
             Serial.print("Unable to connect to receiver at ");
             Serial.println(IPAddressConverter.toString(_address));
             _client.stop();
-            _client.flush();
             return;
         }
     }
 
-    bool mute = false;
-    float volume = 0.0;
-    char elementName[XML_ELEMENT_NAME_LENGTH + 1];
-    this->readToContentStart();
+    Serial.println("Read to XML.");
+    if (!this->readToContentStart())
+    {
+        // Circuit breaker - with the April 2018
+        // update to the Marantz receiver the
+        // GET request could get issued but the response
+        // wouldn't come back, like the internal
+        // web server had to reset.
+        Serial.println("Failed to find XML.");
+        _client.stop();
+        return;
+    }
 
+    Serial.println("Read to item.");
+    char elementName[XML_ELEMENT_NAME_LENGTH + 1];
     while (strcmp("item", elementName) != 0)
     {
         // Read the opening "item" tag.
         this->readElement(elementName);
     }
 
+    Serial.println("Processing content.");
+    bool mute = false;
+    float volume = 0.0;
     int numReadElements = 0;
     while (numReadElements < 5 && (_client.connected() || _client.available()))
     {
@@ -115,6 +131,7 @@ void MarantzClientClass::updateStatistics()
         }
     }
 
+    Serial.println("Done processing content.");
     _client.stop();
 
     if (mute)
@@ -128,7 +145,7 @@ void MarantzClientClass::updateStatistics()
 
     Serial.print("Resolved volume: ");
     Serial.println(_receiverVolume);
-    Serial.println("Finished processing XML.");
+    Serial.println("Finished statistics.");
     Serial.println();
 }
 
@@ -244,18 +261,28 @@ void MarantzClientClass::readElement(char* name)
     }
 }
 
-void MarantzClientClass::readToContentStart()
+bool MarantzClientClass::readToContentStart()
 {
-    while (_client.available() || _client.connected())
+    // Circuit breaker tries to get to the root content
+    // element (past headers, etc.) five times with a 10ms
+    // delay between read attempts. If the receiver is going
+    // to hang during its response, here's where it'll happen.
+    int retry = 0;
+    while (_client.connected() && retry < 5)
     {
-        if (_client.available())
+        while (_client.available())
         {
             if (_client.read() == '<')
             {
-                break;
+                return true;
             }
         }
+
+        delay(10);
+        retry++;
     }
+
+    return false;
 }
 
 bool MarantzClientClass::isReceiverOn()
