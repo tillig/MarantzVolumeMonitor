@@ -1,26 +1,47 @@
-# Marantz Volume Monitor
+# Marantz Volume Monitor v2
 
-Arduino-based volume monitor for Marantz receivers.
+A modern, touchscreen-based volume monitor for Marantz home theater receivers, powered by the NodeMCU Mini Lua WiFi and a 4" SPI TFT display.
 
----
+## Features
 
-My Marantz receiver sits in a cabinet, which is fine, but when handling 4K content the on-screen display showing volume and input information doesn't come up. This seems to be a fairly well-known issue.
+- **WiFi Connectivity:** No more Ethernet cables; connects directly to your home network.
+- **4" Touchscreen:** Large, high-contrast display with a modern Dark Mode UI.
+- **Real-time Status:** Polling-based updates for Volume, Input Source, and Audio Mode.
+- **Interactive UI:** Touch-driven configuration menus for WiFi and Receiver setup.
+- **Auto-Discovery:** SSDP support to find your Marantz receiver on the network automatically.
 
-My solution to this is a small Arduino-based volume monitor that uses the Marantz HTTP API to get info about the receiver and display it on an LCD.
+## Hardware Requirements
 
-- [Blog entry with additional details](http://www.paraesthesia.com/archive/2017/03/27/arduino-volume-monitor-for-marantz-receiver/)
-- [YouTube video with the monitor in action](https://www.youtube.com/watch?v=8WN-ZNZASWc)
+- **Microcontroller:** NodeMCU Mini Lua WiFi (ESP8266)
+- **Display:** 4" SPI TFT Touchscreen (ST7796 Driver)
+- **Power:** 5V 2A power supply (via USB or direct wiring)
 
-# Software
+Refer to `UpdatePlan.md` for detailed wiring instructions and power requirements.
 
-I used the [Visual Micro](http://www.visualmicro.com/) Arduino integration for Visual Studio when building this so you'll see VS solution and project files in there, but you shouldn't need that to use the code.
+## Software Setup
 
-Note I have tried to retain project structure compatibility with the standard Arduino IDE, but that's not a priority; given I use Visual Micro, I give priority to the dev environment that I work in.
+This project uses [PlatformIO](https://platformio.org/) for development.
 
-# Hardware
+1. Install [VS Code](https://code.visualstudio.com/) and the [PlatformIO extension](https://marketplace.visualstudio.com/items?itemName=platformio.platformio-ide).
+2. Clone this repository.
+3. Open the project folder in VS Code.
+4. PlatformIO will automatically download the required libraries.
+5. Build and upload to your NodeMCU.
 
-This is what I used, so the pins and such are set to use these items. If you use a different set of shields or hardware, you may have to adjust accordingly.
+## Configuration
 
-- [Arduino Uno R3](http://amzn.to/2moYxUe)
-- [DFRobot 1602 LCD Shield](http://amzn.to/2mwXbGw) ([Reference](https://www.dfrobot.com/product-51.html))
-- [SunFounder Ethernet Shield W5100](http://amzn.to/2miekaT)
+Upon first boot, use the on-screen menus to:
+
+1. Connect to your WiFi network.
+2. Enter the IP address of your Marantz receiver (or use auto-discovery).
+
+## Project Structure
+
+- `src/ui`: UI management and screen implementations.
+- `src/network`: WiFi management and Marantz API client.
+- `src/storage`: Persistent configuration storage using LittleFS.
+- `docs/`: Original project plans and design specifications.
+
+## License
+
+This project is licensed under the MIT License - see the `LICENSE` file for details.
