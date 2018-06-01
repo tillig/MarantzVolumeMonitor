@@ -15,6 +15,8 @@ My solution to this is a small Arduino-based volume monitor that uses the Marant
 
 I used the [Visual Micro](http://www.visualmicro.com/) Arduino integration for Visual Studio when building this so you'll see VS solution and project files in there, but you shouldn't need that to use the code.
 
+Note I have tried to retain project structure compatibility with the standard Arduino IDE, but that's not a priority; given I use Visual Micro, I give priority to the dev environment that I work in.
+
 # Hardware
 
 This is what I used, so the pins and such are set to use these items. If you use a different set of shields or hardware, you may have to adjust accordingly.
