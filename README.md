@@ -1,6 +1,6 @@
 # Marantz Volume Monitor v2
 
-A modern, touchscreen-based volume monitor for Marantz home theater receivers, powered by the NodeMCU Mini Lua WiFi and a 4" SPI TFT display.
+A modern, touchscreen-based volume monitor for Marantz home theater receivers, powered by an ESP32 and a 4" SPI TFT display.
 
 ## Features
 
@@ -12,21 +12,21 @@ A modern, touchscreen-based volume monitor for Marantz home theater receivers, p
 
 ## Hardware Requirements
 
-- **Microcontroller:** NodeMCU Mini Lua WiFi (ESP8266)
+- **Microcontroller:** Elegoo ESP32 DevKit V1
 - **Display:** 4" SPI TFT Touchscreen (ST7796 Driver)
-- **Power:** 5V 2A power supply (via USB or direct wiring)
+- **Power:** 5V 2A power supply (via USB-C or VIN)
 
-Refer to `UpdatePlan.md` for detailed wiring instructions and power requirements.
+Refer to `spec/system/hardware.md` and `spec/system/power.md` for detailed wiring instructions and power requirements.
 
 ## Software Setup
 
-This project uses [PlatformIO](https://platformio.org/) for development.
+This project uses [PlatformIO](https://platformio.org/) for development and [Spec Kit](https://github.com/tillig/speckit) for project management.
 
 1. Install [VS Code](https://code.visualstudio.com/) and the [PlatformIO extension](https://marketplace.visualstudio.com/items?itemName=platformio.platformio-ide).
 2. Clone this repository.
 3. Open the project folder in VS Code.
 4. PlatformIO will automatically download the required libraries.
-5. Build and upload to your NodeMCU.
+5. Build and upload to your ESP32.
 
 ## Configuration
 
@@ -40,7 +40,8 @@ Upon first boot, use the on-screen menus to:
 - `src/ui`: UI management and screen implementations.
 - `src/network`: WiFi management and Marantz API client.
 - `src/storage`: Persistent configuration storage using LittleFS.
-- `docs/`: Original project plans and design specifications.
+- `spec/`: Technical specifications, architectural plans, and hardware requirements.
+- `.gemini/`: Custom commands and configurations for Spec Kit.
 
 ## License
 

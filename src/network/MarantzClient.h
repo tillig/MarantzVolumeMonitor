@@ -2,8 +2,8 @@
 #define MARANTZ_CLIENT_H
 
 #include <Arduino.h>
-#include <ESP8266HTTPClient.h>
-#include <WiFiClient.h>
+#include <HTTPClient.h>
+#include <WiFi.h>
 
 struct MarantzStatus {
     bool power;
@@ -28,7 +28,7 @@ public:
 private:
     MarantzClient() : _receiverIp("") {}
     String _receiverIp;
-    
+
     String extractValue(const String& xml, const String& tag);
 };
 

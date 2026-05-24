@@ -56,8 +56,8 @@ The UI is designed to be:
 
 #### Source & Mode Text
 
-- SRC: <source>
-- MODE: <exact string from receiver>
+- `SRC: <source>`
+- `MODE: <exact string from receiver>`
 - Mode text is **verbatim** from Marantz API
 
 #### Audio Family Tiles
@@ -91,31 +91,31 @@ Tiles represent **families**, not specific modes:
 
 ## 3. Color Palette (Dark Mode)
 
-### Background
+### Background Color
 
 - Primary: `#101010`
 - Panel: `#181818`
 
-### Text
+### Text Color
 
 - Primary: `#FFFFFF`
 - Secondary: `#A0A0A0`
 - Dimmed: `#606060`
 
-### Volume Bar
+### Volume Bar Color
 
 - Fill: `#3DAEFF`
 - Background: `#303030`
 - Peak (optional): `#FF7043`
 
-### Tiles
+### Tile Color
 
 - Active background: `#3DAEFF`
 - Active text/icon: `#000000`
 - Inactive background: `#303030`
 - Inactive text/icon: `#A0A0A0`
 
-### Settings Gear
+### Settings Gear Color
 
 - Default: `#A0A0A0`
 - On tap: `#3DAEFF`
@@ -124,19 +124,19 @@ Tiles represent **families**, not specific modes:
 
 ## 4. Typography
 
-### Volume Number
+### Volume Number Typography
 
 - Size: 72–96 px
 - Weight: Bold
 - Alignment: Center
 
-### Labels (SRC, MODE)
+### Labels (SRC, MODE) Typography
 
 - Size: 20–24 px
 - Weight: Medium
 - Alignment: Left/Right
 
-### Tile Labels
+### Tile Labels Typography
 
 - Size: 18–20 px
 - Weight: Medium
@@ -151,18 +151,18 @@ Tiles represent **families**, not specific modes:
 - Outer margin: 12–16 px
 - Section spacing: 20–28 px
 
-### Volume Bar
+### Volume Bar Spacing
 
 - Height: 20–24 px
 - Width: ~70% of screen width
 
-### Tiles
+### Tile Spacing
 
 - Size: ~90×50 px
 - Spacing: 10–12 px
 - Touch target: ≥48×48 px
 
-### Settings Gear
+### Settings Gear Spacing
 
 - Size: ~32 px
 - Touch target: 48×48 px

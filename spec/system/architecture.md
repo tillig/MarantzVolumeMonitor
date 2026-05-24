@@ -17,6 +17,27 @@
   - Touch controller (XPT2046)
   - Power subsystem
 
+## Source Code Structure
+
+```text
+/src
+  /ui
+    DisplayManager.cpp
+    TouchManager.cpp
+    Screens/
+      HomeScreen.cpp
+      SettingsScreen.cpp
+      WiFiSetupScreen.cpp
+      ReceiverSetupScreen.cpp
+  /network
+    WiFiManager.cpp
+    ReceiverDiscovery.cpp
+    MarantzClient.cpp
+  /storage
+    ConfigStore.cpp (SPIFFS/LittleFS)
+  main.cpp
+```
+
 ## Data Flow
 
 1. WiFi connects using stored credentials.

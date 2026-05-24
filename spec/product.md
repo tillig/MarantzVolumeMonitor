@@ -2,7 +2,7 @@
 
 ## Overview
 
-Marantz Volume Monitor v2 is a modernization of the original Arduino-based volume monitor for Marantz receivers. The new version uses a NodeMCU Mini Lua WiFi microcontroller, a 4" SPI TFT touchscreen, WiFi networking, and a modern UI to display receiver volume, source, and audio mode information.
+Marantz Volume Monitor v2 is a modernization of the original Arduino-based volume monitor for Marantz receivers. The new version uses an ESP32 microcontroller, a 4" SPI TFT touchscreen, WiFi networking, and a modern UI to display receiver volume, source, and audio mode information.
 
 ## Goals
 
@@ -15,7 +15,7 @@ Marantz Volume Monitor v2 is a modernization of the original Arduino-based volum
 
 ## Target Hardware
 
-- NodeMCU Mini Lua WiFi (ESP8266)
+- Elegoo ESP32 DevKit V1 (ESP32-WROOM-32)
 - 4" SPI TFT touchscreen (480×320)
 - XPT2046 touch controller
 - 5V power supply (USB or dedicated 2A supply)
