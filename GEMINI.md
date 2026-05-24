@@ -22,7 +22,48 @@ Again, everything from here down is how it works NOW - this is the stuff we're u
 
 ## How It Works
 
-Marantz receivers have an HTTP API used for remote control programs and general network interaction. By making a `GET` request to `http://<receiver-ip-address>/goform/formMainZone_MainZoneXml.xml` you will get a fairly large XML document that has all the information about the receiver's current status.
+Marantz receivers have an HTTP API used for remote control programs and general network interaction. By making a `GET` request to `http://<receiver-ip-address>/goform/formMainZone_MainZoneXml.xml` you will get a fairly large XML document that has all the information about the receiver's current status. My receiver is at 192.168.1.204 if we need to do any tests on the local network.
+
+Here is one example of the response:
+
+```xml
+<?xml version="1.0" encoding="utf-8" ?>
+<item>
+<FriendlyName><value>Marantz SR5010</value></FriendlyName>
+<Power><value>ON</value></Power>
+<ZonePower><value>ON</value></ZonePower>
+</value></RenameZone>IN ZONE
+<TopMenuLink><value>ON</value></TopMenuLink>
+<VideoSelectDisp><value>OFF</value></VideoSelectDisp>
+<VideoSelect><value></value></VideoSelect>
+<VideoSelectOnOff><value>OFF</value></VideoSelectOnOff>
+<VideoSelectLists>
+<value index='ON' >On</value>
+<value index='OFF' >Off</value>
+</VideoSelectLists>
+<ECOModeDisp><value>ON</value></ECOModeDisp>
+<ECOMode><value></value></ECOMode>
+<ECOModeLists>
+<value index='ON'  table='ECO : ON' param=''/>
+<value index='OFF'  table='ECO : OFF' param=''/>
+<value index='AUTO'  table='ECO : AUTO' param=''/>
+</ECOModeLists>
+<AddSourceDisplay><value>FALSE</value></AddSourceDisplay>
+<ModelId><value>9</value></ModelId>
+<BrandId><value>MARANTZ_MODEL</value></BrandId>
+<SalesArea><value>0</value></SalesArea>
+<InputFuncSelect><value>Shield TV</value></InputFuncSelect>
+<NetFuncSelect><value>FAVORITES</value></NetFuncSelect>
+<selectSurround><value>Stereo                         </value></selectSurround>
+<VolumeDisplay><value>Absolute</value></VolumeDisplay>
+<MasterVolume><value>-18.5</value></MasterVolume>
+<Mute><value>off</value></Mute>
+<RemoteMaintenance><value></value></RemoteMaintenance>
+<SubwooferDisplay><value>FALSE</value></SubwooferDisplay>
+<Zone2VolDisp><value>TRUE</value></Zone2VolDisp>
+<SleepOff><value>Off</value></SleepOff>
+</item>
+```
 
 The Arduino volume monitor polls this endpoint and displays values based on the contents of the response.
 
