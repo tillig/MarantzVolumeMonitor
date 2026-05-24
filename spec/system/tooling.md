@@ -49,4 +49,3 @@ build_flags =
 4. Add libraries to `platformio.ini` under `lib_deps`.
 5. Reference `TFT_eSPI_Setup.h` via `build_flags`.
 6. Use PlatformIO tools for firmware and filesystem (LittleFS) uploads.
-

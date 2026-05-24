@@ -28,7 +28,7 @@ public:
 private:
     MarantzClient() : _receiverIp("") {}
     String _receiverIp;
-    
+
     String extractValue(const String& xml, const String& tag);
 };
 

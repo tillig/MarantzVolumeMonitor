@@ -19,6 +19,7 @@ As a developer, I want to see a "Hello World" message on the TFT display so I kn
 **Independent Test**: Build and upload. Success if "Hello World" is visible on the screen.
 
 **Acceptance Scenarios**:
+
 1. **Given** the NodeMCU is powered and connected to the TFT, **When** the code runs, **Then** the screen background is black and white text "Hello World" is centered.
 
 ---
@@ -32,6 +33,7 @@ As a developer, I want the "Hello World" text color to change when I touch the s
 **Independent Test**: Touch the screen. Success if text color cycles (e.g., White -> Green -> Blue).
 
 **Acceptance Scenarios**:
+
 1. **Given** the "Hello World" screen is active, **When** the user touches any part of the screen, **Then** the text color changes to a different high-contrast color.
 
 ---
@@ -67,6 +69,8 @@ As a developer, I want the "Hello World" text color to change when I touch the s
 - The user has a stable USB connection to the NodeMCU.
 
 ## Clarifications
+
 ### Session 2026-05-24
+
 - Q: Should the spike use the existing architecture (Screen classes) or be a raw `main.cpp` test? → A: Use a raw `main.cpp` approach for the simplest possible verification, then integrate into the architecture if successful.
 - Q: How should the system handle hardware initialization failure? → A: Log detailed error to Serial and stop execution.

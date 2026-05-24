@@ -1,76 +1,62 @@
 #include <Arduino.h>
-#include "storage/ConfigStore.h"
-#include "network/WiFiManager.h"
-#include "network/MarantzClient.h"
 #include "ui/DisplayManager.h"
 #include "ui/TouchManager.h"
-#include "ui/ScreenManager.h"
-#include "ui/Screens/HomeScreen.h"
 
-DeviceConfig config;
-unsigned long lastUpdate = 0;
-const unsigned long UPDATE_INTERVAL = 1000; // 1 second
+// Hardware Spike State
+uint16_t textColors[] = {TFT_WHITE, TFT_GREEN, TFT_BLUE, TFT_RED, TFT_YELLOW, TFT_MAGENTA, TFT_CYAN};
+int colorIndex = 0;
+bool lastTouchState = false;
 
 void setup() {
     Serial.begin(115200);
-    
-    // Initialize Storage
-    if (ConfigStore::getInstance().begin()) {
-        ConfigStore::getInstance().loadConfig(config);
-    }
-    
+    delay(1000); // Give serial monitor time to connect
+    Serial.println("Hardware Spike Started");
+
     // Initialize Display
+    Serial.println("Initializing Display...");
     DisplayManager::getInstance().begin();
-    
-    // Initialize Touch
-    TouchManager::getInstance().begin();
-    
-    // Show splash or loading message
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
+
+    // Clear screen and draw initial text
+    tft.fillScreen(TFT_BLACK);
     tft.setTextDatum(MC_DATUM);
-    tft.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY);
-    tft.drawString("Connecting to WiFi...", 240, 160, 4);
-    
-    // Initialize WiFi
-    if (config.wifiSsid != "") {
-        if (WiFiManager::getInstance().connect(config.wifiSsid, config.wifiPassword)) {
-            tft.fillScreen(DisplayManager::COLOR_BACKGROUND);
-            tft.drawString("WiFi Connected", 240, 160, 4);
-        } else {
-            tft.fillScreen(DisplayManager::COLOR_BACKGROUND);
-            tft.drawString("WiFi Failed", 240, 160, 4);
-        }
-    } else {
-        tft.fillScreen(DisplayManager::COLOR_BACKGROUND);
-        tft.drawString("No WiFi Configured", 240, 160, 4);
-    }
-    
-    // Initialize Marantz Client
-    if (config.receiverIp != "") {
-        MarantzClient::getInstance().setReceiverIp(config.receiverIp);
-    }
-    
-    // Start with Home Screen
-    ScreenManager::getInstance().setScreen(new HomeScreen());
+    tft.setTextColor(textColors[colorIndex]);
+    tft.drawString("Hello World", 240, 160, 4); // Large font (Font 4)
+    Serial.println("Hello World drawn to display");
+
+    // Initialize Touch
+    Serial.println("Initializing Touch...");
+    TouchManager::getInstance().begin();
+    Serial.println("Hardware initialization complete");
 }
 
 void loop() {
-    // Handle Touch
-    if (TouchManager::getInstance().isTouched()) {
-        TS_Point p = TouchManager::getInstance().getPoint();
-        
-        // Map touch point to screen coordinates
-        // This mapping depends on calibration, will need refinement
-        int16_t x = map(p.y, 200, 3800, 0, 480);
-        int16_t y = map(p.x, 200, 3800, 320, 0);
-        
-        ScreenManager::getInstance().handleTouch({x, y, p.z});
-        delay(100); // Debounce
+    bool isTouched = TouchManager::getInstance().isTouched();
+
+    // Check for new touch event (rising edge)
+    if (isTouched && !lastTouchState) {
+        Serial.println("Touch detected!");
+
+        // Cycle color
+        colorIndex = (colorIndex + 1) % (sizeof(textColors) / sizeof(textColors[0]));
+
+        // Update display
+        TFT_eSPI& tft = DisplayManager::getInstance().getTft();
+        tft.setTextColor(textColors[colorIndex]);
+
+        // Redraw text over background to avoid clearing whole screen (less flicker)
+        tft.fillScreen(TFT_BLACK);
+        tft.drawString("Hello World", 240, 160, 4);
+
+        Serial.print("Text color changed. Index: ");
+        Serial.println(colorIndex);
+
+        // Simple debounce
+        delay(200);
     }
-    
-    // Update current screen
-    if (millis() - lastUpdate >= UPDATE_INTERVAL) {
-        ScreenManager::getInstance().update();
-        lastUpdate = millis();
-    }
+
+    lastTouchState = isTouched;
+
+    // Small delay to prevent tight loop
+    delay(10);
 }

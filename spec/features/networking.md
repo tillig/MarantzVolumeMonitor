@@ -20,4 +20,3 @@
   - Input source (e.g., Blu-ray, Game)
   - Audio channel mode (e.g., Dolby TrueHD, DTS:X)
 - **Performance**: Use non-blocking HTTP requests to keep the UI responsive.
-

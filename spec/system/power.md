@@ -39,4 +39,3 @@ Use a **5V 2A regulated supply** and wire it directly:
 - **Power Draw**: No constant animations to reduce unnecessary current consumption.
 - **Backlight Control**: If the TFT’s LED/BL pin is raw (no resistor), use a transistor + resistor for PWM brightness control.
 - **Logic Level**: Most ESP-compatible TFT modules accept 5V power but use 3.3V logic.
-

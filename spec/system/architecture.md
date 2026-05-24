@@ -45,4 +45,3 @@
 3. Marantz API is polled every 1–2 seconds.
 4. UI updates volume, source, and mode.
 5. Touch input triggers navigation and settings.
-

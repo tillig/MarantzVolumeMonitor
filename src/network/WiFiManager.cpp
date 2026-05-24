@@ -2,14 +2,14 @@
 
 bool WiFiManager::connect(const String& ssid, const String& password) {
     WiFi.begin(ssid.c_str(), password.c_str());
-    
+
     int counter = 0;
     while (WiFi.status() != WL_CONNECTED && counter < 20) {
         delay(500);
         Serial.print(".");
         counter++;
     }
-    
+
     if (WiFi.status() == WL_CONNECTED) {
         Serial.println("\nWiFi connected");
         Serial.println("IP address: ");

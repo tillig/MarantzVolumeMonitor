@@ -44,4 +44,3 @@
 | **T_CLK** | **D5**                               | SCK (shared SPI)                           |
 | **VCC**   | **3V3** or **5V** (module‑dependent) | Touch controller power                     |
 | **GND**   | **G**                                | Ground                                     |
-
