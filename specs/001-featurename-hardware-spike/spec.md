@@ -45,6 +45,7 @@ As a developer, I want the "Hello World" text color to change when I touch the s
 - **FR-003**: System MUST display "Hello World" in a large, readable font (e.g., 24pt+).
 - **FR-004**: System MUST detect touch events and provide visual feedback (color change).
 - **FR-005**: System MUST log "Hardware Spike Started" to Serial at 115200 baud.
+- **FR-006**: System MUST log a detailed error to Serial and halt execution if TFT or Touch initialization fails.
 
 ### Key Entities
 
@@ -68,3 +69,4 @@ As a developer, I want the "Hello World" text color to change when I touch the s
 ## Clarifications
 ### Session 2026-05-24
 - Q: Should the spike use the existing architecture (Screen classes) or be a raw `main.cpp` test? → A: Use a raw `main.cpp` approach for the simplest possible verification, then integrate into the architecture if successful.
+- Q: How should the system handle hardware initialization failure? → A: Log detailed error to Serial and stop execution.
