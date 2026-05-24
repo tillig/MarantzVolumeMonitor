@@ -1,50 +1,64 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report:
+- Version change: Initial Template → 1.0.0
+- List of modified principles:
+  - Principle 1 → I. Visibility-First UI
+  - Principle 2 → II. Passive Appliance Stability
+  - Principle 3 → III. Strict Layered Architecture
+  - Principle 4 → IV. Deterministic Dependency Management
+  - Principle 5 → V. Intuitive On-Device Setup
+- Added sections: Hardware & Power Standards, Development Workflow
+- Removed sections: None
+- Templates requiring updates (✅ updated / ⚠ pending):
+  - .specify/templates/plan-template.md ✅
+  - .specify/templates/spec-template.md ✅
+  - .specify/templates/tasks-template.md ✅
+- Follow-up TODOs: None
+-->
+
+# Marantz Volume Monitor Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Visibility-First UI
+The primary UI must be readable from 15 feet. High contrast, dark mode only (#101010 background). 
+Large volume display (72-96px). No layout shifting or constant animations that distract from the 
+room's ambiance.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Passive Appliance Stability
+The device must function as a passive appliance. It must boot in <5s, auto-reconnect to WiFi, and 
+maintain status via non-blocking polling (1-2s interval). UI must remain responsive even during 
+network timeouts.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Strict Layered Architecture
+Maintain a clean separation between UI (Screens), Networking (MarantzClient), and Storage 
+(ConfigStore). Screens must not perform network I/O; they delegate to managers. UI logic must be 
+decoupled from driver-specific code where possible.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Deterministic Dependency Management
+Use PlatformIO for all build and dependency management. No manual library modifications. All 
+hardware-specific configurations (like TFT_eSPI_Setup.h) must be tracked in the repository and 
+referenced in platformio.ini.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Intuitive On-Device Setup
+All critical configuration (WiFi, Receiver IP) must be achievable via the touchscreen. 
+Auto-discovery (SSDP) is the primary method for receiver setup. Manual entry must use the 
+on-screen keyboard/numpad.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Hardware & Power Standards
+- **Microcontroller**: NodeMCU Mini Lua WiFi (ESP8266).
+- **Display**: 4" SPI TFT (ST7796) + XPT2046 touch controller.
+- **Power**: 5V/2A regulated supply is mandatory for stability.
+- **Filesystem**: LittleFS for persistent configuration.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
-
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
-
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+## Development Workflow
+- **Coding Style**: CamelCase for classes, camelCase for methods/members.
+- **Documentation**: All new features must have a spec/ entry and an implementation plan.
+- **Testing**: Hardware verification is required for all UI and networking changes.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+The Constitution is the project's supreme guidance. All architectural decisions must be justified 
+against these principles. Amendments require a version bump and an update to the Sync Impact 
+Report. Compliance is reviewed during the implementation planning phase.
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
-
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2026-05-23 | **Last Amended**: 2026-05-23

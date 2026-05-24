@@ -17,7 +17,31 @@
 - XPT2046
 - SPI shared with display
 
-## Wiring
+## Hardware Wiring (NodeMCU Mini Lua WiFi)
 
-- TFT: MOSI=D7, MISO=D6, SCK=D5, CS=D8, DC=D3, RESET=D4
-- Touch: T_CS=D2, T_IRQ=D1
+### SPI TFT Display Wiring
+
+| TFT Pin      | NodeMCU Mini Pin           | Purpose                            |
+| ------------ | -------------------------- | ---------------------------------- |
+| **VCC**      | **5V**                     | Main power for display + backlight |
+| **GND**      | **G**                      | Ground                             |
+| **CS**       | **D8**                     | Chip select                        |
+| **RESET**    | **D4**                     | Reset line                         |
+| **DC**       | **D3**                     | Data/command                       |
+| **MOSI**     | **D7**                     | SPI MOSI                           |
+| **MISO**     | **D6**                     | SPI MISO                           |
+| **SCK**      | **D5**                     | SPI clock                          |
+| **LED / BL** | **5V** (or transistor/PWM) | Backlight                          |
+
+### Touch Controller (XPT2046)
+
+| Touch Pin | NodeMCU Mini Pin                     | Purpose                                    |
+| --------- | ------------------------------------ | ------------------------------------------ |
+| **T_CS**  | **D2**                               | Touch chip select                          |
+| **T_IRQ** | **D1**                               | Touch interrupt (optional but recommended) |
+| **T_DO**  | **D6**                               | MISO (shared SPI)                          |
+| **T_DIN** | **D7**                               | MOSI (shared SPI)                          |
+| **T_CLK** | **D5**                               | SCK (shared SPI)                           |
+| **VCC**   | **3V3** or **5V** (module‑dependent) | Touch controller power                     |
+| **GND**   | **G**                                | Ground                                     |
+
