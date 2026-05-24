@@ -16,11 +16,11 @@ A modern, touchscreen-based volume monitor for Marantz home theater receivers, p
 - **Display:** 4" SPI TFT Touchscreen (ST7796 Driver)
 - **Power:** 5V 2A power supply (via USB or direct wiring)
 
-Refer to `UpdatePlan.md` for detailed wiring instructions and power requirements.
+Refer to `spec/system/hardware.md` and `spec/system/power.md` for detailed wiring instructions and power requirements.
 
 ## Software Setup
 
-This project uses [PlatformIO](https://platformio.org/) for development.
+This project uses [PlatformIO](https://platformio.org/) for development and [Spec Kit](https://speckit.org/) for project management.
 
 1. Install [VS Code](https://code.visualstudio.com/) and the [PlatformIO extension](https://marketplace.visualstudio.com/items?itemName=platformio.platformio-ide).
 2. Clone this repository.
@@ -40,7 +40,8 @@ Upon first boot, use the on-screen menus to:
 - `src/ui`: UI management and screen implementations.
 - `src/network`: WiFi management and Marantz API client.
 - `src/storage`: Persistent configuration storage using LittleFS.
-- `docs/`: Original project plans and design specifications.
+- `spec/`: Technical specifications, architectural plans, and hardware requirements.
+- `.gemini/`: Custom commands and configurations for Spec Kit.
 
 ## License
 
