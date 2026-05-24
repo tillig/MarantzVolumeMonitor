@@ -2,8 +2,8 @@ root = true
 
 [*]
 indent_style = space
-indent_size = 4
+indent_size = 2
 trim_trailing_whitespace = true
 
-[*.vcxproj]
-indent_size = 2
+[*.{cpp,h}]
+indent_size = 4
