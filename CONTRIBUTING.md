@@ -32,6 +32,7 @@ Welcome! We appreciate your interest in contributing to the Marantz Volume Monit
 ## AI Contributor Guidelines
 
 If you are an AI assistant (like Gemini CLI) working on this codebase:
+
 - **Context Awareness:** Always read `GEMINI.md`, `UpdatePlan.md`, and `UIPlan.md` before making changes.
 - **Safety:** Do not hardcode credentials. Use the `ConfigStore` for secrets.
 - **Verification:** If possible, describe how to verify your changes in a real or simulated environment.

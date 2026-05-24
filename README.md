@@ -31,6 +31,7 @@ This project uses [PlatformIO](https://platformio.org/) for development.
 ## Configuration
 
 Upon first boot, use the on-screen menus to:
+
 1. Connect to your WiFi network.
 2. Enter the IP address of your Marantz receiver (or use auto-discovery).
 
