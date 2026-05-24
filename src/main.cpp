@@ -4,10 +4,10 @@
 #include "network/MarantzClient.h"
 #include "ui/DisplayManager.h"
 #include "ui/TouchManager.h"
+#include "ui/ScreenManager.h"
 #include "ui/Screens/HomeScreen.h"
 
 DeviceConfig config;
-Screen* currentScreen = nullptr;
 unsigned long lastUpdate = 0;
 const unsigned long UPDATE_INTERVAL = 1000; // 1 second
 
@@ -51,8 +51,7 @@ void setup() {
     }
     
     // Start with Home Screen
-    currentScreen = new HomeScreen();
-    currentScreen->draw();
+    ScreenManager::getInstance().setScreen(new HomeScreen());
 }
 
 void loop() {
@@ -65,13 +64,13 @@ void loop() {
         int16_t x = map(p.y, 200, 3800, 0, 480);
         int16_t y = map(p.x, 200, 3800, 320, 0);
         
-        currentScreen->handleTouch({x, y, p.z});
+        ScreenManager::getInstance().handleTouch({x, y, p.z});
         delay(100); // Debounce
     }
     
     // Update current screen
     if (millis() - lastUpdate >= UPDATE_INTERVAL) {
-        currentScreen->update();
+        ScreenManager::getInstance().update();
         lastUpdate = millis();
     }
 }

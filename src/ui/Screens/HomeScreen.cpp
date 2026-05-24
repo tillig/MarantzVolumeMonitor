@@ -1,4 +1,6 @@
 #include "HomeScreen.h"
+#include "SettingsScreen.h"
+#include "../ScreenManager.h"
 
 void HomeScreen::draw() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
@@ -29,10 +31,9 @@ void HomeScreen::update() {
 }
 
 void HomeScreen::handleTouch(TS_Point p) {
-    // Check if settings button was pressed (top right corner based on UIPlan.md says corner, but diagram shows bottom right gear)
-    // Actually UIPlan diagram shows [ G ] in bottom right.
-    if (p.x > 400 && p.y > 280) { // Rough estimate for bottom right gear
-        // Trigger settings transition
+    // Check if settings button was pressed (bottom right gear)
+    if (p.x > 400 && p.y > 240) { 
+        ScreenManager::getInstance().setScreen(new SettingsScreen());
     }
 }
 

@@ -8,7 +8,6 @@
 compile_commands.json
 
 # IDEs
-.vscode/
 .idea/
 *.swp
 *.swo

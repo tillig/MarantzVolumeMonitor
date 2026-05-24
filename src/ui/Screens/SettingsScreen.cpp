@@ -1,4 +1,6 @@
 #include "SettingsScreen.h"
+#include "HomeScreen.h"
+#include "../ScreenManager.h"
 
 void SettingsScreen::draw() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
@@ -25,7 +27,8 @@ void SettingsScreen::update() {
 }
 
 void SettingsScreen::handleTouch(TS_Point p) {
+    // Close settings (return to home) if X is pressed
     if (p.x > 400 && p.y < 60) {
-        // Close settings (return to home)
+        ScreenManager::getInstance().setScreen(new HomeScreen());
     }
 }
