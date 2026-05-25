@@ -35,12 +35,12 @@
 
 ### Touch Controller (XPT2046)
 
-| Touch Pin | NodeMCU Mini Pin                     | Purpose                                    |
-| --------- | ------------------------------------ | ------------------------------------------ |
-| **T_CS**  | **D2**                               | Touch chip select                          |
-| **T_IRQ** | **D1**                               | Touch interrupt (optional but recommended) |
-| **T_DO**  | **D6**                               | MISO (shared SPI)                          |
-| **T_DIN** | **D7**                               | MOSI (shared SPI)                          |
-| **T_CLK** | **D5**                               | SCK (shared SPI)                           |
-| **VCC**   | **3V3** or **5V** (module‑dependent) | Touch controller power                     |
-| **GND**   | **G**                                | Ground                                     |
+The touch controller power comes from the display - there is no separate pin for VCC or GND.
+
+| Touch Pin | NodeMCU Mini Pin | Purpose                                    |
+| --------- | ---------------- | ------------------------------------------ |
+| **T_CS**  | **D2**           | Touch chip select                          |
+| **T_IRQ** | **D1**           | Touch interrupt (optional but recommended) |
+| **T_DO**  | **D6**           | MISO (shared SPI)                          |
+| **T_DIN** | **D7**           | MOSI (shared SPI)                          |
+| **T_CLK** | **D5**           | SCK (shared SPI)                           |
