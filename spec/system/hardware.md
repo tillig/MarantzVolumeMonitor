@@ -2,7 +2,9 @@
 
 ## Microcontroller
 
-- NodeMCU Mini Lua WiFi (ESP8266)
+- NodeMCU V3 (ESP8266)
+- 32Mb (4MB) Flash Memory
+- USB-Serial: CH340G
 - 5V input via USB or external supply
 - 3.3V logic for SPI
 
@@ -17,27 +19,27 @@
 - XPT2046
 - SPI shared with display
 
-## Hardware Wiring (NodeMCU Mini Lua WiFi)
+## Hardware Wiring (NodeMCU V3)
 
 ### SPI TFT Display Wiring
 
-| TFT Pin      | NodeMCU Mini Pin           | Purpose                            |
+| TFT Pin      | NodeMCU V3 Pin             | Purpose                            |
 | ------------ | -------------------------- | ---------------------------------- |
-| **VCC**      | **5V**                     | Main power for display + backlight |
-| **GND**      | **G**                      | Ground                             |
+| **VCC**      | **WN (VIN)**               | Main power for display + backlight |
+| **GND**      | **GND**                    | Ground                             |
 | **CS**       | **D8**                     | Chip select                        |
 | **RESET**    | **D4**                     | Reset line                         |
 | **DC**       | **D3**                     | Data/command                       |
 | **MOSI**     | **D7**                     | SPI MOSI                           |
 | **MISO**     | **D6**                     | SPI MISO                           |
 | **SCK**      | **D5**                     | SPI clock                          |
-| **LED / BL** | **5V** (or transistor/PWM) | Backlight                          |
+| **LED / BL** | **WN (VIN)** (or PWM)      | Backlight                          |
 
 ### Touch Controller (XPT2046)
 
 The touch controller power comes from the display - there is no separate pin for VCC or GND.
 
-| Touch Pin | NodeMCU Mini Pin | Purpose                                    |
+| Touch Pin | NodeMCU V3 Pin   | Purpose                                    |
 | --------- | ---------------- | ------------------------------------------ |
 | **T_CS**  | **D2**           | Touch chip select                          |
 | **T_IRQ** | **D1**           | Touch interrupt (optional but recommended) |
