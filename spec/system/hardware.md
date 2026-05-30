@@ -2,47 +2,50 @@
 
 ## Microcontroller
 
-- NodeMCU V3 (ESP8266)
+- Elegoo ESP32 DevKit V1 (ESP32-WROOM-32)
 - 32Mb (4MB) Flash Memory
-- USB-Serial: CH340G
-- 5V input via USB or external supply
-- 3.3V logic for SPI
+- Dual-core Processor @ 240MHz
+- USB-Serial: Silicon Labs CP2102
+- 5V input via USB-C or VIN pin
+- 3.3V logic level (NOT 5V tolerant)
 
 ## Display
 
 - 4" SPI TFT (480×320)
-- ILI9341 / ILI9488 / ST7796 compatible
-- Backlight powered from 5V
+- ST7796 Driver
+- Backlight powered from 3.3V (controlled via GPIO 32 for PWM)
 
 ## Touch Controller
 
 - XPT2046
-- SPI shared with display
+- SPI shared with display (VSPI)
 
-## Hardware Wiring (NodeMCU V3)
+## Hardware Wiring (Elegoo ESP32)
 
 ### SPI TFT Display Wiring
 
-| TFT Pin      | NodeMCU V3 Pin             | Purpose                            |
+The display uses the **VSPI** controller pins by default.
+
+| TFT Pin      | ESP32 Pin                  | Purpose                            |
 | ------------ | -------------------------- | ---------------------------------- |
-| **VCC**      | **WN (VIN)**               | Main power for display + backlight |
+| **VCC**      | **3V3**                    | Main power for display logic       |
 | **GND**      | **GND**                    | Ground                             |
-| **CS**       | **D8**                     | Chip select                        |
-| **RESET**    | **D4**                     | Reset line                         |
-| **DC**       | **D3**                     | Data/command                       |
-| **MOSI**     | **D7**                     | SPI MOSI                           |
-| **MISO**     | **D6**                     | SPI MISO                           |
-| **SCK**      | **D5**                     | SPI clock                          |
-| **LED / BL** | **WN (VIN)** (or PWM)      | Backlight                          |
+| **CS**       | **GPIO 5**                 | Chip select                        |
+| **RESET**    | **GPIO 22**                | Reset line                         |
+| **DC**       | **GPIO 21**                | Data/command                       |
+| **MOSI**     | **GPIO 23**                | SPI MOSI (VSPI)                    |
+| **MISO**     | **GPIO 19**                | SPI MISO (VSPI)                    |
+| **SCK**      | **GPIO 18**                | SPI clock (VSPI)                   |
+| **LED / BL** | **GPIO 32**                | Backlight (PWM capable)            |
 
 ### Touch Controller (XPT2046)
 
-The touch controller power comes from the display - there is no separate pin for VCC or GND.
+The touch controller shares the SPI bus with the display.
 
-| Touch Pin | NodeMCU V3 Pin   | Purpose                                    |
-| --------- | ---------------- | ------------------------------------------ |
-| **T_CS**  | **D2**           | Touch chip select                          |
-| **T_IRQ** | **D1**           | Touch interrupt (optional but recommended) |
-| **T_DO**  | **D6**           | MISO (shared SPI)                          |
-| **T_DIN** | **D7**           | MOSI (shared SPI)                          |
-| **T_CLK** | **D5**           | SCK (shared SPI)                           |
+| Touch Pin | ESP32 Pin                  | Purpose                                    |
+| --------- | -------------------------- | ------------------------------------------ |
+| **T_CS**  | **GPIO 14**                | Touch chip select                          |
+| **T_IRQ** | **GPIO 27**                | Touch interrupt (optional)                 |
+| **T_DO**  | **GPIO 19**                | MISO (shared SPI)                          |
+| **T_DIN** | **GPIO 23**                | MOSI (shared SPI)                          |
+| **T_CLK** | **GPIO 18**                | SCK (shared SPI)                           |

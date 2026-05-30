@@ -5,7 +5,7 @@ Welcome! We appreciate your interest in contributing to the Marantz Volume Monit
 ## Development Environment
 
 - **Framework:** Arduino
-- **Platform:** Espressif 8266 (NodeMCU v2)
+- **Platform:** Espressif 32 (Elegoo ESP32 DevKit V1)
 - **Tooling:** PlatformIO, [Spec Kit](https://github.com/tillig/speckit)
 - **Key Libraries:**
   - `TFT_eSPI`: High-performance graphics library.

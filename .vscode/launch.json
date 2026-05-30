@@ -12,9 +12,9 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug",
-            "executable": "C:/dev/MarantzVolumeMonitor/.pio/build/nodemcuv2/firmware.elf",
-            "projectEnvName": "nodemcuv2",
-            "toolchainBinDir": "C:/Users/tillig/.platformio/packages/toolchain-xtensa/bin",
+            "executable": "C:/dev/MarantzVolumeMonitor/.pio/build/esp32dev/firmware.elf",
+            "projectEnvName": "esp32dev",
+            "toolchainBinDir": "C:/Users/tillig/.platformio/packages/toolchain-xtensa-esp32/bin",
             "internalConsoleOptions": "openOnSessionStart",
             "preLaunchTask": {
                 "type": "PlatformIO",
@@ -25,18 +25,18 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (skip Pre-Debug)",
-            "executable": "C:/dev/MarantzVolumeMonitor/.pio/build/nodemcuv2/firmware.elf",
-            "projectEnvName": "nodemcuv2",
-            "toolchainBinDir": "C:/Users/tillig/.platformio/packages/toolchain-xtensa/bin",
+            "executable": "C:/dev/MarantzVolumeMonitor/.pio/build/esp32dev/firmware.elf",
+            "projectEnvName": "esp32dev",
+            "toolchainBinDir": "C:/Users/tillig/.platformio/packages/toolchain-xtensa-esp32/bin",
             "internalConsoleOptions": "openOnSessionStart"
         },
         {
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (without uploading)",
-            "executable": "C:/dev/MarantzVolumeMonitor/.pio/build/nodemcuv2/firmware.elf",
-            "projectEnvName": "nodemcuv2",
-            "toolchainBinDir": "C:/Users/tillig/.platformio/packages/toolchain-xtensa/bin",
+            "executable": "C:/dev/MarantzVolumeMonitor/.pio/build/esp32dev/firmware.elf",
+            "projectEnvName": "esp32dev",
+            "toolchainBinDir": "C:/Users/tillig/.platformio/packages/toolchain-xtensa-esp32/bin",
             "internalConsoleOptions": "openOnSessionStart",
             "loadMode": "manual"
         }

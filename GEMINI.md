@@ -3,7 +3,7 @@
 ## Core Mandates
 
 - **Constitution Compliance**: All development must adhere to the [Project Constitution](.specify/memory/constitution.md).
-- **Technology Stack**: ESP8266 (NodeMCU), PlatformIO, TFT_eSPI, LittleFS.
+- **Technology Stack**: ESP32 (Elegoo DevKit V1), PlatformIO, TFT_eSPI, LittleFS.
 - **Architectural Pattern**: Layered decoupling (UI, Network, Storage).
 - **Act Like a Contributor**: Follow the rules for documentation updates and validation as laid out in `CONTRIBUTING.md`.
 - **Documentation Maintenance**: Any changes to functionality or tooling must be reflected in `README.md` or `CONTRIBUTING.md`.
