@@ -17,9 +17,9 @@
 
 **Purpose**: Core infrastructure that MUST be complete before ANY user story can be implemented
 
-- [ ] T003 [P] Define UI Constants (Colors) in `src/ui/DisplayManager.h` per project standards
-- [ ] T004 [P] Update `Screen` base class in `src/ui/Screens/Screen.h` for ESP32 compatibility
-- [ ] T005 Update `ScreenManager` in `src/ui/ScreenManager.cpp` to handle initial screen setup
+- [x] T003 [P] Define UI Constants (Colors) in `src/ui/DisplayManager.h` per project standards
+- [x] T004 [P] Update `Screen` base class in `src/ui/Screens/Screen.h` for ESP32 compatibility
+- [x] T005 Update `ScreenManager` in `src/ui/ScreenManager.cpp` to handle initial screen setup
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -33,9 +33,9 @@
 
 ### Implementation for User Story 1
 
-- [ ] T006 [P] [US1] Implement ESP32-specific `TFT_eSPI` initialization in `src/ui/DisplayManager.cpp`
-- [ ] T007 [P] [US1] Implement calibration mapping logic in `src/ui/TouchManager.cpp` using derived constants
-- [ ] T008 [US1] Refactor `main.cpp` to call `DisplayManager::getInstance().begin()` and `TouchManager::getInstance().begin()`
+- [x] T006 [P] [US1] Implement ESP32-specific `TFT_eSPI` initialization in `src/ui/DisplayManager.cpp`
+- [x] T007 [P] [US1] Implement calibration mapping logic in `src/ui/TouchManager.cpp` using derived constants
+- [x] T008 [US1] Refactor `main.cpp` to call `DisplayManager::getInstance().begin()` and `TouchManager::getInstance().begin()`
 
 **Checkpoint**: At this point, the hardware is initialized via the architecture, but nothing is drawn yet.
 
@@ -49,9 +49,9 @@
 
 ### Implementation for User Story 2
 
-- [ ] T009 [P] [US2] Implement `HomeScreen::draw()` in `src/ui/Screens/HomeScreen.cpp` using `DisplayManager` constants
-- [ ] T010 [US2] Configure `ScreenManager` to set `HomeScreen` as the active screen on boot
-- [ ] T011 [US2] Update `main.cpp` to call `ScreenManager::getInstance().update()` in the loop
+- [x] T009 [P] [US2] Implement `HomeScreen::draw()` in `src/ui/Screens/HomeScreen.cpp` using `DisplayManager` constants
+- [x] T010 [US2] Configure `ScreenManager` to set `HomeScreen` as the active screen on boot
+- [x] T011 [US2] Update `main.cpp` to call `ScreenManager::getInstance().update()` in the loop
 
 **Checkpoint**: User Story 2 delivers a functional visual output using the formal architecture.
 
@@ -65,14 +65,14 @@
 
 ### Implementation for User Story 3
 
-- [ ] T012 [P] [US3] Implement `HomeScreen::handleTouch()` to detect touches and cycle colors
-- [ ] T013 [US3] Ensure `ScreenManager` correctly forwards touch events to the active screen
-- [ ] T014 [US3] Final hardware verification of end-to-end flow
+- [x] T012 [P] [US3] Implement `HomeScreen::handleTouch()` to detect touches and cycle colors
+- [x] T013 [US3] Ensure `ScreenManager` correctly forwards touch events to the active screen
+- [x] T014 [US3] Final hardware verification of end-to-end flow
 
 ---
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T015 [P] Remove all temporary hardware spike code from `main.cpp`
-- [ ] T016 [P] Update `README.md` with the new architecture status
-- [ ] T017 Run `pre-commit run --all` for final validation
+- [x] T015 [P] Remove all temporary hardware spike code from `main.cpp`
+- [x] T016 [P] Update `README.md` with the new architecture status
+- [x] T017 Run `pre-commit run --all` for final validation
