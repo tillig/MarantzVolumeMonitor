@@ -4,7 +4,7 @@
 
 HomeScreen::HomeScreen() {
     _colorIndex = 0;
-    _currentLayout = Layout::Classic;
+    _currentLayout = Layout::Unified;
     _textColors[0] = TFT_WHITE;
     _textColors[1] = TFT_GREEN;
     _textColors[2] = TFT_BLUE;
@@ -17,7 +17,7 @@ HomeScreen::HomeScreen() {
     _lastStatus.volume = -45.0;
     _lastStatus.input = "Blu-ray";
     _lastStatus.mode = "Dolby TrueHD";
-    _lastStatus.isValid = false; // Keep false to stay in prototyping mode
+    _lastStatus.isValid = false;
 }
 
 void HomeScreen::draw() {
@@ -28,18 +28,18 @@ void HomeScreen::draw() {
         case Layout::Classic: drawLayoutClassic(); break;
         case Layout::Modern:  drawLayoutModern();  break;
         case Layout::Minimal: drawLayoutMinimal(); break;
+        case Layout::Unified: drawLayoutUnified(); break;
     }
 }
 
 void HomeScreen::update() {
-    // Polling logic removed for prototyping clarity
 }
 
 void HomeScreen::handleTouch(TS_Point p) {
     if (!_lastStatus.isValid) {
-        // Cycle colors on bottom half tap, cycle layouts on top half tap
+        // Cycle layouts on top half, colors on bottom half
         if (p.y < 160) {
-            _currentLayout = (Layout)(((int)_currentLayout + 1) % 3);
+            _currentLayout = (Layout)(((int)_currentLayout + 1) % 4);
             Serial.print("HomeScreen Layout Changed to: ");
             Serial.println((int)_currentLayout);
         } else {
@@ -50,8 +50,65 @@ void HomeScreen::handleTouch(TS_Point p) {
         draw();
         return;
     }
+}
 
-    // Settings button logic...
+void HomeScreen::drawLayoutUnified() {
+    TFT_eSPI& tft = DisplayManager::getInstance().getTft();
+
+    // 1. Arc Gauge around the center
+    drawVolumeArc(240, 110, 90, _lastStatus.volume);
+
+    // 2. Large Volume Number (Font 8)
+    tft.setTextColor(TFT_WHITE, DisplayManager::COLOR_BACKGROUND);
+    tft.setTextDatum(MC_DATUM);
+    tft.drawString("-45.0", 240, 110, 8);
+    tft.setTextDatum(BC_DATUM);
+    tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY);
+    tft.drawString("dB", 240, 180, 4);
+
+    // 3. Labels below (Classic placement, no prefixes, Font 4)
+    tft.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY);
+    tft.setTextDatum(ML_DATUM);
+    tft.drawString("Blu-ray", 30, 210, 4);
+    tft.setTextDatum(MR_DATUM);
+    tft.drawString("Dolby TrueHD", 450, 210, 4);
+
+    // 4. Tiles (Modern pills with gray background)
+    String families[] = {"Dolby", "DTS", "PCM", "Other"};
+    for(int i=0; i<4; i++) {
+        int tx = 20 + (i*115);
+        int ty = 250;
+        tft.fillRoundRect(tx, ty, 105, 45, 22, DisplayManager::COLOR_BAR_BG);
+        tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY);
+        tft.setTextDatum(MC_DATUM);
+        tft.drawString(families[i], tx + 52, ty + 22, 2);
+    }
+
+    tft.setTextDatum(BC_DATUM);
+    tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
+    tft.drawString("Layout: UNIFIED (Tap Top to Cycle)", 240, 315, 2);
+}
+
+void HomeScreen::drawVolumeArc(int x, int y, int r, float volume) {
+    TFT_eSPI& tft = DisplayManager::getInstance().getTft();
+
+    // Map volume (-80 to 18) to arc progress (0 to 270 degrees)
+    float percent = (volume + 80) / 98.0;
+    if (percent < 0) percent = 0;
+    if (percent > 1) percent = 1;
+
+    int startAngle = 225; // Bottom leftish
+    int sweepAngle = (int)(percent * 270);
+
+    // Draw Background Shadow Arc
+    tft.drawArc(x, y, r, r-15, 225, 495, DisplayManager::COLOR_BAR_BG, DisplayManager::COLOR_BACKGROUND);
+
+    // Draw Value Arc with Color Gradient (simplified for now: Green -> Yellow -> Red)
+    uint16_t arcColor = TFT_GREEN;
+    if (percent > 0.5) arcColor = TFT_YELLOW;
+    if (percent > 0.8) arcColor = TFT_RED;
+
+    tft.drawArc(x, y, r, r-15, 225, 225 + sweepAngle, arcColor, DisplayManager::COLOR_BACKGROUND);
 }
 
 void HomeScreen::drawLayoutClassic() {

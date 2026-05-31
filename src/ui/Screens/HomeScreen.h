@@ -9,7 +9,8 @@ public:
     enum class Layout {
         Classic,
         Modern,
-        Minimal
+        Minimal,
+        Unified
     };
 
     HomeScreen();
@@ -17,7 +18,7 @@ public:
     void update() override;
     void handleTouch(TS_Point p) override;
 
-private:
+    private:
     MarantzStatus _lastStatus;
     uint16_t _textColors[7];
     int _colorIndex;
@@ -34,6 +35,9 @@ private:
     void drawLayoutClassic();
     void drawLayoutModern();
     void drawLayoutMinimal();
-};
+    void drawLayoutUnified();
 
+    // Helper for Arc Gauge
+    void drawVolumeArc(int x, int y, int r, float volume);
+    };
 #endif
