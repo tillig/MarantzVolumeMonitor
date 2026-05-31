@@ -6,7 +6,7 @@
 
 **Status**: Active
 
-**Input**: User request for a "Hello World" to verify NodeMCU + TFT/SPI + PlatformIO.
+**Input**: User request for a "Hello World" to verify ESP32 + TFT/SPI + PlatformIO.
 
 ## User Scenarios & Testing
 
@@ -20,7 +20,7 @@ As a developer, I want to see a "Hello World" message on the TFT display so I kn
 
 **Acceptance Scenarios**:
 
-1. **Given** the NodeMCU is powered and connected to the TFT, **When** the code runs, **Then** the screen background is black and white text "Hello World" is centered.
+1. **Given** the ESP32 is powered and connected to the TFT, **When** the code runs, **Then** the screen background is black and white text "Hello World" is centered.
 
 ---
 
@@ -65,8 +65,8 @@ As a developer, I want the "Hello World" text color to change when I touch the s
 ## Assumptions
 
 - Hardware is wired according to `spec/system/hardware.md`.
-- `TFT_eSPI_Setup.h` is correctly configured for the ST7796 driver and NodeMCU pinout.
-- The user has a stable USB connection to the NodeMCU.
+- `platformio.ini` is correctly configured for the ST7796 driver and ESP32 pinout.
+- The user has a stable USB connection to the ESP32.
 
 ## Clarifications
 
@@ -74,3 +74,4 @@ As a developer, I want the "Hello World" text color to change when I touch the s
 
 - Q: Should the spike use the existing architecture (Screen classes) or be a raw `main.cpp` test? → A: Use a raw `main.cpp` approach for the simplest possible verification, then integrate into the architecture if successful.
 - Q: How should the system handle hardware initialization failure? → A: Log detailed error to Serial and stop execution.
+on.

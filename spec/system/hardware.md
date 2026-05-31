@@ -13,7 +13,8 @@
 
 - 4" SPI TFT (480×320)
 - ST7796 Driver
-- Backlight powered from 3.3V (controlled via GPIO 32 for PWM)
+- **Main Power**: Powered from **VIN (5V)** for stability.
+- **Backlight**: Powered from **VIN (5V)**. If PWM dimming is desired, use a transistor controlled by **D32**.
 
 ## Touch Controller
 
@@ -24,28 +25,28 @@
 
 ### SPI TFT Display Wiring
 
-The display uses the **VSPI** controller pins by default.
+The display uses the **VSPI** controller pins. Note that labels on your board use the **D** prefix.
 
-| TFT Pin      | ESP32 Pin                  | Purpose                            |
-| ------------ | -------------------------- | ---------------------------------- |
-| **VCC**      | **3V3**                    | Main power for display logic       |
-| **GND**      | **GND**                    | Ground                             |
-| **CS**       | **GPIO 5**                 | Chip select                        |
-| **RESET**    | **GPIO 22**                | Reset line                         |
-| **DC**       | **GPIO 21**                | Data/command                       |
-| **MOSI**     | **GPIO 23**                | SPI MOSI (VSPI)                    |
-| **MISO**     | **GPIO 19**                | SPI MISO (VSPI)                    |
-| **SCK**      | **GPIO 18**                | SPI clock (VSPI)                   |
-| **LED / BL** | **GPIO 32**                | Backlight (PWM capable)            |
+| TFT Pin      | ESP32 Pin Label | GPIO  | Purpose                      |
+| ------------ | --------------- | ----- | ---------------------------- |
+| **VCC**      | **VIN**         | 5V    | Main power for display logic |
+| **GND**      | **GND**         | GND   | Ground                       |
+| **CS**       | **D5**          | 5     | Chip select                  |
+| **RESET**    | **D22**         | 22    | Reset line                   |
+| **DC**       | **D21**         | 21    | Data/command                 |
+| **MOSI**     | **D23**         | 23    | SPI MOSI (VSPI)              |
+| **MISO**     | **D19**         | 19    | SPI MISO (VSPI)              |
+| **SCK**      | **D18**         | 18    | SPI clock (VSPI)             |
+| **LED / BL** | **VIN (or D32)**| 5V/32 | Backlight power/control      |
 
 ### Touch Controller (XPT2046)
 
 The touch controller shares the SPI bus with the display.
 
-| Touch Pin | ESP32 Pin                  | Purpose                                    |
-| --------- | -------------------------- | ------------------------------------------ |
-| **T_CS**  | **GPIO 14**                | Touch chip select                          |
-| **T_IRQ** | **GPIO 27**                | Touch interrupt (optional)                 |
-| **T_DO**  | **GPIO 19**                | MISO (shared SPI)                          |
-| **T_DIN** | **GPIO 23**                | MOSI (shared SPI)                          |
-| **T_CLK** | **GPIO 18**                | SCK (shared SPI)                           |
+| Touch Pin | ESP32 Pin Label | GPIO  | Purpose                    |
+| --------- | --------------- | ----- | -------------------------- |
+| **T_CS**  | **D14**         | 14    | Touch chip select          |
+| **T_IRQ** | **D27**         | 27    | Touch interrupt (optional) |
+| **T_DO**  | **D19**         | 19    | MISO (shared SPI)          |
+| **T_DIN** | **D23**         | 23    | MOSI (shared SPI)          |
+| **T_CLK** | **D18**         | 18    | SCK (shared SPI)           |

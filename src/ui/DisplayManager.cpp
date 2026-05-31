@@ -7,7 +7,7 @@ void DisplayManager::begin() {
 }
 
 void DisplayManager::setBrightness(uint8_t brightness) {
-    // NodeMCU Mini doesn't always have a backlight pin wired to PWM by default
+    // ESP32 supports PWM on most pins for backlight control
     // but if it is, we would use analogWrite here.
     // Assuming for now it's just on or we'll add PWM later.
 }

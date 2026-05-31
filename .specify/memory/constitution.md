@@ -52,7 +52,7 @@ on-screen keyboard/numpad.
 
 ## Hardware & Power Standards
 
-- **Microcontroller**: NodeMCU Mini Lua WiFi (ESP8266).
+- **Microcontroller**: Elegoo ESP32 DevKit V1 (ESP32-WROOM-32).
 - **Display**: 4" SPI TFT (ST7796) + XPT2046 touch controller.
 - **Power**: 5V/2A regulated supply is mandatory for stability.
 - **Filesystem**: LittleFS for persistent configuration.

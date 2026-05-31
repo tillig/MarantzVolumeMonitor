@@ -19,12 +19,12 @@ MarantzVolumeMonitorV2/
   data/        (for LittleFS/SPIFFS)
 ```
 
-## Example `platformio.ini` (NodeMCU Mini Lua WiFi)
+## Example `platformio.ini` (Elegoo ESP32 DevKit V1)
 
 ```ini
-[env:nodemcuv2]
-platform = espressif8266
-board = nodemcuv2
+[env:esp32dev]
+platform = espressif32
+board = esp32dev
 framework = arduino
 
 monitor_speed = 115200
@@ -33,18 +33,13 @@ lib_deps =
     bodmer/TFT_eSPI
     paulstoffregen/XPT2046_Touchscreen
     bblanchon/ArduinoJson
-    ESP8266WiFi
-    ESP8266mDNS
-
-build_flags =
-    -DUSER_SETUP_LOADED
-    -include src/TFT_eSPI_Setup.h
+    LittleFS
 ```
 
 ## Migration from Visual Micro
 
 1. Install VS Code + PlatformIO extension.
-2. Create project targeting `nodemcuv2`.
+2. Create project targeting `esp32dev`.
 3. Copy source files into `src/` and headers into `include/` or `src/`.
 4. Add libraries to `platformio.ini` under `lib_deps`.
 5. Reference `TFT_eSPI_Setup.h` via `build_flags`.

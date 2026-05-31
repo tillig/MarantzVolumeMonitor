@@ -4,7 +4,7 @@
 
 ## Summary
 
-This spike verifies the core hardware components (NodeMCU, ST7796 TFT, XPT2046 Touch) and the build environment (PlatformIO, TFT_eSPI). We will implement a simple standalone `main.cpp` that renders "Hello World" and changes text color upon touch.
+This spike verifies the core hardware components (ESP32, ST7796 TFT, XPT2046 Touch) and the build environment (PlatformIO, TFT_eSPI). We will implement a simple standalone `main.cpp` that renders "Hello World" and changes text color upon touch.
 
 ## Technical Context
 
@@ -19,7 +19,7 @@ This spike verifies the core hardware components (NodeMCU, ST7796 TFT, XPT2046 T
 
 **Testing**: Visual verification on physical hardware.
 
-**Target Platform**: NodeMCU Mini Lua WiFi (ESP8266)
+**Target Platform**: Elegoo ESP32 DevKit V1 (ESP32-WROOM-32)
 
 **Project Type**: Hardware Integration Spike
 
