@@ -1,6 +1,6 @@
 # Implementation Plan: Hardware Integration Spike (Hello World)
 
-**Branch**: `001-featurename-hardware-spike` | **Date**: 2026-05-24 | **Spec**: [spec.md](spec.md)
+**Branch**: `001-hardware-spike` | **Date**: 2026-05-24 | **Spec**: [spec.md](spec.md)
 
 ## Summary
 
@@ -41,7 +41,7 @@ This spike verifies the core hardware components (ESP32, ST7796 TFT, XPT2046 Tou
 ### Documentation (this feature)
 
 ```text
-specs/001-featurename-hardware-spike/
+specs/001-hardware-spike/
 ├── spec.md              # Feature specification
 ├── plan.md              # This file
 └── tasks.md             # Implementation tasks

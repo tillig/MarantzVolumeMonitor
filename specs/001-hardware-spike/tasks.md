@@ -1,6 +1,6 @@
 # Tasks: Hardware Integration Spike (Hello World)
 
-**Input**: Design documents from `specs/001-featurename-hardware-spike/`
+**Input**: Design documents from `specs/001-hardware-spike/`
 
 **Prerequisites**: plan.md, spec.md
 
