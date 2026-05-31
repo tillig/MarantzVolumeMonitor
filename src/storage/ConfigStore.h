@@ -10,8 +10,9 @@ struct DeviceConfig {
     String wifiPassword;
     String receiverIp;
     int brightness;
+    bool useDbScale;
 
-    DeviceConfig() : wifiSsid(""), wifiPassword(""), receiverIp(""), brightness(255) {}
+    DeviceConfig() : wifiSsid(""), wifiPassword(""), receiverIp(""), brightness(255), useDbScale(false) {}
 };
 
 class ConfigStore {

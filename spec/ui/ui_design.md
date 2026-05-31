@@ -2,322 +2,83 @@
 
 Target Display: 4" 480×320 SPI TFT (Dark Mode)
 
-Status: Final
+Status: Final (Hardware Verified)
 
 ---
 
 ## 1. Overview
 
 This document defines the complete UI design for MarantzVolumeMonitor v2.
-It includes layout, typography, color palette, touch behavior, animation rules, and mockups for all screens.
-
-The UI is designed to be:
-
-- Readable from 10–15 feet away
-- Calm and non-distracting
-- Appliance-like (no constant animations)
-- Touch-friendly
-- Dark-mode optimized
+The UI is optimized for a 15-foot viewing distance using a high-contrast dark palette.
 
 ---
 
-## 2. Home Screen (Final Mockup)
+## 2. Home Screen (Final Layout)
 
 ```text
 +------------------------------------------------------------+
 |                                                            |
-|                          45.0 dB                           |
+|                           /  \                             |
+|                          | 50 |                            |
+|                           \__/                             |
 |                                                            |
-|                 [====================----]                 |
+|      Blu-ray                           Dolby TrueHD        |
 |                                                            |
-|   SRC: Blu-ray                     MODE: Dolby TrueHD       |
+|   ( Dolby )      (  DTS  )      (  PCM  )      ( Other )   |
 |                                                            |
-|   [ 🎧 Dolby ]     [ 🔊 DTS ]     [ 🎼 PCM ]     [ … Other ]|
-|                                                            |
-|                                                [ ⚙ ]        |
 +------------------------------------------------------------+
 ```
 
 ### 2.1 Home Screen Elements
 
-#### Volume Number
+#### Volume Number & Gauge
 
-- Centered, large, bold
-- Size: 72–96 px
-- High contrast
-
-#### Volume Bar
-
-- Horizontal bar beneath the number
-- Width: ~70% of screen width
-- Height: 20–24 px
-- Rounded corners (4–6 px)
-- Animates only when volume changes
+- **Center Point**: (240, 140)
+- **Volume Number**: White, Font 8 (approx 72pt), centered at **Y=125**.
+- **Volume Caption**: Dimmed Gray, Font 2, "VOLUME" centered at **Y=185**.
+- **Gauge Arc**:
+  - **Radii**: Outer 125px, Inner 109px (Thickness 16px).
+  - **Span**: 240 degrees total.
+  - **Angles**: Starts at 60° (8:00), ends at 300° (4:00) wrapping over top.
+  - **Ends**: Rounded "pill" caps (Radius 8px) at Start, End, and Current Fill.
+  - **Colors**: Gradient Fill (Green → Yellow → Red) over Shadow Background (#303030).
 
 #### Source & Mode Text
 
-- `SRC: <source>`
-- `MODE: <exact string from receiver>`
-- Mode text is **verbatim** from Marantz API
+- **Typography**: White, Font 4 (approx 26px).
+- **Vertical Position**: Centered at **Y=255**.
+- **Horizontal**: Left-aligned at X=40 (Source), Right-aligned at X=440 (Mode).
+- **Formatting**: Raw value only (No prefixes like "SRC:").
 
 #### Audio Family Tiles
 
-Tiles represent **families**, not specific modes:
-
-- Dolby
-- DTS
-- PCM
-- Other (always visible)
-
-#### Tile Behavior
-
-- Highlight tile if MODE contains:
-  - “Dolby” → Dolby tile
-  - “DTS” → DTS tile
-  - “PCM” → PCM tile
-  - Otherwise → Other tile
-- Only one tile is active at a time
-- Active tile uses accent color
-- Inactive tiles are dimmed
-
-#### Settings Gear
-
-- Small, subtle
-- Top-right corner
-- Touch target: 48×48 px
-- Opens slide-in settings panel
+- **Typography**: Secondary Gray, Font 2.
+- **Vertical Position**: **Y=278** (10px margin from bottom).
+- **Shape**: Rounded pills (Size: 102x32px, Radius: 16px).
+- **Active State**: Accent Blue background (#3DAEFF) with Black text.
 
 ---
 
 ## 3. Color Palette (Dark Mode)
 
-### Background Color
-
-- Primary: `#101010`
-- Panel: `#181818`
-
-### Text Color
-
-- Primary: `#FFFFFF`
-- Secondary: `#A0A0A0`
-- Dimmed: `#606060`
-
-### Volume Bar Color
-
-- Fill: `#3DAEFF`
-- Background: `#303030`
-- Peak (optional): `#FF7043`
-
-### Tile Color
-
-- Active background: `#3DAEFF`
-- Active text/icon: `#000000`
-- Inactive background: `#303030`
-- Inactive text/icon: `#A0A0A0`
-
-### Settings Gear Color
-
-- Default: `#A0A0A0`
-- On tap: `#3DAEFF`
+- **Background**: `#101010` (0x0841)
+- **Text Primary**: `#FFFFFF` (TFT_WHITE)
+- **Text Secondary**: `#A0A0A0` (0xA514)
+- **Text Dimmed**: `#606060` (0x632C)
+- **Accent/Fill**: `#3DAEFF` (0x3D7F)
+- **Gauge Background**: `#303030` (0x3186)
 
 ---
 
-## 4. Typography
+## 4. Animation Rules
 
-### Volume Number Typography
-
-- Size: 72–96 px
-- Weight: Bold
-- Alignment: Center
-
-### Labels (SRC, MODE) Typography
-
-- Size: 20–24 px
-- Weight: Medium
-- Alignment: Left/Right
-
-### Tile Labels Typography
-
-- Size: 18–20 px
-- Weight: Medium
-- Alignment: Center
+- **Volume Update**: Arc length and end-cap position update over 200ms.
+- **Screen Transition**: Settings panel (future) slides from right.
 
 ---
 
-## 5. Spacing & Layout
+## 5. Implementation Notes
 
-### Margins
-
-- Outer margin: 12–16 px
-- Section spacing: 20–28 px
-
-### Volume Bar Spacing
-
-- Height: 20–24 px
-- Width: ~70% of screen width
-
-### Tile Spacing
-
-- Size: ~90×50 px
-- Spacing: 10–12 px
-- Touch target: ≥48×48 px
-
-### Settings Gear Spacing
-
-- Size: ~32 px
-- Touch target: 48×48 px
-- Padding: 12 px from edges
-
----
-
-## 6. Animation Rules
-
-### Volume Change
-
-- Number transitions over 150–250 ms
-- Bar animates to new value over same duration
-- No idle animation
-
-### Screen Transitions
-
-- Settings panel slides in from right (150–200 ms)
-- Ease-in-out curve
-- Background dims 5–10%
-
-### Tile Highlight
-
-- Instant or 100 ms fade
-- No pulsing or looping animations
-
----
-
-## 7. UI Flow
-
-```text
-[ Home Screen ]
-       |
-       v
-[ Settings Panel ]  <-- slide-in from right
-       |
-       +--> WiFi Setup
-       |        |
-       |        +--> Scan Networks
-       |        +--> Enter Password (Keyboard)
-       |
-       +--> Receiver Setup
-       |        |
-       |        +--> Auto Discovery (SSDP)
-       |        +--> Manual IP Entry (Numeric Keyboard)
-       |
-       +--> Display Settings
-       |        |
-       |        +--> Brightness
-       |        +--> Theme (Dark)
-       |
-       +--> Back (slide-out)
-```
-
----
-
-## 8. Settings Screen Mockup
-
-```text
-+------------------------------------------------------------+
-| Settings                                         [ ✕ ] |
-| ------------------------------------------------------ |
-| WiFi Setup →                                           |
-| - Scan Networks                                        |
-| - Enter Password                                       |
-|                                                        |
-| Receiver Setup →                                       |
-| - Auto Discover                                        |
-| - Manual IP Entry                                      |
-|                                                        |
-| Display Settings →                                     |
-| - Brightness                                           |
-| - Theme (Dark)                                         |
-+------------------------------------------------------------+
-```
-
----
-
-## 9. On-Screen Keyboard Specification
-
-## 9.1 Modes
-
-- QWERTY (letters + punctuation)
-- Symbols (full punctuation set)
-- Numeric (for IP entry)
-
-## 9.2 Requirements
-
-- Touch targets ≥ 48×48 px
-- Enter, Backspace, Space keys
-- Mode switch keys:
-  - [123]
-  - [Symbols]
-  - [ABC]
-
-## 9.3 Character Sets
-
-### QWERTY Mode
-
-```text
-Q W E R T Y U I O P
-A S D F G H J K L
-Z X C V B N M
-
-[123]   [Symbols]   [ Space ]   [← Back]   [Enter]
-```
-
-### Symbols Mode
-
-```text
-! @ # $ % ^ & *
-( ) - _ = + [ ]
-{ } ; : ' " , .
-/ ? \ | ~ `
-
-[ABC]   [123]   [← Back]   [Enter]
-```
-
-### Numeric Mode (IP Entry)
-
-```text
-1 2 3
-4 5 6
-7 8 9
-. 0 ← Back   [Enter]
-```
-
----
-
-## 10. Implementation Notes
-
-- UI should be implemented using TFT_eSPI.
-- All coordinates should be defined in a layout constants file.
-- Animations should be time-based, not frame-based.
-- Touch regions must be debounced.
-- Settings panel should be a separate screen class.
-- Keyboard should be modular and reusable.
-
----
-
-## 11. Final Home Screen Mockup (480×320 Proportions)
-
-```text
-+------------------------------------------------------------+
-|                                                            |
-|                          45.0 dB                           |
-|                                                            |
-|                 [====================----]                 |
-|                                                            |
-|   SRC: Blu-ray                     MODE: Dolby TrueHD       |
-|                                                            |
-|   [ 🎧 Dolby ]     [ 🔊 DTS ]     [ 🎼 PCM ]     [ … Other ]|
-|                                                            |
-|                                                [ ⚙ ]        |
-+------------------------------------------------------------+
-```
-
-This is the final, approved UI design.
+- Coordinate system for `drawArc`: 0° is Bottom (6:00).
+- Coordinate system for `fillCircle` caps: Math radians (Arc Angle + 90° offset).
+- Touch hitboxes for pills: (X, 278, 102, 32).

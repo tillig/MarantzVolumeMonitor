@@ -1,66 +1,34 @@
 #include <Arduino.h>
 #include "ui/DisplayManager.h"
 #include "ui/TouchManager.h"
-
-// Hardware Spike State
-uint16_t textColors[] = {TFT_WHITE, TFT_GREEN, TFT_BLUE, TFT_RED, TFT_YELLOW, TFT_MAGENTA, TFT_CYAN};
-int colorIndex = 0;
-bool lastTouchState = false;
+#include "ui/ScreenManager.h"
+#include "ui/Screens/HomeScreen.h"
 
 void setup() {
     Serial.begin(115200);
-    delay(1000); // Give serial monitor time to connect
-    Serial.println("Hardware Spike Started");
+    delay(1000);
+    Serial.println("Marantz Volume Monitor v2 Starting...");
 
-    // Initialize Display
-    Serial.println("Initializing Display...");
+    // Initialize Hardware via Managers
     DisplayManager::getInstance().begin();
-    TFT_eSPI& tft = DisplayManager::getInstance().getTft();
-
-    // Clear screen and draw initial text
-    tft.fillScreen(TFT_BLACK);
-    tft.setTextDatum(MC_DATUM);
-    tft.setTextColor(textColors[colorIndex]);
-    tft.drawString("Hello World", 240, 160, 4); // Large font (Font 4)
-    Serial.println("Hello World drawn to display");
-
-    // Initialize Touch
-    Serial.println("Initializing Touch...");
     TouchManager::getInstance().begin();
-    Serial.println("Hardware initialization complete");
+
+    // Initial Screen (Start with HomeScreen for prototyping)
+    ScreenManager::getInstance().setScreen(new HomeScreen());
+
+    Serial.println("System Initialization Complete");
 }
 
 void loop() {
-    bool isTouched = TouchManager::getInstance().isTouched();
-
-    // Check for new touch event (rising edge)
-    if (isTouched && !lastTouchState) {
+    // 1. Handle Touch (forwarding to ScreenManager)
+    if (TouchManager::getInstance().isTouched()) {
         TS_Point p = TouchManager::getInstance().getPoint();
-        Serial.print("Screen Touch at: x=");
-        Serial.print(p.x);
-        Serial.print(", y=");
-        Serial.println(p.y);
-
-        // Cycle color
-        colorIndex = (colorIndex + 1) % (sizeof(textColors) / sizeof(textColors[0]));
-
-        // Update display
-        TFT_eSPI& tft = DisplayManager::getInstance().getTft();
-        tft.setTextColor(textColors[colorIndex]);
-
-        // Redraw text over background to avoid clearing whole screen (less flicker)
-        tft.fillScreen(TFT_BLACK);
-        tft.drawString("Hello World", 240, 160, 4);
-
-        Serial.print("Text color changed. Index: ");
-        Serial.println(colorIndex);
-
-        // Simple debounce
-        delay(200);
+        ScreenManager::getInstance().handleTouch(p);
     }
 
-    lastTouchState = isTouched;
+    // 2. Update Active Screen (polling, animations, etc.)
+    ScreenManager::getInstance().update();
 
-    // Small delay to prevent tight loop
+    // Small delay to keep loop responsive but not spinning
     delay(10);
 }

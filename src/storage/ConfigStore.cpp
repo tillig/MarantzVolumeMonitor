@@ -33,6 +33,7 @@ bool ConfigStore::loadConfig(DeviceConfig& config) {
     config.wifiPassword = doc["wifiPassword"] | "";
     config.receiverIp = doc["receiverIp"] | "";
     config.brightness = doc["brightness"] | 255;
+    config.useDbScale = doc["useDbScale"] | false;
 
     return true;
 }
@@ -43,6 +44,7 @@ bool ConfigStore::saveConfig(const DeviceConfig& config) {
     doc["wifiPassword"] = config.wifiPassword;
     doc["receiverIp"] = config.receiverIp;
     doc["brightness"] = config.brightness;
+    doc["useDbScale"] = config.useDbScale;
 
     File configFile = LittleFS.open(CONFIG_FILE, "w");
     if (!configFile) {
