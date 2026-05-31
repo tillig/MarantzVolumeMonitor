@@ -16,8 +16,17 @@ public:
     TS_Point getPoint();
 
 private:
-    TouchManager() : _ts(4) {} // D2 = GPIO 4
+    TouchManager() : _ts(TOUCH_CS) {}
     XPT2046_Touchscreen _ts;
+
+    // Calibration constants derived from raw hardware data
+    static constexpr uint16_t TS_MIN_X = 350;
+    static constexpr uint16_t TS_MAX_X = 3750;
+    static constexpr uint16_t TS_MIN_Y = 400;
+    static constexpr uint16_t TS_MAX_Y = 3750;
+
+    static constexpr uint16_t SCREEN_WIDTH = 480;
+    static constexpr uint16_t SCREEN_HEIGHT = 320;
 };
 
 #endif

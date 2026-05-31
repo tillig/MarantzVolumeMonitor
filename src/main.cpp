@@ -35,7 +35,11 @@ void loop() {
 
     // Check for new touch event (rising edge)
     if (isTouched && !lastTouchState) {
-        Serial.println("Touch detected!");
+        TS_Point p = TouchManager::getInstance().getPoint();
+        Serial.print("Screen Touch at: x=");
+        Serial.print(p.x);
+        Serial.print(", y=");
+        Serial.println(p.y);
 
         // Cycle color
         colorIndex = (colorIndex + 1) % (sizeof(textColors) / sizeof(textColors[0]));
