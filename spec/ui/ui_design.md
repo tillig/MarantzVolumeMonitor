@@ -2,22 +2,14 @@
 
 Target Display: 4" 480×320 SPI TFT (Dark Mode)
 
-Status: Final (Updated with Circular Gauge)
+Status: Final (Hardware Verified)
 
 ---
 
 ## 1. Overview
 
 This document defines the complete UI design for MarantzVolumeMonitor v2.
-It includes layout, typography, color palette, touch behavior, animation rules, and mockups for all screens.
-
-The UI is designed to be:
-
-- Readable from 10–15 feet away
-- Calm and non-distracting
-- Appliance-like (no constant animations)
-- Touch-friendly
-- Dark-mode optimized
+The UI is optimized for a 15-foot viewing distance using a high-contrast dark palette.
 
 ---
 
@@ -27,102 +19,66 @@ The UI is designed to be:
 +------------------------------------------------------------+
 |                                                            |
 |                           /  \                             |
-|                          | 45 |                            |
+|                          | 50 |                            |
 |                           \__/                             |
 |                                                            |
 |      Blu-ray                           Dolby TrueHD        |
 |                                                            |
 |   ( Dolby )      (  DTS  )      (  PCM  )      ( Other )   |
 |                                                            |
-|                                                [ ⚙ ]        |
 +------------------------------------------------------------+
 ```
 
 ### 2.1 Home Screen Elements
 
-#### Volume Number
+#### Volume Number & Gauge
 
-- Centered inside the circular gauge.
-- Large, bold white text.
-- Size: 96 px (Font 8).
-
-#### Volume Arc Gauge
-
-- A circular arc that wraps around the volume number.
-- **Inner Radius**: ~80 px.
-- **Outer Radius**: ~100 px.
-- **Arc Span**: -225° to +45° (approx 270 degree sweep).
-- **Color**: Gradient from Green (low volume) to Yellow (medium) to Red (high).
-- **Unfilled**: Dark gray shadow color (#303030).
+- **Center Point**: (240, 140)
+- **Volume Number**: White, Font 8 (approx 72pt), centered at **Y=125**.
+- **Volume Caption**: Dimmed Gray, Font 2, "VOLUME" centered at **Y=185**.
+- **Gauge Arc**:
+  - **Radii**: Outer 125px, Inner 109px (Thickness 16px).
+  - **Span**: 240 degrees total.
+  - **Angles**: Starts at 60° (8:00), ends at 300° (4:00) wrapping over top.
+  - **Ends**: Rounded "pill" caps (Radius 8px) at Start, End, and Current Fill.
+  - **Colors**: Gradient Fill (Green → Yellow → Red) over Shadow Background (#303030).
 
 #### Source & Mode Text
 
-- Positioned below the volume gauge.
-- **Left**: Actual source value (e.g., "Blu-ray"). No prefix.
-- **Right**: Actual mode value (e.g., "Dolby TrueHD"). No prefix.
-- **Size**: 24 px (Font 4) for high visibility.
+- **Typography**: White, Font 4 (approx 26px).
+- **Vertical Position**: Centered at **Y=255**.
+- **Horizontal**: Left-aligned at X=40 (Source), Right-aligned at X=440 (Mode).
+- **Formatting**: Raw value only (No prefixes like "SRC:").
 
 #### Audio Family Tiles
 
-- Dolby, DTS, PCM, Other.
-- **Shape**: Highly rounded edges (pills).
-- **Background**: Slight gray shaded background (#303030).
-- **Active State**: Accent color background (#3DAEFF) with black text.
-- **Inactive State**: Gray background with secondary text color.
-
-#### Settings Gear
-
-- Small, subtle.
-- Bottom-right corner.
-- Touch target: 48×48 px.
+- **Typography**: Secondary Gray, Font 2.
+- **Vertical Position**: **Y=278** (10px margin from bottom).
+- **Shape**: Rounded pills (Size: 102x32px, Radius: 16px).
+- **Active State**: Accent Blue background (#3DAEFF) with Black text.
 
 ---
 
 ## 3. Color Palette (Dark Mode)
 
-### Background Color
-
-- Primary: `#101010`
-- Panel: `#181818`
-
-### Text Color
-
-- Primary: `#FFFFFF`
-- Secondary: `#A0A0A0`
-- Dimmed: `#606060`
-
-### Arc Gauge Colors
-
-- Low: `#00FF00` (Green)
-- High: `#FF0000` (Red)
-- Shadow: `#303030`
+- **Background**: `#101010` (0x0841)
+- **Text Primary**: `#FFFFFF` (TFT_WHITE)
+- **Text Secondary**: `#A0A0A0` (0xA514)
+- **Text Dimmed**: `#606060` (0x632C)
+- **Accent/Fill**: `#3DAEFF` (0x3D7F)
+- **Gauge Background**: `#303030` (0x3186)
 
 ---
 
-## 4. Typography
+## 4. Animation Rules
 
-### Volume Number Typography
-
-- Size: 96 px (Font 8)
-- Weight: Bold
-- Alignment: Center
-
-### Labels (Source/Mode) Typography
-
-- Size: 24 px (Font 4)
-- Weight: Medium
-- Alignment: Left/Right
+- **Volume Update**: Arc length and end-cap position update over 200ms.
+- **Screen Transition**: Settings panel (future) slides from right.
 
 ---
 
-## 5. Animation Rules
+## 5. Implementation Notes
 
-- Volume changes should update the arc length smoothly.
-- No idle animations.
-
----
-
-## 6. Implementation Notes
-
-- Use `_tft.drawArc()` for the circular volume gauge.
-- Calibration values from `TouchManager` must be used for the settings button hit box.
+- Coordinate system for `drawArc`: 0° is Bottom (6:00).
+- Coordinate system for `fillCircle` caps: Math radians (Arc Angle + 90° offset).
+- Touch hitboxes for pills: (X, 278, 102, 32).
