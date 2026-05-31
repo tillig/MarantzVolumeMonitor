@@ -6,6 +6,12 @@
 
 class HomeScreen : public Screen {
 public:
+    enum class Layout {
+        Classic,
+        Modern,
+        Minimal
+    };
+
     HomeScreen();
     void draw() override;
     void update() override;
@@ -15,6 +21,7 @@ private:
     MarantzStatus _lastStatus;
     uint16_t _textColors[7];
     int _colorIndex;
+    Layout _currentLayout;
 
     void drawVolume(float volume);
     void drawSource(const String& source);
@@ -22,6 +29,11 @@ private:
     void drawTiles(const String& mode);
     void drawSettingsButton();
     void drawSpikeText();
+
+    // Layout-specific drawing
+    void drawLayoutClassic();
+    void drawLayoutModern();
+    void drawLayoutMinimal();
 };
 
 #endif

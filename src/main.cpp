@@ -13,14 +13,14 @@ void setup() {
     DisplayManager::getInstance().begin();
     TouchManager::getInstance().begin();
 
-    // Initial Screen
+    // Initial Screen (Start with HomeScreen for prototyping)
     ScreenManager::getInstance().setScreen(new HomeScreen());
 
     Serial.println("System Initialization Complete");
 }
 
 void loop() {
-    // 1. Handle Touch
+    // 1. Handle Touch (forwarding to ScreenManager)
     if (TouchManager::getInstance().isTouched()) {
         TS_Point p = TouchManager::getInstance().getPoint();
         ScreenManager::getInstance().handleTouch(p);

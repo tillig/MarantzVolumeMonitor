@@ -49,9 +49,11 @@
 
 ### Implementation for User Story 2
 
-- [x] T009 [P] [US2] Implement `HomeScreen::draw()` in `src/ui/Screens/HomeScreen.cpp` using `DisplayManager` constants
-- [x] T010 [US2] Configure `ScreenManager` to set `HomeScreen` as the active screen on boot
-- [x] T011 [US2] Update `main.cpp` to call `ScreenManager::getInstance().update()` in the loop
+- [x] T009 [P] [US2] Implement `HomeScreen::draw()` in `src/ui/Screens/HomeScreen.cpp`
+- [x] T010 [US2] Implement 3 Layout Presets in `HomeScreen` (Classic, Modern, Minimal)
+- [x] T011 [US2] Create touch-based "Prototyping Loop" to cycle presets for visual review
+- [x] T012 [US2] Configure `ScreenManager` to set `HomeScreen` as the active screen on boot
+- [x] T013 [US2] Update `main.cpp` to call `ScreenManager::getInstance().update()` in the loop
 
 **Checkpoint**: User Story 2 delivers a functional visual output using the formal architecture.
 

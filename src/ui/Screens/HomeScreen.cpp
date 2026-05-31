@@ -4,6 +4,7 @@
 
 HomeScreen::HomeScreen() {
     _colorIndex = 0;
+    _currentLayout = Layout::Classic;
     _textColors[0] = TFT_WHITE;
     _textColors[1] = TFT_GREEN;
     _textColors[2] = TFT_BLUE;
@@ -11,67 +12,128 @@ HomeScreen::HomeScreen() {
     _textColors[4] = TFT_YELLOW;
     _textColors[5] = TFT_MAGENTA;
     _textColors[6] = TFT_CYAN;
+
+    // Default placeholder status for prototyping
+    _lastStatus.volume = -45.0;
+    _lastStatus.input = "Blu-ray";
+    _lastStatus.mode = "Dolby TrueHD";
+    _lastStatus.isValid = false; // Keep false to stay in prototyping mode
 }
 
 void HomeScreen::draw() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
     tft.fillScreen(DisplayManager::COLOR_BACKGROUND);
 
-    if (_lastStatus.isValid) {
-        drawVolume(_lastStatus.volume);
-        drawSource(_lastStatus.input);
-        drawMode(_lastStatus.mode);
-        drawTiles(_lastStatus.mode);
-        drawSettingsButton();
-    } else {
-        drawSpikeText();
+    switch (_currentLayout) {
+        case Layout::Classic: drawLayoutClassic(); break;
+        case Layout::Modern:  drawLayoutModern();  break;
+        case Layout::Minimal: drawLayoutMinimal(); break;
     }
 }
 
 void HomeScreen::update() {
-    // If we aren't connected to a receiver, just keep showing spike text
-    if (_lastStatus.isValid) {
-        MarantzStatus status = MarantzClient::getInstance().getStatus();
-        if (status.isValid) {
-            if (status.volume != _lastStatus.volume) {
-                drawVolume(status.volume);
-            }
-            if (status.input != _lastStatus.input) {
-                drawSource(status.input);
-            }
-            if (status.mode != _lastStatus.mode) {
-                drawMode(status.mode);
-                drawTiles(status.mode);
-            }
-            _lastStatus = status;
-        }
-    }
+    // Polling logic removed for prototyping clarity
 }
 
 void HomeScreen::handleTouch(TS_Point p) {
     if (!_lastStatus.isValid) {
-        // Cycle colors if in spike mode
-        _colorIndex = (_colorIndex + 1) % 7;
-        drawSpikeText();
-        Serial.print("HomeScreen Color Changed to index: ");
-        Serial.println(_colorIndex);
+        // Cycle colors on bottom half tap, cycle layouts on top half tap
+        if (p.y < 160) {
+            _currentLayout = (Layout)(((int)_currentLayout + 1) % 3);
+            Serial.print("HomeScreen Layout Changed to: ");
+            Serial.println((int)_currentLayout);
+        } else {
+            _colorIndex = (_colorIndex + 1) % 7;
+            Serial.print("HomeScreen Color Changed to index: ");
+            Serial.println(_colorIndex);
+        }
+        draw();
         return;
     }
 
-    // Check if settings button was pressed (bottom right gear)
-    if (p.x > 400 && p.y > 240) {
-        ScreenManager::getInstance().setScreen(new SettingsScreen());
-    }
+    // Settings button logic...
 }
 
-void HomeScreen::drawSpikeText() {
+void HomeScreen::drawLayoutClassic() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
-    tft.setTextDatum(MC_DATUM);
+
+    // Large Volume
     tft.setTextColor(_textColors[_colorIndex], DisplayManager::COLOR_BACKGROUND);
-    tft.drawString("Hello World", 240, 160, 4);
+    tft.setTextDatum(MC_DATUM);
+    tft.drawString("-45.0 dB", 240, 80, 7);
+
+    // Volume Bar
+    tft.fillRoundRect(72, 140, 336, 24, 4, DisplayManager::COLOR_BAR_BG);
+    tft.fillRoundRect(72, 140, 200, 24, 4, DisplayManager::COLOR_ACCENT);
+
+    // Labels
+    tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY);
+    tft.setTextDatum(ML_DATUM);
+    tft.drawString("SRC: Blu-ray", 20, 200, 4);
+    tft.setTextDatum(MR_DATUM);
+    tft.drawString("MODE: Dolby TrueHD", 460, 200, 4);
+
+    // Tiles (boxes)
+    for(int i=0; i<4; i++) {
+        tft.drawRoundRect(20 + (i*115), 240, 100, 50, 4, DisplayManager::COLOR_BAR_BG);
+    }
+
     tft.setTextDatum(BC_DATUM);
     tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
-    tft.drawString("Architecture Ready", 240, 310, 2);
+    tft.drawString("Layout: CLASSIC (Tap Top to Cycle)", 240, 310, 2);
+}
+
+void HomeScreen::drawLayoutModern() {
+    TFT_eSPI& tft = DisplayManager::getInstance().getTft();
+
+    // Centered Bar Focus
+    tft.fillRoundRect(24, 150, 432, 40, 6, DisplayManager::COLOR_BAR_BG);
+    tft.fillRoundRect(24, 150, 300, 40, 6, DisplayManager::COLOR_ACCENT);
+
+    // Volume floating above bar
+    tft.setTextColor(_textColors[_colorIndex]);
+    tft.setTextDatum(BC_DATUM);
+    tft.drawString("-45.0 dB", 240, 140, 7);
+
+    // Labels at very top
+    tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY);
+    tft.setTextDatum(TL_DATUM);
+    tft.drawString("Blu-ray", 20, 10, 4);
+    tft.setTextDatum(TR_DATUM);
+    tft.drawString("Dolby TrueHD", 460, 10, 4);
+
+    // Tiles (pills)
+    for(int i=0; i<4; i++) {
+        tft.fillRoundRect(20 + (i*115), 230, 100, 40, 20, DisplayManager::COLOR_BAR_BG);
+    }
+
+    tft.setTextDatum(BC_DATUM);
+    tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
+    tft.drawString("Layout: MODERN (Tap Top to Cycle)", 240, 310, 2);
+}
+
+void HomeScreen::drawLayoutMinimal() {
+    TFT_eSPI& tft = DisplayManager::getInstance().getTft();
+
+    // Massive Volume Number
+    tft.setTextColor(_textColors[_colorIndex]);
+    tft.setTextDatum(MC_DATUM);
+    tft.drawString("-45.0", 240, 160, 8); // Largest font
+
+    // Thin bar at bottom
+    tft.fillRect(0, 310, 480, 10, DisplayManager::COLOR_BAR_BG);
+    tft.fillRect(0, 310, 320, 10, DisplayManager::COLOR_ACCENT);
+
+    // Tiny labels
+    tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
+    tft.setTextDatum(TL_DATUM);
+    tft.drawString("BLU-RAY", 10, 10, 2);
+    tft.setTextDatum(TR_DATUM);
+    tft.drawString("DOLBY TRUEHD", 470, 10, 2);
+
+    tft.setTextDatum(BC_DATUM);
+    tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
+    tft.drawString("Layout: MINIMAL (Tap Top to Cycle)", 240, 280, 2);
 }
 
 void HomeScreen::drawVolume(float volume) {

@@ -6,6 +6,8 @@
 
 This feature transitions the project from a raw hardware spike to its formal layered architecture. We will encapsulate the verified ESP32 hardware configurations within `DisplayManager` and `TouchManager`, implement the `HomeScreen` UI class, and refactor `main.cpp` to use the `ScreenManager` for UI orchestration.
 
+**Visual Iteration**: To support hardware-in-the-loop design, the `HomeScreen` implementation will include a "Prototyping Mode" allowing the user to cycle through different layout presets to verify visual appeal on the physical 4" screen.
+
 ## Technical Context
 
 **Language/Version**: C++/Arduino (PlatformIO)

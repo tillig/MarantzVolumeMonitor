@@ -22,6 +22,7 @@ public:
     static const uint16_t COLOR_TEXT_DIMMED = 0x632C;    // #606060
     static const uint16_t COLOR_ACCENT = 0x3D7F;         // #3DAEFF
     static const uint16_t COLOR_BAR_BG = 0x3186;         // #303030
+    static const uint16_t COLOR_TEXT_DARK = TFT_BLACK;   // For active tiles
 
 private:
     DisplayManager() : _tft(TFT_eSPI()) {}

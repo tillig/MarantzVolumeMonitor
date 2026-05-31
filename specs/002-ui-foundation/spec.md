@@ -8,6 +8,13 @@
 
 **Input**: User description: "Integrate spike logic into UI architecture"
 
+## Clarifications
+
+### Session 2026-05-31
+
+- Q: Should we expand the foundation scope to include layout skeletons from ui_design.md? → A: Yes, include Volume bar, Source/Mode labels, and Audio Tile placeholders.
+- Q: How should the system behave in an "unconfigured" state (no WiFi/Receiver set)? → A: Show a prominent "UNCONFIGURED" message with "Tap for Settings" instructions.
+
 ## User Scenarios & Testing
 
 ### User Story 1 - Clean UI Layer Initialization (Priority: P1)
@@ -25,32 +32,33 @@ As a developer, I want the display and touch hardware to be initialized within t
 
 ---
 
-### User Story 2 - Basic HomeScreen Rendering (Priority: P1)
+### User Story 2 - Final UI Layout Skeleton (Priority: P1)
 
-As a user, I want to see the application's Home Screen after boot so I know the system is ready for use.
+As a user, I want to see the real application layout (Volume, Bar, Labels, Tiles) after boot so I can see the final design intent even before the receiver is connected.
 
-**Why this priority**: Confirms the `ScreenManager` and `Screen` base classes are functioning correctly on the new hardware.
+**Why this priority**: Confirms the `ScreenManager` and `HomeScreen` classes can handle complex layouts defined in `ui_design.md`.
 
-**Independent Test**: Boot the device. Success if the `HomeScreen` is rendered with the "Hello World" text.
+**Independent Test**: Boot the device. Success if the `HomeScreen` renders all the structural elements (Volume bar, labels, tile boxes) on a black background.
 
 **Acceptance Scenarios**:
 
-1. **Given** the hardware is initialized, **When** the application starts, **Then** the `ScreenManager` displays the `HomeScreen`.
-2. **Given** the `HomeScreen` is active, **When** rendered, **Then** it uses the colors defined in the project constitution (Dark Mode).
+1. **Given** the hardware is initialized, **When** the application starts, **Then** the `ScreenManager` displays the `HomeScreen` with placeholders for Volume, Source, and Mode.
+2. **Given** the `HomeScreen` is active, **When** rendered, **Then** it uses the color palette (e.g., #101010 background, #3DAEFF accent) defined in `ui_design.md`.
 
 ---
 
-### User Story 3 - Interactive Feedback (Priority: P2)
+### User Story 3 - Unconfigured State Messaging (Priority: P2)
 
-As a user, I want the UI to respond to my touch so I can verify the end-to-one interaction layer is working.
+As a first-time user, I want a clear message when the device is not yet set up so I know I need to access the settings menu.
 
-**Why this priority**: Required for all future interactive features like menu navigation.
+**Why this priority**: Ensures the "passive appliance" feel by communicating state clearly.
 
-**Independent Test**: Touch the screen. Success if the "Hello World" text changes color.
+**Independent Test**: Power on the device for the first time. Success if the screen shows "UNCONFIGURED" in the center.
 
 **Acceptance Scenarios**:
 
-1. **Given** the `HomeScreen` is active, **When** the user touches the screen, **Then** the "Hello World" text cycles through the defined color list.
+1. **Given** no configuration exists, **When** the `HomeScreen` loads, **Then** a prominent "UNCONFIGURED" message is displayed with "Tap for Settings" instructions.
+2. **Given** the unconfigured screen is visible, **When** the user touches the screen, **Then** the system provides feedback that it is transitioning or acknowledging the setup requirement.
 
 ## Requirements
 
@@ -59,8 +67,13 @@ As a user, I want the UI to respond to my touch so I can verify the end-to-one i
 - **FR-001**: `DisplayManager` MUST handle all `TFT_eSPI` initialization using the ESP32 VSPI pin mapping.
 - **FR-002**: `TouchManager` MUST implement the calibration mapping (X: 350-3750, Y: 400-3750) to provide screen pixel coordinates.
 - **FR-003**: `ScreenManager` MUST manage the lifecycle of the active screen and handle the background clearing.
-- **FR-004**: `HomeScreen` MUST implement the `draw()` and `handleTouch()` methods.
-- **FR-005**: `main.cpp` MUST only interact with high-level managers, not raw drivers.
+- **FR-004**: `HomeScreen` MUST implement the layout skeleton from `ui_design.md`, including placeholders for:
+  - Volume Number (72-96px)
+  - Volume Bar (70% width)
+  - Source and Mode labels
+  - Audio Family Tiles (Dolby, DTS, PCM, Other)
+- **FR-005**: `HomeScreen` MUST display a prominent "UNCONFIGURED" message if WiFi or Receiver IP is missing.
+- **FR-006**: `main.cpp` MUST only interact with high-level managers, not raw drivers.
 
 ### Key Entities
 
@@ -75,7 +88,8 @@ As a user, I want the UI to respond to my touch so I can verify the end-to-one i
 
 - **SC-001**: System renders the initial screen within 2 seconds of power-on.
 - **SC-002**: Touch coordinates reported by `TouchManager` are accurate within 5 pixels of the physical touch point.
-- **SC-003**: No driver-specific code (TFT_eSPI calls) exists in `main.cpp`.
+- **SC-003**: All layout elements from `ui_design.md` are visually represented (even if data is hardcoded/placeholder).
+- **SC-004**: No driver-specific code (TFT_eSPI calls) exists in `main.cpp`.
 
 ## Assumptions
 
