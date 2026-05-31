@@ -5,8 +5,8 @@ Welcome! We appreciate your interest in contributing to the Marantz Volume Monit
 ## Development Environment
 
 - **Framework:** Arduino
-- **Platform:** Espressif 8266 (NodeMCU v2)
-- **Tooling:** PlatformIO
+- **Platform:** Espressif 32 (Elegoo ESP32 DevKit V1)
+- **Tooling:** PlatformIO, [Spec Kit](https://github.com/tillig/speckit)
 - **Key Libraries:**
   - `TFT_eSPI`: High-performance graphics library.
   - `XPT2046_Touchscreen`: Touch controller driver.
@@ -15,10 +15,15 @@ Welcome! We appreciate your interest in contributing to the Marantz Volume Monit
 
 ## Project Principles
 
-1. **Clean UI/UX:** Adhere to the `UIPlan.md` for all visual changes. Maintain the Dark Mode aesthetic and high-contrast labels.
+1. **Clean UI/UX:** Adhere to `spec/ui/ui_design.md` for all visual changes. Maintain the Dark Mode aesthetic and high-contrast labels.
 2. **Non-Blocking Logic:** Ensure the UI remains responsive. Avoid using `delay()` in the `loop()` or screen updates. Use timer-based polling for network requests.
 3. **Surgical Changes:** When fixing bugs or adding features, modify only the relevant managers or screens.
-4. **Documentation First:** Significant architectural changes should be reflected in `UpdatePlan.md` or a new design doc before implementation.
+4. **Documentation First:** Significant architectural changes should be reflected in the relevant specification in `spec/` before implementation. Any changes to functionality or tooling must be reflected in `README.md` or this file.
+
+## Quality Standards
+
+- **Validation:** All changes must pass `pre-commit` validation. Run `pre-commit run --all` before committing.
+- **Linting:** Markdown must pass `markdownlint` as configured in `.markdownlint.json`.
 
 ## How to Contribute
 
@@ -33,9 +38,10 @@ Welcome! We appreciate your interest in contributing to the Marantz Volume Monit
 
 If you are an AI assistant (like Gemini CLI) working on this codebase:
 
-- **Context Awareness:** Always read `GEMINI.md`, `UpdatePlan.md`, and `UIPlan.md` before making changes.
+- **Context Awareness:** Always read `GEMINI.md` and the relevant specifications in `spec/` before making changes.
+- **Spec Kit:** Use Spec Kit commands for planning and task management.
 - **Safety:** Do not hardcode credentials. Use the `ConfigStore` for secrets.
-- **Verification:** If possible, describe how to verify your changes in a real or simulated environment.
+- **Verification:** Always run `pre-commit run --all` before finishing a task. Describe how to verify your changes in a real or simulated environment.
 
 ## Contact
 

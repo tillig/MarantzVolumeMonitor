@@ -1,41 +1,41 @@
 {
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "type": "PlatformIO",
-            "task": "Build",
-            "problemMatcher": [
-                "$platformio"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "label": "PlatformIO: Build"
-        },
-        {
-            "type": "PlatformIO",
-            "task": "Upload",
-            "problemMatcher": [
-                "$platformio"
-            ],
-            "label": "PlatformIO: Upload"
-        },
-        {
-            "type": "PlatformIO",
-            "task": "Monitor",
-            "problemMatcher": [
-                "$platformio"
-            ],
-            "label": "PlatformIO: Monitor"
-        },
-        {
-            "type": "PlatformIO",
-            "task": "Upload File System image",
-            "problemMatcher": [
-                "$platformio"
-            ],
-            "label": "PlatformIO: Upload File System image"
-        }
-    ]
+  "tasks": [
+    {
+      "group": {
+        "isDefault": true,
+        "kind": "build"
+      },
+      "label": "PlatformIO: Build",
+      "problemMatcher": [
+        "$platformio"
+      ],
+      "task": "Build",
+      "type": "PlatformIO"
+    },
+    {
+      "label": "PlatformIO: Upload",
+      "problemMatcher": [
+        "$platformio"
+      ],
+      "task": "Upload",
+      "type": "PlatformIO"
+    },
+    {
+      "label": "PlatformIO: Monitor",
+      "problemMatcher": [
+        "$platformio"
+      ],
+      "task": "Monitor",
+      "type": "PlatformIO"
+    },
+    {
+      "label": "PlatformIO: Upload File System image",
+      "problemMatcher": [
+        "$platformio"
+      ],
+      "task": "Upload File System image",
+      "type": "PlatformIO"
+    }
+  ],
+  "version": "2.0.0"
 }

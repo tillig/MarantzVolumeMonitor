@@ -1,15 +1,15 @@
 {
-  "version": "0.8.14.dev0",
-  "integration_state_schema": 1,
+  "default_integration": "gemini",
   "installed_integrations": [
     "gemini"
   ],
+  "integration": "gemini",
   "integration_settings": {
     "gemini": {
-      "script": "ps",
-      "invoke_separator": "."
+      "invoke_separator": ".",
+      "script": "ps"
     }
   },
-  "integration": "gemini",
-  "default_integration": "gemini"
+  "integration_state_schema": 1,
+  "version": "0.8.14.dev0"
 }
