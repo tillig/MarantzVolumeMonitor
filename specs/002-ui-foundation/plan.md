@@ -1,6 +1,6 @@
 # Implementation Plan: UI Foundation Integration
 
-**Branch**: `002-ui-foundation` | **Date**: 2026-05-31 | **Spec**: [spec.md](spec.md)
+**Branch**: `feature/002-ui-foundation` | **Date**: 2026-05-31 | **Spec**: [spec.md](spec.md)
 
 ## Summary
 

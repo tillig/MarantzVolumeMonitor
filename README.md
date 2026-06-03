@@ -4,10 +4,10 @@ A modern, touchscreen-based volume monitor for Marantz home theater receivers, p
 
 ## Features
 
-- **WiFi Connectivity:** No more Ethernet cables; connects directly to your home network.
+- **Wi-Fi Connectivity:** No more Ethernet cables; connects directly to your home network.
 - **4" Touchscreen:** Large, high-contrast display with a modern Dark Mode UI.
 - **Real-time Status:** Polling-based updates for Volume, Input Source, and Audio Mode.
-- **Interactive UI:** Touch-driven configuration menus for WiFi and Receiver setup.
+- **Interactive UI:** Touch-driven configuration menus for Wi-Fi and Receiver setup.
 - **Auto-Discovery:** SSDP support to find your Marantz receiver on the network automatically.
 
 ## Hardware Requirements
@@ -32,13 +32,21 @@ This project uses [PlatformIO](https://platformio.org/) for development and [Spe
 
 Upon first boot, use the on-screen menus to:
 
-1. Connect to your WiFi network.
+1. Connect to your Wi-Fi network.
 2. Enter the IP address of your Marantz receiver (or use auto-discovery).
+
+Successful Wi-Fi setup stores credentials in `config.json` on LittleFS. On later boots, the device
+attempts to reconnect automatically using the saved SSID and password.
+
+If touch alignment is off, use the small `CAL` button on the unconfigured/setup Home Screen to
+open the calibration capture flow. That screen records a 9-point touch dataset to the serial
+console so the touch transform can be recalculated from measured hardware data instead of
+per-screen offsets.
 
 ## Project Structure
 
 - `src/ui`: UI management and screen implementations.
-- `src/network`: WiFi management and Marantz API client.
+- `src/network`: Wi-Fi management and Marantz API client.
 - `src/storage`: Persistent configuration storage using LittleFS.
 - `spec/`: Technical specifications, architectural plans, and hardware requirements.
 - `.gemini/`: Custom commands and configurations for Spec Kit.

@@ -1,12 +1,12 @@
 {
-  "default_integration": "gemini",
+  "default_integration": "agy",
   "installed_integrations": [
-    "gemini"
+    "agy"
   ],
-  "integration": "gemini",
+  "integration": "agy",
   "integration_settings": {
-    "gemini": {
-      "invoke_separator": ".",
+    "agy": {
+      "invoke_separator": "-",
       "script": "ps"
     }
   },

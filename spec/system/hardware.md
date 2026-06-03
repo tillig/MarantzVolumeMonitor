@@ -20,6 +20,12 @@
 
 - XPT2046
 - SPI shared with display (VSPI)
+- Touch alignment on this hardware requires a measured calibration transform. A 9-point affine fit
+  is used in `src/ui/TouchManager.*` because simple axis-only min/max calibration plus manual
+  offsets was not accurate enough for the keyboard and list screens.
+- `XPT2046_Touchscreen::setRotation(1)` already rotates touch controller coordinates to match the
+  display orientation. If touch drifts again, re-run the 9-point calibration capture flow and
+  update the affine coefficients rather than adding screen-specific offsets.
 
 ## Hardware Wiring (Elegoo ESP32)
 

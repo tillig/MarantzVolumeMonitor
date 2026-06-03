@@ -1,6 +1,6 @@
 # Feature Specification: UI Foundation Integration
 
-**Feature Branch**: `002-ui-foundation`
+**Feature Branch**: `feature/002-ui-foundation`
 
 **Created**: 2026-05-31
 

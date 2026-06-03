@@ -1,6 +1,6 @@
 # Feature Specification: Hardware Integration Spike (Hello World)
 
-**Feature Branch**: `000-hardware-spike`
+**Feature Branch**: `feature/001-hardware-spike`
 
 **Created**: 2026-05-24
 

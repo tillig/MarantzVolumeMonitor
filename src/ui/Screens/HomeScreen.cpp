@@ -1,6 +1,9 @@
 #include "HomeScreen.h"
 #include "SettingsScreen.h"
+#include "NetworkListScreen.h"
+#include "CalibrationScreen.h"
 #include "../ScreenManager.h"
+#include "../../network/WiFiManager.h"
 
 HomeScreen::HomeScreen() {
     _colorIndex = 0;
@@ -18,11 +21,19 @@ HomeScreen::HomeScreen() {
     _lastStatus.input = "Blu-ray";
     _lastStatus.mode = "Dolby TrueHD";
     _lastStatus.isValid = false;
+
+    loadStoredConfig();
+    refreshState();
 }
 
 void HomeScreen::draw() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
     tft.fillScreen(DisplayManager::COLOR_BACKGROUND);
+
+    if (!_lastStatus.isValid) {
+        drawSetupState();
+        return;
+    }
 
     switch (_currentLayout) {
         case Layout::Classic: drawLayoutClassic(); break;
@@ -33,23 +44,115 @@ void HomeScreen::draw() {
 }
 
 void HomeScreen::update() {
+    if (millis() - _lastRefreshMs >= 1000) {
+        MarantzStatus previousStatus = _lastStatus;
+        bool previousHasWifiConfig = _hasWifiConfig;
+        bool previousHasReceiverConfig = _hasReceiverConfig;
+        bool previousWifiConnected = _isWifiConnected;
+        String previousIpAddress = _ipAddress;
+        String previousWifiSsid = _config.wifiSsid;
+        String previousReceiverIp = _config.receiverIp;
+
+        refreshState();
+        if (previousHasWifiConfig != _hasWifiConfig ||
+            previousHasReceiverConfig != _hasReceiverConfig ||
+            previousWifiConnected != _isWifiConnected ||
+            previousIpAddress != _ipAddress ||
+            previousWifiSsid != _config.wifiSsid ||
+            previousReceiverIp != _config.receiverIp ||
+            previousStatus.isValid != _lastStatus.isValid ||
+            previousStatus.volume != _lastStatus.volume ||
+            previousStatus.input != _lastStatus.input ||
+            previousStatus.mode != _lastStatus.mode) {
+            draw();
+        }
+    }
 }
 
 void HomeScreen::handleTouch(TS_Point p) {
     if (!_lastStatus.isValid) {
-        // Cycle layouts on top half, colors on bottom half
-        if (p.y < 160) {
-            _currentLayout = (Layout)(((int)_currentLayout + 1) % 4);
-            Serial.print("HomeScreen Layout Changed to: ");
-            Serial.println((int)_currentLayout);
+        if (isCalibrationButtonPressed(p)) {
+            ScreenManager::getInstance().setScreen(new CalibrationScreen());
         } else {
-            _colorIndex = (_colorIndex + 1) % 7;
-            Serial.print("HomeScreen Color Changed to index: ");
-            Serial.println(_colorIndex);
+            ScreenManager::getInstance().setScreen(new NetworkListScreen());
         }
-        draw();
         return;
     }
+}
+
+void HomeScreen::drawSetupState() {
+    TFT_eSPI& tft = DisplayManager::getInstance().getTft();
+    tft.setTextDatum(MC_DATUM);
+
+    if (!_hasWifiConfig) {
+        tft.setTextColor(TFT_WHITE);
+        tft.drawString("UNCONFIGURED", 240, 90, 4);
+
+        tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
+        tft.drawString("Tap anywhere to configure Wi-Fi", 240, 138, 2);
+    } else if (_isWifiConnected && !_hasReceiverConfig) {
+        tft.setTextColor(TFT_WHITE);
+        tft.drawString("WI-FI CONNECTED", 240, 80, 4);
+
+        tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY);
+        tft.drawString(_config.wifiSsid, 240, 122, 2);
+        if (_ipAddress.length() > 0) {
+            tft.drawString(_ipAddress, 240, 146, 2);
+        }
+
+        tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
+        tft.drawString("Receiver setup is still required.", 240, 188, 2);
+        tft.drawString("Tap to change Wi-Fi if needed.", 240, 212, 2);
+    } else if (!_isWifiConnected) {
+        tft.setTextColor(TFT_WHITE);
+        tft.drawString("CONNECTING WI-FI", 240, 90, 4);
+
+        tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY);
+        tft.drawString(_config.wifiSsid, 240, 134, 2);
+
+        tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
+        tft.drawString("Saved credentials found. Waiting for connection.", 240, 182, 2);
+        tft.drawString("Tap to reconfigure Wi-Fi.", 240, 206, 2);
+    } else {
+        tft.setTextColor(TFT_WHITE);
+        tft.drawString("RECEIVER UNAVAILABLE", 240, 90, 4);
+
+        tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
+        tft.drawString("Wi-Fi is connected, but receiver status is unavailable.", 240, 142, 2);
+        tft.drawString("Tap to change Wi-Fi settings.", 240, 166, 2);
+    }
+
+    tft.fillRoundRect(390, 286, 72, 24, 12, DisplayManager::COLOR_PANEL);
+    tft.drawRoundRect(390, 286, 72, 24, 12, DisplayManager::COLOR_BAR_BG);
+    tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
+    tft.drawString("CAL", 426, 298, 1);
+}
+
+void HomeScreen::loadStoredConfig() {
+    _config = DeviceConfig();
+    ConfigStore::getInstance().loadConfig(_config);
+}
+
+void HomeScreen::refreshState() {
+    _lastRefreshMs = millis();
+
+    _hasWifiConfig = _config.wifiSsid.length() > 0;
+    _hasReceiverConfig = _config.receiverIp.length() > 0;
+    _isWifiConnected = WiFiManager::getInstance().isConnected();
+    _ipAddress = _isWifiConnected ? WiFiManager::getInstance().getIPAddress() : "";
+
+    _lastStatus.isValid = false;
+    if (_hasReceiverConfig) {
+        MarantzClient::getInstance().setReceiverIp(_config.receiverIp);
+    }
+
+    if (_hasWifiConfig && _hasReceiverConfig && _isWifiConnected) {
+        _lastStatus = MarantzClient::getInstance().getStatus();
+    }
+}
+
+bool HomeScreen::isCalibrationButtonPressed(TS_Point p) const {
+    return p.x >= 390 && p.x <= 462 && p.y >= 286 && p.y <= 310;
 }
 
 void HomeScreen::drawLayoutUnified() {
@@ -60,24 +163,22 @@ void HomeScreen::drawLayoutUnified() {
     drawVolumeArc(240, 140, 125, _lastStatus.volume);
 
     // 2. Large Volume Number (Font 8)
-    // Moved up 5px to Y=125 for final visual centering
     tft.setTextColor(TFT_WHITE, DisplayManager::COLOR_BACKGROUND);
     tft.setTextDatum(MC_DATUM);
     tft.drawNumber((int)_lastStatus.volume, 240, 125, 8);
 
-    // "VOLUME" label moved up to Y=185
     tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
     tft.setTextDatum(MC_DATUM);
     tft.drawString("VOLUME", 240, 185, 2);
 
-    // 3. Labels (Moved to Y=255 to clear the gauge)
+    // 3. Labels
     tft.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY);
     tft.setTextDatum(ML_DATUM);
     tft.drawString("Blu-ray", 40, 255, 4);
     tft.setTextDatum(MR_DATUM);
     tft.drawString("Dolby TrueHD", 440, 255, 4);
 
-    // 4. Tiles (10px margin from bottom: 320 - 32 - 10 = 278)
+    // 4. Tiles (10px margin from bottom)
     String families[] = {"Dolby", "DTS", "PCM", "Other"};
     for(int i=0; i<4; i++) {
         int tx = 25 + (i*112);
@@ -101,7 +202,6 @@ void HomeScreen::drawVolumeArc(int x, int y, int r, float volume) {
     int currentSweep = (int)(percent * maxSweep);
     int endAngle = startAngle + currentSweep;
 
-    // Draw the Gradient Fill
     for (int i = 0; i < currentSweep; i += 8) {
         float p = (float)i / maxSweep;
         uint8_t red, green;
@@ -120,19 +220,13 @@ void HomeScreen::drawVolumeArc(int x, int y, int r, float volume) {
         tft.drawArc(x, y, r, r-16, segStart, segEnd, color, DisplayManager::COLOR_BACKGROUND);
     }
 
-    // Add Rounded Ends (Pills)
-    // To align with Arc (0=Bottom), Math Angle = Arc Angle + 90
     float r_mid = r - 8;
-
-    // 1. Start cap (8:00 - Arc 60)
     float a1 = (60 + 90) * PI / 180.0;
     tft.fillCircle(x + r_mid * cos(a1), y + r_mid * sin(a1), 8, tft.color565(0, 255, 0));
 
-    // 2. Track End cap (4:00 - Arc 300)
     float a3 = (300 + 90) * PI / 180.0;
     tft.fillCircle(x + r_mid * cos(a3), y + r_mid * sin(a3), 8, DisplayManager::COLOR_BAR_BG);
 
-    // 3. Current volume cap (Gradient color)
     if (currentSweep > 0) {
         float a2 = (endAngle + 90) * PI / 180.0;
         float p = (float)currentSweep / maxSweep;

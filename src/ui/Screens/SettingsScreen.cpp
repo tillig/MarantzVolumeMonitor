@@ -13,7 +13,7 @@ void SettingsScreen::draw() {
     tft.drawFastHLine(20, 50, 440, DisplayManager::COLOR_TEXT_DIMMED);
 
     tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY);
-    tft.drawString("WiFi Setup ->", 20, 80, 4);
+    tft.drawString("Wi-Fi Setup ->", 20, 80, 4);
     tft.drawString("Receiver Setup ->", 20, 140, 4);
     tft.drawString("Display Settings ->", 20, 200, 4);
 

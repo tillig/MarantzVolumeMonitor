@@ -1,16 +1,29 @@
 #include "ConfigStore.h"
 
+bool ConfigStore::ensureReady() {
+    return _isReady || begin();
+}
+
 bool ConfigStore::begin() {
+    if (_isReady) {
+        return true;
+    }
+
     if (!LittleFS.begin(true)) {
         Serial.println("An Error has occurred while mounting LittleFS");
         return false;
     }
+
+    _isReady = true;
     return true;
 }
 
 bool ConfigStore::loadConfig(DeviceConfig& config) {
+    if (!ensureReady()) {
+        return false;
+    }
+
     if (!LittleFS.exists(CONFIG_FILE)) {
-        Serial.println("Config file does not exist");
         return false;
     }
 
@@ -39,6 +52,10 @@ bool ConfigStore::loadConfig(DeviceConfig& config) {
 }
 
 bool ConfigStore::saveConfig(const DeviceConfig& config) {
+    if (!ensureReady()) {
+        return false;
+    }
+
     JsonDocument doc;
     doc["wifiSsid"] = config.wifiSsid;
     doc["wifiPassword"] = config.wifiPassword;

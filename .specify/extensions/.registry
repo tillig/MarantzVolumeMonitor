@@ -8,7 +8,7 @@
       "enabled": true,
       "priority": 10,
       "registered_commands": {
-        "gemini": [
+        "agy": [
           "speckit.git.feature",
           "speckit.git.validate",
           "speckit.git.remote",
@@ -26,7 +26,7 @@
       "enabled": true,
       "priority": 10,
       "registered_commands": {
-        "gemini": [
+        "agy": [
           "speckit.branch-convention.configure",
           "speckit.branch-convention.validate",
           "speckit.branch-convention.rename"

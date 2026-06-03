@@ -11,6 +11,8 @@ public:
         return instance;
     }
 
+    void startConnect(const String& ssid, const String& password);
+    wl_status_t getConnectStatus();
     bool connect(const String& ssid, const String& password);
     bool isConnected();
     String getIPAddress();
@@ -21,7 +23,10 @@ public:
         uint8_t encryptionType;
     };
 
-    std::vector<NetworkInfo> scanNetworks();
+    void startScan();
+    int16_t getScanStatus();
+    std::vector<NetworkInfo> getScanResults();
+    std::vector<NetworkInfo> scanNetworks(); // Existing for backward compatibility if needed
 
 private:
     WiFiManager() {}

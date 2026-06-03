@@ -1,5 +1,13 @@
 #include "WiFiManager.h"
 
+void WiFiManager::startConnect(const String& ssid, const String& password) {
+    WiFi.begin(ssid.c_str(), password.c_str());
+}
+
+wl_status_t WiFiManager::getConnectStatus() {
+    return WiFi.status();
+}
+
 bool WiFiManager::connect(const String& ssid, const String& password) {
     WiFi.begin(ssid.c_str(), password.c_str());
 
@@ -27,6 +35,47 @@ bool WiFiManager::isConnected() {
 
 String WiFiManager::getIPAddress() {
     return WiFi.localIP().toString();
+}
+
+#include <map>
+
+std::vector<WiFiManager::NetworkInfo> WiFiManager::getScanResults() {
+    std::vector<NetworkInfo> networks;
+    int n = WiFi.scanComplete();
+    if (n > 0) {
+        // Use a map to deduplicate by SSID, keeping the strongest RSSI
+        std::map<String, NetworkInfo> deduped;
+
+        for (int i = 0; i < n; ++i) {
+            String ssid = WiFi.SSID(i);
+            int32_t rssi = WiFi.RSSI(i);
+            uint8_t enc = WiFi.encryptionType(i);
+
+            if (deduped.find(ssid) == deduped.end() || rssi > deduped[ssid].rssi) {
+                deduped[ssid] = {ssid, rssi, enc};
+            }
+        }
+
+        for (auto const& [ssid, info] : deduped) {
+            networks.push_back(info);
+        }
+
+        // Sort by RSSI (strongest first)
+        std::sort(networks.begin(), networks.end(), [](const NetworkInfo& a, const NetworkInfo& b) {
+            return a.rssi > b.rssi;
+        });
+
+        WiFi.scanDelete();
+    }
+    return networks;
+}
+
+void WiFiManager::startScan() {
+    WiFi.scanNetworks(true);
+}
+
+int16_t WiFiManager::getScanStatus() {
+    return WiFi.scanComplete();
 }
 
 std::vector<WiFiManager::NetworkInfo> WiFiManager::scanNetworks() {

@@ -28,7 +28,10 @@ public:
 
 private:
     ConfigStore() {}
+    bool ensureReady();
+
     const char* CONFIG_FILE = "/config.json";
+    bool _isReady = false;
 };
 
 #endif
