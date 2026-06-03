@@ -1,7 +1,6 @@
 ---
 name: speckit-branch-convention-validate
-description:
-  Check all feature branches and spec folders against the configured naming
+description: Check all feature branches and spec folders against the configured naming
   convention
 compatibility: Requires spec-kit project structure with .specify/ directory
 metadata:
@@ -63,21 +62,19 @@ You **MUST** consider the user input before proceeding (if not empty). The user 
 
    ## Results
 
-   | Branch             | Folder          | Status           | Issues                   |
-   | ------------------ | --------------- | ---------------- | ------------------------ |
+   | Branch             | Folder          | Status          | Issues                   |
+   | ------------------ | --------------- | --------------- | ------------------------ |
    | feat/003-user-auth | 003-user-auth   | ✅ Compliant     | —                        |
    | 004-chat-system    | 004-chat-system | ⚠️ Non-compliant | Missing type prefix      |
    | feat/5-api         | 5-api           | ⚠️ Non-compliant | Sequence not zero-padded |
 
    ## Summary
-
    - **Total**: {N} branches
    - **Compliant**: {X} ✅
    - **Non-compliant**: {Y} ⚠️
    - **Orphaned folders** (no branch): {Z}
 
    ## Recommended Actions
-
    1. Run `/speckit.branch-convention.rename` to fix non-compliant items
    ```
 
