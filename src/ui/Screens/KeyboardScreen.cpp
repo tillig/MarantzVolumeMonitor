@@ -13,7 +13,8 @@
 #define KEY_EYE       '\x06'
 #define KEY_SPACE     ' '
 
-KeyboardScreen::KeyboardScreen(const String& ssid) : _ssid(ssid) {
+KeyboardScreen::KeyboardScreen(const String& ssid, ScreenReturnTarget returnTarget)
+    : _ssid(ssid), _returnTarget(returnTarget) {
     _currentMode = Mode::Lowercase;
     _capsLock = false;
     initKeys();
@@ -48,13 +49,13 @@ void KeyboardScreen::handleTouch(TS_Point p) {
                         break;
                     case KEY_OK:
                         if (_ssid == "") {
-                            ScreenManager::getInstance().setScreen(new KeyboardScreen(_password));
+                            ScreenManager::getInstance().setScreen(new KeyboardScreen(_password, _returnTarget));
                         } else {
-                            ScreenManager::getInstance().setScreen(new SetupStatusScreen(_ssid, _password));
+                            ScreenManager::getInstance().setScreen(new SetupStatusScreen(_ssid, _password, _returnTarget));
                         }
                         return;
                     case KEY_CANCEL:
-                        ScreenManager::getInstance().setScreen(new NetworkListScreen());
+                        ScreenManager::getInstance().setScreen(new NetworkListScreen(_returnTarget));
                         return;
                     case KEY_SHIFT:
                         _capsLock = !_capsLock;

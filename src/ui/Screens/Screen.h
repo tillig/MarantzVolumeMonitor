@@ -4,6 +4,11 @@
 #include "../DisplayManager.h"
 #include "../TouchManager.h"
 
+enum class ScreenReturnTarget {
+    Home,
+    Settings
+};
+
 class Screen {
 public:
     virtual ~Screen() {}

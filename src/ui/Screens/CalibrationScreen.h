@@ -5,6 +5,7 @@
 
 class CalibrationScreen : public Screen {
 public:
+    CalibrationScreen(ScreenReturnTarget returnTarget = ScreenReturnTarget::Home);
     void draw() override;
     void update() override;
     void handleTouch(TS_Point p) override;
@@ -29,6 +30,7 @@ private:
     uint8_t _step = 0;
     bool _isComplete = false;
     bool _printedHeader = false;
+    ScreenReturnTarget _returnTarget;
 
     CalibrationPoint _points[PointCount] = {
         {40, 40, "Top Left"},

@@ -8,6 +8,7 @@ This extension provides Git operations as an optional, self-contained module. It
 
 - **Repository initialization** with configurable commit messages
 - **Feature branch creation** with sequential (`001-feature-name`) or timestamp (`20260319-143022-feature-name`) numbering
+- **Branch convention integration** by honoring `.specify/branch-convention.yml` when one is configured
 - **Branch validation** to ensure branches follow naming conventions
 - **Git remote detection** for GitHub integration (e.g., issue creation)
 - **Auto-commit** after core commands (configurable per-command with custom messages)
@@ -64,6 +65,11 @@ auto_commit:
     enabled: true
     message: "[Spec Kit] Add specification"
 ```
+
+If `.specify/branch-convention.yml` exists, `speckit.git.feature` uses its `branch_pattern`,
+`type_prefix`, `seq_padding`, `date_format`, `separator`, and `ticket_pattern` values when
+constructing the branch name. This keeps `/speckit.specify` aligned with the configured project
+branch convention instead of the git extension's built-in default numbering format.
 
 ## Installation
 

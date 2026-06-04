@@ -24,11 +24,13 @@ public:
 
     void setReceiverIp(const String& ip);
     MarantzStatus getStatus();
+    bool verifyReceiver(const String& ip, MarantzStatus* verifiedStatus = nullptr);
 
 private:
     MarantzClient() : _receiverIp("") {}
     String _receiverIp;
 
+    MarantzStatus fetchStatus(const String& ip);
     String extractValue(const String& xml, const String& tag);
 };
 

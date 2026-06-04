@@ -1,13 +1,14 @@
 #include "SetupStatusScreen.h"
 #include "HomeScreen.h"
 #include "KeyboardScreen.h"
+#include "SettingsScreen.h"
 #include "../ScreenManager.h"
 #include "../DisplayManager.h"
 #include "../../network/WiFiManager.h"
 #include "../../storage/ConfigStore.h"
 
-SetupStatusScreen::SetupStatusScreen(const String& ssid, const String& password)
-    : _ssid(ssid), _password(password) {}
+SetupStatusScreen::SetupStatusScreen(const String& ssid, const String& password, ScreenReturnTarget returnTarget)
+    : _ssid(ssid), _password(password), _returnTarget(returnTarget) {}
 
 void SetupStatusScreen::draw() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
@@ -56,7 +57,11 @@ void SetupStatusScreen::update() {
             }
 
             Serial.println("WiFi Connected Successfully");
-            ScreenManager::getInstance().setScreen(new HomeScreen());
+            if (_returnTarget == ScreenReturnTarget::Settings) {
+                ScreenManager::getInstance().setScreen(new SettingsScreen());
+            } else {
+                ScreenManager::getInstance().setScreen(new HomeScreen());
+            }
         } else if (status == WL_CONNECT_FAILED || status == WL_NO_SSID_AVAIL || (millis() - _startTime > 15000)) {
             _isConnecting = false;
             _failed = true;
@@ -68,6 +73,6 @@ void SetupStatusScreen::update() {
 
 void SetupStatusScreen::handleTouch(TS_Point p) {
     if (_failed && p.y > 220) {
-        ScreenManager::getInstance().setScreen(new KeyboardScreen(_ssid));
+        ScreenManager::getInstance().setScreen(new KeyboardScreen(_ssid, _returnTarget));
     }
 }

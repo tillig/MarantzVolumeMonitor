@@ -3,6 +3,7 @@
 #include <Arduino.h>
 
 #include "HomeScreen.h"
+#include "SettingsScreen.h"
 #include "../DisplayManager.h"
 #include "../ScreenManager.h"
 #include "../TouchManager.h"
@@ -12,6 +13,9 @@ uint16_t average3(uint16_t a, uint16_t b, uint16_t c) {
     return static_cast<uint16_t>((static_cast<uint32_t>(a) + b + c) / 3U);
 }
 }
+
+CalibrationScreen::CalibrationScreen(ScreenReturnTarget returnTarget)
+    : _returnTarget(returnTarget) {}
 
 void CalibrationScreen::draw() {
     if (!_printedHeader) {
@@ -30,7 +34,9 @@ void CalibrationScreen::draw() {
         tft.drawString("Capture complete", 240, 90, 4);
         tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY, TFT_BLACK);
         tft.drawString("Copy the serial log from this run.", 240, 140, 2);
-        tft.drawString("Tap anywhere to return home.", 240, 170, 2);
+        String returnText = _returnTarget == ScreenReturnTarget::Settings ? "Tap anywhere to return to Settings."
+                                                                          : "Tap anywhere to return home.";
+        tft.drawString(returnText, 240, 170, 2);
         tft.drawString("No new constants are applied yet.", 240, 200, 2);
         return;
     }
@@ -56,7 +62,11 @@ void CalibrationScreen::update() {}
 
 void CalibrationScreen::handleTouch(TS_Point p) {
     if (_isComplete) {
-        ScreenManager::getInstance().setScreen(new HomeScreen());
+        if (_returnTarget == ScreenReturnTarget::Settings) {
+            ScreenManager::getInstance().setScreen(new SettingsScreen());
+        } else {
+            ScreenManager::getInstance().setScreen(new HomeScreen());
+        }
         return;
     }
 

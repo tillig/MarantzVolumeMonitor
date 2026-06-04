@@ -15,33 +15,61 @@ Welcome! We appreciate your interest in contributing to the Marantz Volume Monit
 
 ## Project Principles
 
-1. **Clean UI/UX:** Adhere to `spec/ui/ui_design.md` for all visual changes. Maintain the Dark Mode aesthetic and high-contrast labels.
+1. **Clean UI/UX:** Adhere to `docs/ui-reference.md` for visual changes. Maintain the dark-mode aesthetic and high-contrast labels.
 2. **Non-Blocking Logic:** Ensure the UI remains responsive. Avoid using `delay()` in the `loop()` or screen updates. Use timer-based polling for network requests.
 3. **Surgical Changes:** When fixing bugs or adding features, modify only the relevant managers or screens.
-4. **Documentation First:** Significant architectural changes should be reflected in the relevant specification in `spec/` before implementation. Any changes to functionality or tooling must be reflected in `README.md` or this file.
+4. **Documentation First:** Feature work should be driven through Spec Kit artifacts in `specs/`. Durable behavior, hardware, tooling, or architecture changes must update the appropriate top-level documentation.
 
 ## Quality Standards
 
-- **Validation:** All changes must pass `pre-commit` validation. Run `pre-commit run --all` before committing.
+- **Validation:** All changes must pass `pre-commit` validation. Run `pre-commit run --all-files` before committing.
 - **Linting:** Markdown must pass `markdownlint` as configured in `.markdownlint.json`.
+- **Firmware Build:** Run `platformio run` before finishing firmware changes.
+
+## Build And Validation
+
+Use these commands from the repository root:
+
+```bash
+platformio run
+pre-commit run --all-files
+```
+
+To flash a connected ESP32, use PlatformIO's upload action or:
+
+```bash
+platformio run --target upload
+```
 
 ## How to Contribute
 
 1. **Report Issues:** Use the GitHub issue tracker for bugs or feature requests.
 2. **Submit PRs:**
    - Follow the existing code style (CamelCase for classes, camelCase for methods/variables).
-   - Use the `feature/` branch naming convention.
+   - Use the Spec Kit branch convention in `.specify/branch-convention.yml`. In this repository,
+     `/speckit.specify` should create branches in the `feature/NNN-short-name` form.
    - Ensure the code compiles and follows the `platformio.ini` configuration.
    - Update tests or documentation if applicable.
+
+## Documentation Responsibilities
+
+- Update `README.md` for user-facing setup, usage, hardware summary, and project consumption changes.
+- Update this file for build, validation, contribution, or workflow changes.
+- Update `docs/hardware.md` for wiring, power, touch calibration, or physical assembly changes.
+- Update `docs/ui-reference.md` for durable visual language, layout, or touch-target guidance.
+- Update `docs/architecture.md` for durable layer, ownership, or source-layout changes.
+- Keep feature-specific requirements, contracts, quickstarts, and implementation tasks in `specs/NNN-*`.
 
 ## AI Contributor Guidelines
 
 If you are an AI assistant (like Gemini CLI) working on this codebase:
 
-- **Context Awareness:** Always read `GEMINI.md` and the relevant specifications in `spec/` before making changes.
+- **Context Awareness:** Always read `AGENTS.md`, the active Spec Kit feature under `specs/`, and relevant durable references in `docs/` before making changes.
 - **Spec Kit:** Use Spec Kit commands for planning and task management.
+- **Branching:** Prefer `/speckit.specify` so the git hook can generate a compliant feature branch
+  from `.specify/branch-convention.yml`.
 - **Safety:** Do not hardcode credentials. Use the `ConfigStore` for secrets.
-- **Verification:** Always run `pre-commit run --all` before finishing a task. Describe how to verify your changes in a real or simulated environment.
+- **Verification:** Always run `pre-commit run --all-files` before finishing a task. Describe how to verify your changes in a real or simulated environment.
 
 ## Contact
 

@@ -5,7 +5,8 @@
 
 class SetupStatusScreen : public Screen {
 public:
-    SetupStatusScreen(const String& ssid, const String& password);
+    SetupStatusScreen(const String& ssid, const String& password,
+                      ScreenReturnTarget returnTarget = ScreenReturnTarget::Home);
     void draw() override;
     void update() override;
     void handleTouch(TS_Point p) override;
@@ -13,6 +14,7 @@ public:
 private:
     String _ssid;
     String _password;
+    ScreenReturnTarget _returnTarget;
     String _failureMessage = "Connection Failed";
     bool _isConnecting = false;
     bool _failed = false;

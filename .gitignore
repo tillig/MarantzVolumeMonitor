@@ -9,6 +9,20 @@
 # Compilation databases
 compile_commands.json
 
+# C/C++ build artifacts
+build/
+bin/
+obj/
+out/
+*.o
+*.a
+*.so
+*.dll
+*.exe
+*.elf
+*.map
+*.log
+
 # IDEs
 .idea/
 *.swp

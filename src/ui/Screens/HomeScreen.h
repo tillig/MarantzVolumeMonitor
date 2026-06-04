@@ -40,6 +40,7 @@ private:
     void loadStoredConfig();
     void refreshState();
     bool isCalibrationButtonPressed(TS_Point p) const;
+    bool isSettingsButtonPressed(TS_Point p) const;
 
     // Layout-specific drawing
     void drawLayoutClassic();

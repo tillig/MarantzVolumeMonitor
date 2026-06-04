@@ -1,18 +1,13 @@
 <!--
 Sync Impact Report:
-- Version change: Initial Template → 1.0.0
+- Version change: 1.0.0 -> 1.0.1
 - List of modified principles:
-  - Principle 1 → I. Visibility-First UI
-  - Principle 2 → II. Passive Appliance Stability
-  - Principle 3 → III. Strict Layered Architecture
-  - Principle 4 → IV. Deterministic Dependency Management
-  - Principle 5 → V. Intuitive On-Device Setup
-- Added sections: Hardware & Power Standards, Development Workflow
+  - Development Workflow: documentation guidance now separates Spec Kit feature artifacts from durable reference docs
+- Added sections: None
 - Removed sections: None
-- Templates requiring updates (✅ updated / ⚠ pending):
-  - .specify/templates/plan-template.md ✅
-  - .specify/templates/spec-template.md ✅
-  - .specify/templates/tasks-template.md ✅
+- Templates requiring updates:
+  - .specify/templates/plan-template.md updated
+  - .specify/templates/tasks-template.md updated
 - Follow-up TODOs: None
 -->
 
@@ -60,7 +55,9 @@ on-screen keyboard/numpad.
 ## Development Workflow
 
 - **Coding Style**: CamelCase for classes, camelCase for methods/members.
-- **Documentation**: All new features must have a spec/ entry and an implementation plan.
+- **Documentation**: All new features must have a Spec Kit entry under `specs/` and an
+  implementation plan. Durable hardware, UI, architecture, usage, and contribution guidance must be
+  kept in `docs/`, `README.md`, or `CONTRIBUTING.md` as appropriate.
 - **Testing**: Hardware verification is required for all UI and networking changes.
 
 ## Governance
@@ -69,4 +66,4 @@ The Constitution is the project's supreme guidance. All architectural decisions 
 against these principles. Amendments require a version bump and an update to the Sync Impact
 Report. Compliance is reviewed during the implementation planning phase.
 
-**Version**: 1.0.0 | **Ratified**: 2026-05-23 | **Last Amended**: 2026-05-23
+**Version**: 1.0.1 | **Ratified**: 2026-05-23 | **Last Amended**: 2026-06-03

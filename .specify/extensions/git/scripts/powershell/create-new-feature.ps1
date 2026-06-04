@@ -70,9 +70,9 @@ function Get-HighestNumberFromNames {
 
     [long]$highest = 0
     foreach ($name in $Names) {
-        if ($name -match '^(\d{3,})-' -and $name -notmatch '^\d{8}-\d{6}-') {
+        if ($name -match '(^|/)(\d{3,})-' -and $name -notmatch '(^|/)\d{8}-\d{6}-') {
             [long]$num = 0
-            if ([long]::TryParse($matches[1], [ref]$num) -and $num -gt $highest) {
+            if ([long]::TryParse($matches[2], [ref]$num) -and $num -gt $highest) {
                 $highest = $num
             }
         }
@@ -146,6 +146,170 @@ function Get-NextBranchNumber {
 function ConvertTo-CleanBranchName {
     param([string]$Name)
     return $Name.ToLower() -replace '[^a-z0-9]', '-' -replace '-{2,}', '-' -replace '^-', '' -replace '-$', ''
+}
+
+function Get-ConfigScalar {
+    param(
+        [string]$Path,
+        [string]$Key
+    )
+
+    if (-not (Test-Path $Path)) {
+        return $null
+    }
+
+    $match = Select-String -Path $Path -Pattern "^\s*$([regex]::Escape($Key))\s*:\s*`"?([^`"]+)`"?\s*$" | Select-Object -First 1
+    if ($match) {
+        return $match.Matches[0].Groups[1].Value
+    }
+
+    return $null
+}
+
+function Get-ConfigMapValue {
+    param(
+        [string]$Path,
+        [string]$Section,
+        [string]$Key
+    )
+
+    if (-not (Test-Path $Path)) {
+        return $null
+    }
+
+    $lines = Get-Content $Path
+    $inSection = $false
+
+    foreach ($line in $lines) {
+        if ($line -match "^\s*$([regex]::Escape($Section))\s*:\s*$") {
+            $inSection = $true
+            continue
+        }
+
+        if ($inSection -and $line -match '^\S') {
+            break
+        }
+
+        if ($inSection -and $line -match "^\s+$([regex]::Escape($Key))\s*:\s*`"?([^`"]+)`"?\s*$") {
+            return $matches[1]
+        }
+    }
+
+    return $null
+}
+
+function ConvertTo-ConventionToken {
+    param(
+        [string]$Value,
+        [string]$Separator,
+        [bool]$Lowercase
+    )
+
+    if ($null -eq $Value) {
+        return ''
+    }
+
+    $normalized = $Value
+    if ($Lowercase) {
+        $normalized = $normalized.ToLower()
+    }
+
+    $escapedSeparator = [regex]::Escape($Separator)
+    $normalized = $normalized -replace '[^A-Za-z0-9]', $Separator
+    $normalized = $normalized -replace "$escapedSeparator{2,}", $Separator
+    $normalized = $normalized -replace "^$escapedSeparator+", ''
+    $normalized = $normalized -replace "$escapedSeparator+$", ''
+
+    return $normalized
+}
+
+function ConvertTo-StrftimeDateFormat {
+    param([string]$Format)
+
+    $resolved = if ([string]::IsNullOrWhiteSpace($Format)) { 'YYYYMMDD' } else { $Format }
+    $resolved = $resolved.Replace('YYYY', 'yyyy')
+    $resolved = $resolved.Replace('DD', 'dd')
+    $resolved = $resolved.Replace('HH', 'HH')
+    $resolved = $resolved.Replace('mm', 'mm')
+    $resolved = $resolved.Replace('ss', 'ss')
+
+    return $resolved
+}
+
+function Get-TicketValue {
+    param(
+        [string]$Description,
+        [string]$TicketPattern
+    )
+
+    if ([string]::IsNullOrWhiteSpace($TicketPattern)) {
+        return $null
+    }
+
+    $match = [regex]::Match($Description, $TicketPattern)
+    if ($match.Success) {
+        return $match.Value
+    }
+
+    return $null
+}
+
+function New-BranchConventionConfig {
+    param([string]$Path)
+
+    if (-not (Test-Path $Path)) {
+        return $null
+    }
+
+    $branchPattern = Get-ConfigScalar -Path $Path -Key 'branch_pattern'
+    if ([string]::IsNullOrWhiteSpace($branchPattern)) {
+        return $null
+    }
+
+    $defaultType = Get-ConfigScalar -Path $Path -Key 'default_type'
+    if ([string]::IsNullOrWhiteSpace($defaultType)) {
+        $defaultType = 'feature'
+    }
+
+    $typeValue = Get-ConfigMapValue -Path $Path -Section 'type_prefix' -Key $defaultType
+    if ([string]::IsNullOrWhiteSpace($typeValue)) {
+        $typeValue = $defaultType
+    }
+
+    $separator = Get-ConfigScalar -Path $Path -Key 'separator'
+    if ([string]::IsNullOrWhiteSpace($separator)) {
+        $separator = '-'
+    }
+
+    $seqPadding = Get-ConfigScalar -Path $Path -Key 'seq_padding'
+    [int]$resolvedSeqPadding = 3
+    if (-not [string]::IsNullOrWhiteSpace($seqPadding)) {
+        [int]::TryParse($seqPadding, [ref]$resolvedSeqPadding) | Out-Null
+    }
+
+    $lowercaseValue = Get-ConfigScalar -Path $Path -Key 'lowercase'
+    $lowercase = $true
+    if (-not [string]::IsNullOrWhiteSpace($lowercaseValue)) {
+        [bool]::TryParse($lowercaseValue, [ref]$lowercase) | Out-Null
+    }
+
+    $maxLengthValue = Get-ConfigScalar -Path $Path -Key 'max_length'
+    [int]$resolvedMaxLength = 0
+    if (-not [string]::IsNullOrWhiteSpace($maxLengthValue)) {
+        [int]::TryParse($maxLengthValue, [ref]$resolvedMaxLength) | Out-Null
+    }
+
+    [PSCustomObject]@{
+        BranchPattern = $branchPattern
+        SeqPadding = $resolvedSeqPadding
+        DateFormat = Get-ConfigScalar -Path $Path -Key 'date_format'
+        Separator = $separator
+        Lowercase = $lowercase
+        DefaultType = $defaultType
+        TypeValue = $typeValue
+        TicketPattern = Get-ConfigScalar -Path $Path -Key 'ticket_pattern'
+        MaxLength = $resolvedMaxLength
+    }
 }
 
 # ---------------------------------------------------------------------------
@@ -222,6 +386,8 @@ if (Get-Command Test-HasGit -ErrorAction SilentlyContinue) {
 Set-Location $repoRoot
 
 $specsDir = Join-Path $repoRoot 'specs'
+$branchConventionFile = Join-Path $repoRoot '.specify/branch-convention.yml'
+$branchConvention = New-BranchConventionConfig -Path $branchConventionFile
 
 function Get-BranchName {
     param([string]$Description)
@@ -258,6 +424,34 @@ function Get-BranchName {
     }
 }
 
+function New-ConventionBranchName {
+    param(
+        [string]$Pattern,
+        [string]$FeatureNum,
+        [string]$DateValue,
+        [string]$TicketValue,
+        [string]$TypeValue,
+        [string]$SuffixSource,
+        [string]$Description,
+        [string]$Separator,
+        [bool]$Lowercase
+    )
+
+    $branchName = $Pattern
+    $kebabValue = ConvertTo-ConventionToken -Value $SuffixSource -Separator $Separator -Lowercase $Lowercase
+    $summaryValue = ConvertTo-ConventionToken -Value $Description -Separator $Separator -Lowercase $Lowercase
+    $resolvedType = ConvertTo-ConventionToken -Value $TypeValue -Separator $Separator -Lowercase $Lowercase
+
+    $branchName = $branchName.Replace('{seq}', $FeatureNum)
+    $branchName = $branchName.Replace('{date}', $DateValue)
+    $branchName = $branchName.Replace('{ticket}', $TicketValue)
+    $branchName = $branchName.Replace('{type}', $resolvedType)
+    $branchName = $branchName.Replace('{kebab}', $kebabValue)
+    $branchName = $branchName.Replace('{summary}', $summaryValue)
+
+    return $branchName
+}
+
 # Check for GIT_BRANCH_NAME env var override (exact branch name, no prefix/suffix)
 if ($env:GIT_BRANCH_NAME) {
     $branchName = $env:GIT_BRANCH_NAME
@@ -268,10 +462,10 @@ if ($env:GIT_BRANCH_NAME) {
     }
     # Extract FEATURE_NUM from the branch name if it starts with a numeric prefix
     # Check timestamp pattern first (YYYYMMDD-HHMMSS-) since it also matches the simpler ^\d+ pattern
-    if ($branchName -match '^(\d{8}-\d{6})-') {
-        $featureNum = $matches[1]
-    } elseif ($branchName -match '^(\d+)-') {
-        $featureNum = $matches[1]
+    if ($branchName -match '(^|/)(\d{8}-\d{6})-') {
+        $featureNum = $matches[2]
+    } elseif ($branchName -match '(^|/)(\d+)-') {
+        $featureNum = $matches[2]
     } else {
         $featureNum = $branchName
     }
@@ -287,7 +481,58 @@ if ($env:GIT_BRANCH_NAME) {
         $Number = 0
     }
 
-    if ($Timestamp) {
+    if ($branchConvention) {
+        $dateValue = ''
+        $ticketValue = ''
+
+        if ($branchConvention.BranchPattern.Contains('{seq}')) {
+            if ($Number -eq 0) {
+                if ($DryRun -and $hasGit) {
+                    $Number = Get-NextBranchNumber -SpecsDir $specsDir -SkipFetch
+                } elseif ($DryRun) {
+                    $Number = (Get-HighestNumberFromSpecs -SpecsDir $specsDir) + 1
+                } elseif ($hasGit) {
+                    $Number = Get-NextBranchNumber -SpecsDir $specsDir
+                } else {
+                    $Number = (Get-HighestNumberFromSpecs -SpecsDir $specsDir) + 1
+                }
+            }
+
+            $featureNum = ('{0:d' + $branchConvention.SeqPadding + '}') -f $Number
+        }
+
+        if ($branchConvention.BranchPattern.Contains('{date}')) {
+            $dateValue = Get-Date -Format (ConvertTo-StrftimeDateFormat -Format $branchConvention.DateFormat)
+            if ([string]::IsNullOrWhiteSpace($featureNum)) {
+                $featureNum = $dateValue
+            }
+        }
+
+        if ($branchConvention.BranchPattern.Contains('{ticket}')) {
+            $ticketValue = Get-TicketValue -Description $featureDesc -TicketPattern $branchConvention.TicketPattern
+            if ([string]::IsNullOrWhiteSpace($ticketValue)) {
+                throw "Branch convention requires a ticket matching '$($branchConvention.TicketPattern)' in the feature description or a GIT_BRANCH_NAME override."
+            }
+            if ([string]::IsNullOrWhiteSpace($featureNum)) {
+                $featureNum = $ticketValue
+            }
+        }
+
+        if ([string]::IsNullOrWhiteSpace($featureNum)) {
+            $featureNum = $branchSuffix
+        }
+
+        $branchName = New-ConventionBranchName `
+            -Pattern $branchConvention.BranchPattern `
+            -FeatureNum $featureNum `
+            -DateValue $dateValue `
+            -TicketValue $ticketValue `
+            -TypeValue $branchConvention.TypeValue `
+            -SuffixSource $branchSuffix `
+            -Description $featureDesc `
+            -Separator $branchConvention.Separator `
+            -Lowercase $branchConvention.Lowercase
+    } elseif ($Timestamp) {
         $featureNum = Get-Date -Format 'yyyyMMdd-HHmmss'
         $branchName = "$featureNum-$branchSuffix"
     } else {
@@ -309,15 +554,36 @@ if ($env:GIT_BRANCH_NAME) {
 }
 
 $maxBranchLength = 244
+if ($branchConvention -and $branchConvention.MaxLength -gt 0 -and $branchConvention.MaxLength -lt $maxBranchLength) {
+    $maxBranchLength = $branchConvention.MaxLength
+}
 if ($branchName.Length -gt $maxBranchLength) {
-    $prefixLength = $featureNum.Length + 1
-    $maxSuffixLength = $maxBranchLength - $prefixLength
-
-    $truncatedSuffix = $branchSuffix.Substring(0, [Math]::Min($branchSuffix.Length, $maxSuffixLength))
-    $truncatedSuffix = $truncatedSuffix -replace '-$', ''
-
+    $truncatedSuffix = $branchSuffix
     $originalBranchName = $branchName
-    $branchName = "$featureNum-$truncatedSuffix"
+
+    while (-not [string]::IsNullOrWhiteSpace($truncatedSuffix)) {
+        $truncatedSuffix = $truncatedSuffix.Substring(0, $truncatedSuffix.Length - 1)
+        $truncatedSuffix = $truncatedSuffix -replace '[-_]$', ''
+
+        if ($branchConvention) {
+            $branchName = New-ConventionBranchName `
+                -Pattern $branchConvention.BranchPattern `
+                -FeatureNum $featureNum `
+                -DateValue $dateValue `
+                -TicketValue $ticketValue `
+                -TypeValue $branchConvention.TypeValue `
+                -SuffixSource $truncatedSuffix `
+                -Description $featureDesc `
+                -Separator $branchConvention.Separator `
+                -Lowercase $branchConvention.Lowercase
+        } else {
+            $branchName = "$featureNum-$truncatedSuffix"
+        }
+
+        if ($branchName.Length -le $maxBranchLength) {
+            break
+        }
+    }
 
     Write-Warning "[specify] Branch name exceeded GitHub's 244-byte limit"
     Write-Warning "[specify] Original: $originalBranchName ($($originalBranchName.Length) bytes)"

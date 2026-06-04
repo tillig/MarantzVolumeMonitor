@@ -5,15 +5,28 @@ void MarantzClient::setReceiverIp(const String& ip) {
 }
 
 MarantzStatus MarantzClient::getStatus() {
+    return fetchStatus(_receiverIp);
+}
+
+bool MarantzClient::verifyReceiver(const String& ip, MarantzStatus* verifiedStatus) {
+    MarantzStatus status = fetchStatus(ip);
+    if (verifiedStatus != nullptr) {
+        *verifiedStatus = status;
+    }
+    return status.isValid;
+}
+
+MarantzStatus MarantzClient::fetchStatus(const String& ip) {
     MarantzStatus status;
-    if (_receiverIp == "") return status;
+    if (ip == "") return status;
 
     WiFiClient client;
     HTTPClient http;
 
-    String url = "http://" + _receiverIp + "/goform/formMainZone_MainZoneXml.xml";
+    String url = "http://" + ip + "/goform/formMainZone_MainZoneXml.xml";
 
     if (http.begin(client, url)) {
+        http.setTimeout(5000);
         int httpCode = http.GET();
         if (httpCode == HTTP_CODE_OK) {
             String payload = http.getString();

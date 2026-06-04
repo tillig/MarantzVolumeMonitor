@@ -2,6 +2,7 @@
 #include "SettingsScreen.h"
 #include "NetworkListScreen.h"
 #include "CalibrationScreen.h"
+#include "ReceiverListScreen.h"
 #include "../ScreenManager.h"
 #include "../../network/WiFiManager.h"
 
@@ -41,6 +42,8 @@ void HomeScreen::draw() {
         case Layout::Minimal: drawLayoutMinimal(); break;
         case Layout::Unified: drawLayoutUnified(); break;
     }
+
+    drawSettingsButton();
 }
 
 void HomeScreen::update() {
@@ -73,10 +76,16 @@ void HomeScreen::handleTouch(TS_Point p) {
     if (!_lastStatus.isValid) {
         if (isCalibrationButtonPressed(p)) {
             ScreenManager::getInstance().setScreen(new CalibrationScreen());
+        } else if (_isWifiConnected) {
+            ScreenManager::getInstance().setScreen(new ReceiverListScreen());
         } else {
             ScreenManager::getInstance().setScreen(new NetworkListScreen());
         }
         return;
+    }
+
+    if (isSettingsButtonPressed(p)) {
+        ScreenManager::getInstance().setScreen(new SettingsScreen());
     }
 }
 
@@ -102,7 +111,7 @@ void HomeScreen::drawSetupState() {
 
         tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
         tft.drawString("Receiver setup is still required.", 240, 188, 2);
-        tft.drawString("Tap to change Wi-Fi if needed.", 240, 212, 2);
+        tft.drawString("Tap to configure receiver.", 240, 212, 2);
     } else if (!_isWifiConnected) {
         tft.setTextColor(TFT_WHITE);
         tft.drawString("CONNECTING WI-FI", 240, 90, 4);
@@ -119,7 +128,7 @@ void HomeScreen::drawSetupState() {
 
         tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
         tft.drawString("Wi-Fi is connected, but receiver status is unavailable.", 240, 142, 2);
-        tft.drawString("Tap to change Wi-Fi settings.", 240, 166, 2);
+        tft.drawString("Tap to change receiver settings.", 240, 166, 2);
     }
 
     tft.fillRoundRect(390, 286, 72, 24, 12, DisplayManager::COLOR_PANEL);
@@ -153,6 +162,10 @@ void HomeScreen::refreshState() {
 
 bool HomeScreen::isCalibrationButtonPressed(TS_Point p) const {
     return p.x >= 390 && p.x <= 462 && p.y >= 286 && p.y <= 310;
+}
+
+bool HomeScreen::isSettingsButtonPressed(TS_Point p) const {
+    return p.x >= 438 && p.x <= 462 && p.y >= 16 && p.y <= 40;
 }
 
 void HomeScreen::drawLayoutUnified() {
@@ -323,7 +336,19 @@ void HomeScreen::drawTiles(const String& mode) {
 
 void HomeScreen::drawSettingsButton() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
-    tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY, DisplayManager::COLOR_BACKGROUND);
-    tft.setTextDatum(BR_DATUM);
-    tft.drawString("SET", 470, 310, 4);
+    int centerX = 450;
+    int centerY = 28;
+
+    tft.fillCircle(centerX, centerY, 10, DisplayManager::COLOR_PANEL);
+    tft.drawCircle(centerX, centerY, 10, DisplayManager::COLOR_BAR_BG);
+    tft.drawCircle(centerX, centerY, 4, DisplayManager::COLOR_TEXT_SECONDARY);
+
+    for (int i = 0; i < 8; ++i) {
+        float angle = i * PI / 4.0;
+        int innerX = centerX + (int)(6 * cos(angle));
+        int innerY = centerY + (int)(6 * sin(angle));
+        int outerX = centerX + (int)(9 * cos(angle));
+        int outerY = centerY + (int)(9 * sin(angle));
+        tft.drawLine(innerX, innerY, outerX, outerY, DisplayManager::COLOR_TEXT_SECONDARY);
+    }
 }

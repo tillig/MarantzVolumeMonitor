@@ -64,7 +64,7 @@ As a developer, I want the "Hello World" text color to change when I touch the s
 
 ## Assumptions
 
-- Hardware is wired according to `spec/system/hardware.md`.
+- Hardware is wired according to `docs/hardware.md`.
 - `platformio.ini` is correctly configured for the ST7796 driver and ESP32 pinout.
 - The user has a stable USB connection to the ESP32.
 

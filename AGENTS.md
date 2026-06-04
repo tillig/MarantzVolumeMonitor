@@ -1,4 +1,4 @@
-# Marantz Volume Monitor - Gemini Instructions
+# Marantz Volume Monitor - Agent Instructions
 
 ## Core Mandates
 
@@ -10,11 +10,13 @@
 
 ## Documentation Reference
 
-- **Specifications**: Detailed technical specs are in `spec/`.
-- **UI Design**: See `spec/ui/ui_design.md`.
-- **Hardware/Wiring**: See `spec/system/hardware.md` and `spec/system/power.md`.
+- **Durable Reference Docs**: Hardware, UI, and architecture references are in `docs/`.
+- **Feature Specifications**: Spec Kit feature artifacts are in `specs/`.
+- **UI Design**: See `docs/ui-reference.md`.
+- **Hardware/Wiring**: See `docs/hardware.md`.
 
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
-shell commands, and other important information, read the current plan
+shell commands, and other important information, read the current plan:
+[specs/004-receiver-detection-config/plan.md](specs/004-receiver-detection-config/plan.md)
 <!-- SPECKIT END -->

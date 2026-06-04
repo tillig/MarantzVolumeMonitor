@@ -12,7 +12,7 @@ public:
         Symbols
     };
 
-    KeyboardScreen(const String& ssid);
+    KeyboardScreen(const String& ssid, ScreenReturnTarget returnTarget = ScreenReturnTarget::Home);
     void draw() override;
     void update() override;
     void handleTouch(TS_Point p) override;
@@ -20,6 +20,7 @@ public:
 private:
     String _ssid;
     String _password;
+    ScreenReturnTarget _returnTarget;
     bool _showPassword = false;
     Mode _currentMode = Mode::Lowercase;
     bool _capsLock = false;

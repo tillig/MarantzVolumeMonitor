@@ -103,6 +103,13 @@ ios/ or android/
 **Structure Decision**: [Document the selected structure and reference the real
 directories captured above]
 
+## Documentation Alignment
+
+[Record any durable documentation that must change outside this feature folder. Use `README.md` for
+user-facing setup and usage changes, `CONTRIBUTING.md` for build/validation/workflow changes, and
+`docs/` for hardware, UI, and architecture references. Keep feature-specific details in
+`specs/[###-feature]/`.]
+
 ## Complexity Tracking
 
 > **Fill ONLY if Constitution Check has violations that must be justified**

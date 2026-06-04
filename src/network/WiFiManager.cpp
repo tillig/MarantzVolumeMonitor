@@ -56,8 +56,8 @@ std::vector<WiFiManager::NetworkInfo> WiFiManager::getScanResults() {
             }
         }
 
-        for (auto const& [ssid, info] : deduped) {
-            networks.push_back(info);
+        for (auto const& entry : deduped) {
+            networks.push_back(entry.second);
         }
 
         // Sort by RSSI (strongest first)

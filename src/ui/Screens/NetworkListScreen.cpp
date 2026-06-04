@@ -1,7 +1,16 @@
 #include "NetworkListScreen.h"
 #include "KeyboardScreen.h"
+#include "SettingsScreen.h"
 #include "../ScreenManager.h"
 #include "../DisplayManager.h"
+#include "../../storage/ConfigStore.h"
+
+NetworkListScreen::NetworkListScreen(ScreenReturnTarget returnTarget)
+    : _returnTarget(returnTarget) {
+    DeviceConfig config;
+    ConfigStore::getInstance().loadConfig(config);
+    _canCancel = _returnTarget == ScreenReturnTarget::Settings && config.wifiSsid.length() > 0;
+}
 
 void NetworkListScreen::draw() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
@@ -19,15 +28,7 @@ void NetworkListScreen::draw() {
         drawList();
     }
 
-    // Manual Entry Button
-    tft.fillRoundRect(20, 275, 200, 35, 17, DisplayManager::COLOR_BAR_BG);
-    tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY);
-    tft.setTextDatum(MC_DATUM);
-    tft.drawString("Manual Entry", 120, 292, 2);
-
-    // Scan/Refresh Button
-    tft.fillRoundRect(260, 275, 200, 35, 17, DisplayManager::COLOR_BAR_BG);
-    tft.drawString("Rescan", 360, 292, 2);
+    drawActions(tft);
 }
 
 void NetworkListScreen::update() {
@@ -44,13 +45,26 @@ void NetworkListScreen::update() {
 void NetworkListScreen::handleTouch(TS_Point p) {
     // 1. Bottom Buttons (Manual / Rescan) — drawn at y=275, height=35
     if (p.y > 270) {
-        if (p.x < 240) {
-            ScreenManager::getInstance().setScreen(new KeyboardScreen(""));
+        if (_canCancel) {
+            if (p.x >= 20 && p.x <= 150) {
+                ScreenManager::getInstance().setScreen(new KeyboardScreen("", _returnTarget));
+            } else if (p.x >= 175 && p.x <= 305) {
+                _networks.clear();
+                _isScanning = false;
+                _scrollOffset = 0;
+                draw();
+            } else if (p.x >= 330 && p.x <= 460) {
+                ScreenManager::getInstance().setScreen(new SettingsScreen());
+            }
         } else {
-            _networks.clear();
-            _isScanning = false;
-            _scrollOffset = 0;
-            draw();
+            if (p.x < 240) {
+                ScreenManager::getInstance().setScreen(new KeyboardScreen("", _returnTarget));
+            } else {
+                _networks.clear();
+                _isScanning = false;
+                _scrollOffset = 0;
+                draw();
+            }
         }
         return;
     }
@@ -71,7 +85,7 @@ void NetworkListScreen::handleTouch(TS_Point p) {
     if (p.y > 50 && p.y < 230) {
         int index = _scrollOffset + ((p.y - 50) / 36);
         if (index < _networks.size()) {
-            ScreenManager::getInstance().setScreen(new KeyboardScreen(_networks[index].ssid));
+            ScreenManager::getInstance().setScreen(new KeyboardScreen(_networks[index].ssid, _returnTarget));
         }
     }
 }
@@ -110,4 +124,25 @@ void NetworkListScreen::drawList() {
 
     if (_scrollOffset > 0) tft.drawString("< PREV", 60, 245, 2);
     if ((_scrollOffset + 5) < _networks.size()) tft.drawString("NEXT >", 420, 245, 2);
+}
+
+void NetworkListScreen::drawActions(TFT_eSPI& tft) {
+    tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY);
+    tft.setTextDatum(MC_DATUM);
+
+    if (_canCancel) {
+        const char* labels[] = {"Manual", "Rescan", "Cancel"};
+        for (int i = 0; i < 3; ++i) {
+            int x = 20 + i * 155;
+            tft.fillRoundRect(x, 275, 130, 35, 17, DisplayManager::COLOR_BAR_BG);
+            tft.drawString(labels[i], x + 65, 292, 2);
+        }
+        return;
+    }
+
+    tft.fillRoundRect(20, 275, 200, 35, 17, DisplayManager::COLOR_BAR_BG);
+    tft.drawString("Manual Entry", 120, 292, 2);
+
+    tft.fillRoundRect(260, 275, 200, 35, 17, DisplayManager::COLOR_BAR_BG);
+    tft.drawString("Rescan", 360, 292, 2);
 }

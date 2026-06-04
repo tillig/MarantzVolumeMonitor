@@ -7,15 +7,19 @@
 
 class NetworkListScreen : public Screen {
 public:
+    NetworkListScreen(ScreenReturnTarget returnTarget = ScreenReturnTarget::Home);
     void draw() override;
     void update() override;
     void handleTouch(TS_Point p) override;
 
 private:
+    ScreenReturnTarget _returnTarget;
+    bool _canCancel = false;
     bool _isScanning = false;
     int _scrollOffset = 0;
     std::vector<WiFiManager::NetworkInfo> _networks;
     void drawList();
+    void drawActions(TFT_eSPI& tft);
 };
 
 #endif

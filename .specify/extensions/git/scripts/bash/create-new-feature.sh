@@ -134,8 +134,8 @@ _extract_highest_number() {
     local highest=0
     while IFS= read -r name; do
         [ -z "$name" ] && continue
-        if echo "$name" | grep -Eq '^[0-9]{3,}-' && ! echo "$name" | grep -Eq '^[0-9]{8}-[0-9]{6}-'; then
-            number=$(echo "$name" | grep -Eo '^[0-9]+' || echo "0")
+        if echo "$name" | grep -Eq '(^|/)[0-9]{3,}-' && ! echo "$name" | grep -Eq '(^|/)[0-9]{8}-[0-9]{6}-'; then
+            number=$(echo "$name" | grep -Eo '(^|/)[0-9]+' | tail -1 | tr -d '/' || echo "0")
             number=$((10#$number))
             if [ "$number" -gt "$highest" ]; then
                 highest=$number
@@ -190,6 +190,44 @@ check_existing_branches() {
 clean_branch_name() {
     local name="$1"
     echo "$name" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/-\+/-/g' | sed 's/^-//' | sed 's/-$//'
+}
+
+extract_yaml_scalar() {
+    local file="$1"
+    local key="$2"
+
+    awk -v key="$key" '
+        $0 ~ "^[[:space:]]*" key ":[[:space:]]*" {
+            sub("^[[:space:]]*" key ":[[:space:]]*", "", $0)
+            gsub(/^"/, "", $0)
+            gsub(/"$/, "", $0)
+            print $0
+            exit
+        }
+    ' "$file"
+}
+
+extract_yaml_map_value() {
+    local file="$1"
+    local section="$2"
+    local key="$3"
+
+    awk -v section="$section" -v key="$key" '
+        $0 ~ "^[[:space:]]*" section ":[[:space:]]*$" {
+            in_section=1
+            next
+        }
+        in_section && $0 ~ "^[^[:space:]]" {
+            in_section=0
+        }
+        in_section && $0 ~ "^[[:space:]]+" key ":[[:space:]]*" {
+            sub("^[[:space:]]*" key ":[[:space:]]*", "", $0)
+            gsub(/^"/, "", $0)
+            gsub(/"$/, "", $0)
+            print $0
+            exit
+        }
+    ' "$file"
 }
 
 # ---------------------------------------------------------------------------
@@ -262,6 +300,98 @@ fi
 cd "$REPO_ROOT"
 
 SPECS_DIR="$REPO_ROOT/specs"
+BRANCH_CONVENTION_FILE="$REPO_ROOT/.specify/branch-convention.yml"
+BRANCH_PATTERN=""
+BRANCH_SEQ_PADDING="3"
+BRANCH_DATE_FORMAT="YYYYMMDD"
+BRANCH_SEPARATOR="-"
+BRANCH_LOWERCASE="true"
+BRANCH_DEFAULT_TYPE="feature"
+BRANCH_TYPE_VALUE="feature"
+BRANCH_TICKET_PATTERN="[A-Z]+-[0-9]+"
+BRANCH_MAX_LENGTH=""
+BRANCH_DATE_VALUE=""
+BRANCH_TICKET_VALUE=""
+
+load_branch_convention() {
+    [ -f "$BRANCH_CONVENTION_FILE" ] || return 0
+
+    BRANCH_PATTERN=$(extract_yaml_scalar "$BRANCH_CONVENTION_FILE" "branch_pattern")
+    BRANCH_SEQ_PADDING=$(extract_yaml_scalar "$BRANCH_CONVENTION_FILE" "seq_padding")
+    BRANCH_DATE_FORMAT=$(extract_yaml_scalar "$BRANCH_CONVENTION_FILE" "date_format")
+    BRANCH_SEPARATOR=$(extract_yaml_scalar "$BRANCH_CONVENTION_FILE" "separator")
+    BRANCH_LOWERCASE=$(extract_yaml_scalar "$BRANCH_CONVENTION_FILE" "lowercase")
+    BRANCH_DEFAULT_TYPE=$(extract_yaml_scalar "$BRANCH_CONVENTION_FILE" "default_type")
+    BRANCH_TICKET_PATTERN=$(extract_yaml_scalar "$BRANCH_CONVENTION_FILE" "ticket_pattern")
+    BRANCH_MAX_LENGTH=$(extract_yaml_scalar "$BRANCH_CONVENTION_FILE" "max_length")
+
+    [ -n "$BRANCH_SEQ_PADDING" ] || BRANCH_SEQ_PADDING="3"
+    [ -n "$BRANCH_DATE_FORMAT" ] || BRANCH_DATE_FORMAT="YYYYMMDD"
+    [ -n "$BRANCH_SEPARATOR" ] || BRANCH_SEPARATOR="-"
+    [ -n "$BRANCH_LOWERCASE" ] || BRANCH_LOWERCASE="true"
+    [ -n "$BRANCH_DEFAULT_TYPE" ] || BRANCH_DEFAULT_TYPE="feature"
+    [ -n "$BRANCH_TICKET_PATTERN" ] || BRANCH_TICKET_PATTERN="[A-Z]+-[0-9]+"
+
+    BRANCH_TYPE_VALUE=$(extract_yaml_map_value "$BRANCH_CONVENTION_FILE" "type_prefix" "$BRANCH_DEFAULT_TYPE")
+    [ -n "$BRANCH_TYPE_VALUE" ] || BRANCH_TYPE_VALUE="$BRANCH_DEFAULT_TYPE"
+}
+
+normalize_branch_token() {
+    local value="$1"
+    local separator="${BRANCH_SEPARATOR:--}"
+
+    if [ "$BRANCH_LOWERCASE" = "true" ]; then
+        value=$(printf '%s' "$value" | tr '[:upper:]' '[:lower:]')
+    fi
+
+    value=$(printf '%s' "$value" | sed "s/[^[:alnum:]]/${separator}/g")
+    value=$(printf '%s' "$value" | sed -E "s/${separator}{2,}/${separator}/g")
+    value=$(printf '%s' "$value" | sed -E "s/^${separator}+//; s/${separator}+$//")
+
+    printf '%s\n' "$value"
+}
+
+convert_date_format_to_strftime() {
+    local format="$1"
+
+    format="${format//YYYY/%Y}"
+    format="${format//MM/%m}"
+    format="${format//DD/%d}"
+    format="${format//HH/%H}"
+    format="${format//mm/%M}"
+    format="${format//ss/%S}"
+
+    printf '%s\n' "$format"
+}
+
+extract_ticket_value() {
+    if [ -z "$BRANCH_TICKET_PATTERN" ]; then
+        return 0
+    fi
+
+    printf '%s\n' "$FEATURE_DESCRIPTION" | grep -Eo "$BRANCH_TICKET_PATTERN" | head -1
+}
+
+compose_branch_name_from_convention() {
+    local suffix_source="$1"
+    local branch_name="$BRANCH_PATTERN"
+    local kebab_value
+    local summary_value
+    local type_value
+
+    kebab_value=$(normalize_branch_token "$suffix_source")
+    summary_value=$(normalize_branch_token "$FEATURE_DESCRIPTION")
+    type_value=$(normalize_branch_token "$BRANCH_TYPE_VALUE")
+
+    branch_name="${branch_name//\{seq\}/$FEATURE_NUM}"
+    branch_name="${branch_name//\{date\}/$BRANCH_DATE_VALUE}"
+    branch_name="${branch_name//\{ticket\}/$BRANCH_TICKET_VALUE}"
+    branch_name="${branch_name//\{type\}/$type_value}"
+    branch_name="${branch_name//\{kebab\}/$kebab_value}"
+    branch_name="${branch_name//\{summary\}/$summary_value}"
+
+    printf '%s\n' "$branch_name"
+}
 
 # Function to generate branch name with stop word filtering
 generate_branch_name() {
@@ -307,17 +437,21 @@ if [ -n "${GIT_BRANCH_NAME:-}" ]; then
     BRANCH_NAME="$GIT_BRANCH_NAME"
     # Extract FEATURE_NUM from the branch name if it starts with a numeric prefix
     # Check timestamp pattern first (YYYYMMDD-HHMMSS-) since it also matches the simpler ^[0-9]+ pattern
-    if echo "$BRANCH_NAME" | grep -Eq '^[0-9]{8}-[0-9]{6}-'; then
-        FEATURE_NUM=$(echo "$BRANCH_NAME" | grep -Eo '^[0-9]{8}-[0-9]{6}')
-        BRANCH_SUFFIX="${BRANCH_NAME#${FEATURE_NUM}-}"
-    elif echo "$BRANCH_NAME" | grep -Eq '^[0-9]+-'; then
-        FEATURE_NUM=$(echo "$BRANCH_NAME" | grep -Eo '^[0-9]+')
-        BRANCH_SUFFIX="${BRANCH_NAME#${FEATURE_NUM}-}"
+    if echo "$BRANCH_NAME" | grep -Eq '(^|/)[0-9]{8}-[0-9]{6}-'; then
+        FEATURE_NUM=$(echo "$BRANCH_NAME" | grep -Eo '(^|/)[0-9]{8}-[0-9]{6}' | tail -1 | tr -d '/')
+        BRANCH_SUFFIX="${BRANCH_NAME##*/}"
+        BRANCH_SUFFIX="${BRANCH_SUFFIX#${FEATURE_NUM}-}"
+    elif echo "$BRANCH_NAME" | grep -Eq '(^|/)[0-9]+-'; then
+        FEATURE_NUM=$(echo "$BRANCH_NAME" | grep -Eo '(^|/)[0-9]+' | tail -1 | tr -d '/')
+        BRANCH_SUFFIX="${BRANCH_NAME##*/}"
+        BRANCH_SUFFIX="${BRANCH_SUFFIX#${FEATURE_NUM}-}"
     else
         FEATURE_NUM="$BRANCH_NAME"
         BRANCH_SUFFIX="$BRANCH_NAME"
     fi
 else
+    load_branch_convention
+
     # Generate branch name
     if [ -n "$SHORT_NAME" ]; then
         BRANCH_SUFFIX=$(clean_branch_name "$SHORT_NAME")
@@ -331,8 +465,46 @@ else
         BRANCH_NUMBER=""
     fi
 
-    # Determine branch prefix
-    if [ "$USE_TIMESTAMP" = true ]; then
+    if [ -n "$BRANCH_PATTERN" ]; then
+        if [[ "$BRANCH_PATTERN" == *"{seq}"* ]]; then
+            if [ -z "$BRANCH_NUMBER" ]; then
+                if [ "$DRY_RUN" = true ] && [ "$HAS_GIT" = true ]; then
+                    BRANCH_NUMBER=$(check_existing_branches "$SPECS_DIR" true)
+                elif [ "$DRY_RUN" = true ]; then
+                    HIGHEST=$(get_highest_from_specs "$SPECS_DIR")
+                    BRANCH_NUMBER=$((HIGHEST + 1))
+                elif [ "$HAS_GIT" = true ]; then
+                    BRANCH_NUMBER=$(check_existing_branches "$SPECS_DIR")
+                else
+                    HIGHEST=$(get_highest_from_specs "$SPECS_DIR")
+                    BRANCH_NUMBER=$((HIGHEST + 1))
+                fi
+            fi
+
+            FEATURE_NUM=$(printf "%0${BRANCH_SEQ_PADDING}d" "$((10#$BRANCH_NUMBER))")
+        fi
+
+        if [[ "$BRANCH_PATTERN" == *"{date}"* ]]; then
+            BRANCH_DATE_VALUE=$(date +"$(convert_date_format_to_strftime "$BRANCH_DATE_FORMAT")")
+            if [ -z "${FEATURE_NUM:-}" ]; then
+                FEATURE_NUM="$BRANCH_DATE_VALUE"
+            fi
+        fi
+
+        if [[ "$BRANCH_PATTERN" == *"{ticket}"* ]]; then
+            BRANCH_TICKET_VALUE=$(extract_ticket_value)
+            if [ -z "$BRANCH_TICKET_VALUE" ]; then
+                echo "Error: Branch convention requires a ticket matching '$BRANCH_TICKET_PATTERN' in the feature description or GIT_BRANCH_NAME override." >&2
+                exit 1
+            fi
+            if [ -z "${FEATURE_NUM:-}" ]; then
+                FEATURE_NUM="$BRANCH_TICKET_VALUE"
+            fi
+        fi
+
+        [ -n "${FEATURE_NUM:-}" ] || FEATURE_NUM="$BRANCH_SUFFIX"
+        BRANCH_NAME=$(compose_branch_name_from_convention "$BRANCH_SUFFIX")
+    elif [ "$USE_TIMESTAMP" = true ]; then
         FEATURE_NUM=$(date +%Y%m%d-%H%M%S)
         BRANCH_NAME="${FEATURE_NUM}-${BRANCH_SUFFIX}"
     else
@@ -357,24 +529,37 @@ fi
 
 # GitHub enforces a 244-byte limit on branch names
 MAX_BRANCH_LENGTH=244
+if [ -n "$BRANCH_MAX_LENGTH" ] && [ "$BRANCH_MAX_LENGTH" -lt "$MAX_BRANCH_LENGTH" ] 2>/dev/null; then
+    MAX_BRANCH_LENGTH="$BRANCH_MAX_LENGTH"
+fi
 _byte_length() { printf '%s' "$1" | LC_ALL=C wc -c | tr -d ' '; }
 BRANCH_BYTE_LEN=$(_byte_length "$BRANCH_NAME")
 if [ -n "${GIT_BRANCH_NAME:-}" ] && [ "$BRANCH_BYTE_LEN" -gt $MAX_BRANCH_LENGTH ]; then
     >&2 echo "Error: GIT_BRANCH_NAME must be 244 bytes or fewer in UTF-8. Provided value is ${BRANCH_BYTE_LEN} bytes."
     exit 1
 elif [ "$BRANCH_BYTE_LEN" -gt $MAX_BRANCH_LENGTH ]; then
-    PREFIX_LENGTH=$(( ${#FEATURE_NUM} + 1 ))
-    MAX_SUFFIX_LENGTH=$((MAX_BRANCH_LENGTH - PREFIX_LENGTH))
-
-    TRUNCATED_SUFFIX=$(echo "$BRANCH_SUFFIX" | cut -c1-$MAX_SUFFIX_LENGTH)
-    TRUNCATED_SUFFIX=$(echo "$TRUNCATED_SUFFIX" | sed 's/-$//')
-
+    TRUNCATED_SUFFIX="$BRANCH_SUFFIX"
     ORIGINAL_BRANCH_NAME="$BRANCH_NAME"
-    BRANCH_NAME="${FEATURE_NUM}-${TRUNCATED_SUFFIX}"
+
+    while [ -n "$TRUNCATED_SUFFIX" ]; do
+        TRUNCATED_SUFFIX="${TRUNCATED_SUFFIX%?}"
+        TRUNCATED_SUFFIX="${TRUNCATED_SUFFIX%-}"
+
+        if [ -n "$BRANCH_PATTERN" ]; then
+            BRANCH_NAME=$(compose_branch_name_from_convention "$TRUNCATED_SUFFIX")
+        else
+            BRANCH_NAME="${FEATURE_NUM}-${TRUNCATED_SUFFIX}"
+        fi
+
+        BRANCH_BYTE_LEN=$(_byte_length "$BRANCH_NAME")
+        if [ "$BRANCH_BYTE_LEN" -le "$MAX_BRANCH_LENGTH" ]; then
+            break
+        fi
+    done
 
     >&2 echo "[specify] Warning: Branch name exceeded GitHub's 244-byte limit"
-    >&2 echo "[specify] Original: $ORIGINAL_BRANCH_NAME (${#ORIGINAL_BRANCH_NAME} bytes)"
-    >&2 echo "[specify] Truncated to: $BRANCH_NAME (${#BRANCH_NAME} bytes)"
+    >&2 echo "[specify] Original: $ORIGINAL_BRANCH_NAME ($(_byte_length "$ORIGINAL_BRANCH_NAME") bytes)"
+    >&2 echo "[specify] Truncated to: $BRANCH_NAME ($(_byte_length "$BRANCH_NAME") bytes)"
 fi
 
 if [ "$DRY_RUN" != true ]; then

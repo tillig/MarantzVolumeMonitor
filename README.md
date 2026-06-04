@@ -16,7 +16,7 @@ A modern, touchscreen-based volume monitor for Marantz home theater receivers, p
 - **Display:** 4" SPI TFT Touchscreen (ST7796 Driver)
 - **Power:** 5V 2A power supply (via USB-C or VIN)
 
-Refer to `spec/system/hardware.md` and `spec/system/power.md` for detailed wiring instructions and power requirements.
+Refer to `docs/hardware.md` for detailed wiring, power, and touch calibration notes.
 
 ## Software Setup
 
@@ -26,30 +26,46 @@ This project uses [PlatformIO](https://platformio.org/) for development and [Spe
 2. Clone this repository.
 3. Open the project folder in VS Code.
 4. PlatformIO will automatically download the required libraries.
-5. Build and upload to your ESP32.
+5. Build the firmware with `platformio run`.
+6. Upload the firmware to the ESP32 with PlatformIO's upload action or `platformio run --target upload`.
 
 ## Configuration
 
 Upon first boot, use the on-screen menus to:
 
 1. Connect to your Wi-Fi network.
-2. Enter the IP address of your Marantz receiver (or use auto-discovery).
+2. Select your Marantz receiver with auto-discovery or enter its IPv4 address manually.
+
+After setup, tap the small gear icon in the top-right corner of the Home Screen to reopen Settings.
+Settings provides touch calibration, Wi-Fi setup, and receiver setup. Use the Settings OK button to
+return to the Home Screen.
 
 Successful Wi-Fi setup stores credentials in `config.json` on LittleFS. On later boots, the device
 attempts to reconnect automatically using the saved SSID and password.
 
-If touch alignment is off, use the small `CAL` button on the unconfigured/setup Home Screen to
-open the calibration capture flow. That screen records a 9-point touch dataset to the serial
-console so the touch transform can be recalculated from measured hardware data instead of
-per-screen offsets.
+Receiver auto-discovery uses local-network SSDP/UPnP multicast. If a receiver is not discovered,
+confirm the ESP32 and receiver are on the same subnet and that the router allows multicast between
+clients. Standby discovery may also require the receiver's network/IP control standby setting to be
+enabled.
+
+Receiver setup stores `receiverIp` in the same `config.json` file only after the receiver responds to
+a live status request. If a saved receiver is temporarily offline, the saved receiver configuration is
+kept and the Home Screen shows the receiver as unavailable until it becomes reachable or is replaced.
+
+If touch alignment is off, open Settings and choose touch calibration. The calibration screen records
+a 9-point touch dataset to the serial console so the touch transform can be recalculated from
+measured hardware data instead of per-screen offsets.
 
 ## Project Structure
 
 - `src/ui`: UI management and screen implementations.
 - `src/network`: Wi-Fi management and Marantz API client.
 - `src/storage`: Persistent configuration storage using LittleFS.
-- `spec/`: Technical specifications, architectural plans, and hardware requirements.
-- `.gemini/`: Custom commands and configurations for Spec Kit.
+- `docs/`: Durable hardware, UI, and architecture reference documentation.
+- `specs/`: Spec Kit feature definitions, plans, contracts, quickstarts, and tasks.
+- `.specify/`: Spec Kit configuration, templates, scripts, constitution, and extensions.
+
+For build, validation, and contribution workflow details, see `CONTRIBUTING.md`.
 
 ## License
 

@@ -12,7 +12,7 @@
 
 ### Session 2026-05-31
 
-- Q: Should we expand the foundation scope to include layout skeletons from ui_design.md? → A: Yes, include Volume bar, Source/Mode labels, and Audio Tile placeholders.
+- Q: Should we expand the foundation scope to include layout skeletons from `docs/ui-reference.md`? → A: Yes, include Volume bar, Source/Mode labels, and Audio Tile placeholders.
 - Q: How should the system behave in an "unconfigured" state (no WiFi/Receiver set)? → A: Show a prominent "UNCONFIGURED" message with "Tap for Settings" instructions.
 
 ## User Scenarios & Testing
@@ -36,14 +36,14 @@ As a developer, I want the display and touch hardware to be initialized within t
 
 As a user, I want to see the real application layout (Volume, Bar, Labels, Tiles) after boot so I can see the final design intent even before the receiver is connected.
 
-**Why this priority**: Confirms the `ScreenManager` and `HomeScreen` classes can handle complex layouts defined in `ui_design.md`.
+**Why this priority**: Confirms the `ScreenManager` and `HomeScreen` classes can handle complex layouts defined in `docs/ui-reference.md`.
 
 **Independent Test**: Boot the device. Success if the `HomeScreen` renders all the structural elements (Volume bar, labels, tile boxes) on a black background.
 
 **Acceptance Scenarios**:
 
 1. **Given** the hardware is initialized, **When** the application starts, **Then** the `ScreenManager` displays the `HomeScreen` with placeholders for Volume, Source, and Mode.
-2. **Given** the `HomeScreen` is active, **When** rendered, **Then** it uses the color palette (e.g., #101010 background, #3DAEFF accent) defined in `ui_design.md`.
+2. **Given** the `HomeScreen` is active, **When** rendered, **Then** it uses the color palette (e.g., #101010 background, #3DAEFF accent) defined in `docs/ui-reference.md`.
 
 ---
 
@@ -67,7 +67,7 @@ As a first-time user, I want a clear message when the device is not yet set up s
 - **FR-001**: `DisplayManager` MUST handle all `TFT_eSPI` initialization using the ESP32 VSPI pin mapping.
 - **FR-002**: `TouchManager` MUST implement the calibration mapping (X: 350-3750, Y: 400-3750) to provide screen pixel coordinates.
 - **FR-003**: `ScreenManager` MUST manage the lifecycle of the active screen and handle the background clearing.
-- **FR-004**: `HomeScreen` MUST implement the layout skeleton from `ui_design.md`, including placeholders for:
+- **FR-004**: `HomeScreen` MUST implement the layout skeleton from `docs/ui-reference.md`, including placeholders for:
   - Volume Number (72-96px)
   - Volume Bar (70% width)
   - Source and Mode labels
@@ -88,7 +88,7 @@ As a first-time user, I want a clear message when the device is not yet set up s
 
 - **SC-001**: System renders the initial screen within 2 seconds of power-on.
 - **SC-002**: Touch coordinates reported by `TouchManager` are accurate within 5 pixels of the physical touch point.
-- **SC-003**: All layout elements from `ui_design.md` are visually represented (even if data is hardcoded/placeholder).
+- **SC-003**: All layout elements from `docs/ui-reference.md` are visually represented (even if data is hardcoded/placeholder).
 - **SC-004**: No driver-specific code (TFT_eSPI calls) exists in `main.cpp`.
 
 ## Assumptions

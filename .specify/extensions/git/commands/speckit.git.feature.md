@@ -35,6 +35,21 @@ Determine the branch numbering strategy by checking configuration in this order:
 2. Check `.specify/init-options.json` for `branch_numbering` value (backward compatibility)
 3. Default to `sequential` if neither exists
 
+## Branch Convention Integration
+
+If `.specify/branch-convention.yml` exists and defines `convention.branch_pattern`, the feature
+script MUST use that branch pattern as the source of truth for generated branch names. This allows
+the git feature hook to stay aligned with configured conventions such as `feature/{seq}-{kebab}`.
+
+When a branch convention is active:
+
+- Use the configured `type_prefix` and `default_type` to resolve `{type}`
+- Use the configured `seq_padding` for `{seq}`
+- Use the configured `date_format` for `{date}`
+- Extract `{ticket}` from the feature description using `ticket_pattern`, or fail with a clear
+  error if no matching ticket is present
+- Continue to honor `GIT_BRANCH_NAME` as an explicit override
+
 ## Execution
 
 Generate a concise short name (2-4 words) for the branch:
