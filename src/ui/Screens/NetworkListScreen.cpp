@@ -1,9 +1,27 @@
 #include "NetworkListScreen.h"
 #include "KeyboardScreen.h"
 #include "SettingsScreen.h"
+#include "../IconRenderer.h"
 #include "../ScreenManager.h"
 #include "../DisplayManager.h"
+#include "../assets/IconBitmaps.h"
 #include "../../storage/ConfigStore.h"
+
+namespace {
+void drawIconLabelButton(TFT_eSPI& tft, const Icons::IconBitmap& icon, const char* label,
+                         int x, int y, int w, int h, uint16_t color) {
+    constexpr int gap = 8;
+    int textWidth = tft.textWidth(label, 2);
+    int groupWidth = icon.width + gap + textWidth;
+    int startX = x + (w - groupWidth) / 2;
+    int centerY = y + h / 2;
+    IconRenderer::drawCentered(tft, icon, startX + icon.width / 2, centerY, color);
+    tft.setTextDatum(ML_DATUM);
+    tft.setTextColor(color);
+    tft.drawString(label, startX + icon.width + gap, centerY, 2);
+    tft.setTextDatum(MC_DATUM);
+}
+}
 
 NetworkListScreen::NetworkListScreen(ScreenReturnTarget returnTarget)
     : _returnTarget(returnTarget) {
@@ -21,6 +39,7 @@ void NetworkListScreen::draw() {
     tft.drawString("Select Wi-Fi Network", 240, 10, 4);
 
     if (!_isScanning && _networks.empty()) {
+        IconRenderer::drawCentered(tft, Icons::SCAN, 240, 100, DisplayManager::COLOR_TEXT_SECONDARY);
         tft.drawString("Scanning...", 240, 140, 4);
         WiFiManager::getInstance().startScan();
         _isScanning = true;
@@ -135,14 +154,15 @@ void NetworkListScreen::drawActions(TFT_eSPI& tft) {
         for (int i = 0; i < 3; ++i) {
             int x = 20 + i * 155;
             tft.fillRoundRect(x, 275, 130, 35, 17, DisplayManager::COLOR_BAR_BG);
-            tft.drawString(labels[i], x + 65, 292, 2);
+            const Icons::IconBitmap* icon = i == 0 ? &Icons::MANUAL_ENTRY : i == 1 ? &Icons::RETRY : &Icons::KEYBOARD_CANCEL;
+            drawIconLabelButton(tft, *icon, labels[i], x, 275, 130, 35, DisplayManager::COLOR_TEXT_SECONDARY);
         }
         return;
     }
 
     tft.fillRoundRect(20, 275, 200, 35, 17, DisplayManager::COLOR_BAR_BG);
-    tft.drawString("Manual Entry", 120, 292, 2);
+    drawIconLabelButton(tft, Icons::MANUAL_ENTRY, "Manual Entry", 20, 275, 200, 35, DisplayManager::COLOR_TEXT_SECONDARY);
 
     tft.fillRoundRect(260, 275, 200, 35, 17, DisplayManager::COLOR_BAR_BG);
-    tft.drawString("Rescan", 360, 292, 2);
+    drawIconLabelButton(tft, Icons::RETRY, "Rescan", 260, 275, 200, 35, DisplayManager::COLOR_TEXT_SECONDARY);
 }

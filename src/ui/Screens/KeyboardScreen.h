@@ -35,10 +35,6 @@ private:
     void initKeys();
     void drawKeys();
     void drawInputArea();
-    void drawEyeIcon(int x, int y, bool open);
-    void drawCheckIcon(int x, int y);
-    void drawCancelIcon(int x, int y);
-    void drawShiftIcon(int x, int y, bool active);
 };
 
 #endif

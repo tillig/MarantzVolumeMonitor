@@ -3,7 +3,9 @@
 #include "ReceiverIpScreen.h"
 #include "ReceiverStatusScreen.h"
 #include "SettingsScreen.h"
+#include "../IconRenderer.h"
 #include "../ScreenManager.h"
+#include "../assets/IconBitmaps.h"
 
 ReceiverListScreen::ReceiverListScreen(ScreenReturnTarget returnTarget)
     : _returnTarget(returnTarget) {
@@ -23,8 +25,10 @@ void ReceiverListScreen::draw() {
     if (state == ReceiverDiscoveryState::Searching) {
         tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY);
         tft.drawString("Searching for receivers...", 240, 84, 2);
+        IconRenderer::drawCentered(tft, Icons::SCAN, 240, 122, DisplayManager::COLOR_TEXT_SECONDARY);
     } else if (candidates.empty()) {
         tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY);
+        IconRenderer::drawCentered(tft, Icons::WARNING, 240, 58, DisplayManager::COLOR_WARNING);
         tft.drawString("No receivers found", 240, 92, 4);
         tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
         tft.drawString("Retry discovery or enter an IP address.", 240, 130, 2);
@@ -93,6 +97,8 @@ void ReceiverListScreen::drawActions(TFT_eSPI& tft) {
         tft.drawRoundRect(x, 248, 128, 44, 6, DisplayManager::COLOR_BAR_BG);
         tft.setTextDatum(MC_DATUM);
         tft.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY);
+        const Icons::IconBitmap* icon = i == 0 ? &Icons::RETRY : i == 1 ? &Icons::MANUAL_ENTRY : &Icons::KEYBOARD_CANCEL;
+        IconRenderer::drawCentered(tft, *icon, x + 28, 270, DisplayManager::COLOR_TEXT_PRIMARY);
         tft.drawString(labels[i], x + 64, 270, 2);
     }
 }
@@ -104,9 +110,10 @@ void ReceiverListScreen::drawCandidateRow(TFT_eSPI& tft, const ReceiverCandidate
 
     tft.setTextDatum(ML_DATUM);
     tft.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY);
-    tft.drawString(candidate.name, x + 14, y + 15, 2);
+    IconRenderer::drawCentered(tft, Icons::RECEIVER, x + 24, y + 23, DisplayManager::COLOR_TEXT_SECONDARY);
+    tft.drawString(candidate.name, x + 48, y + 15, 2);
     tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY);
-    tft.drawString(candidate.ipAddress, x + 14, y + 34, 2);
+    tft.drawString(candidate.ipAddress, x + 48, y + 34, 2);
 
     tft.setTextDatum(MR_DATUM);
     tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);

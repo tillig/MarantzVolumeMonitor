@@ -21,7 +21,7 @@ status text, and restrained animation so the device behaves like a passive appli
 |                                                            |
 |      Blu-ray                           Dolby TrueHD        |
 |                                                            |
-|   ( Dolby )      (  DTS  )      (  PCM  )      ( Other )   |
+|   [ Dolby ]      [  DTS  ]      [  PCM  ]      [ Other ]   |
 |                                                            |
 +------------------------------------------------------------+
 ```
@@ -36,7 +36,7 @@ status text, and restrained animation so the device behaves like a passive appli
 
 ### Settings Entry
 
-- A small gear icon in the top-right corner opens Settings from the normal Home Screen.
+- A small bitmap settings icon in the top-right corner opens Settings from the normal Home Screen.
 - Settings exposes touch calibration, Wi-Fi setup, and receiver setup.
 - Flows launched from Settings should return to Settings when complete; the Settings OK button
   returns to the Home Screen.
@@ -49,13 +49,49 @@ status text, and restrained animation so the device behaves like a passive appli
 - Mode: right-aligned near `X=440`
 - Show raw receiver values without labels such as `SRC:`
 
-### Audio Family Tiles
+### Audio Family Icons
 
 - Families: Dolby, DTS, PCM, Other
-- Typography: secondary gray, Font 2
 - Layout: bottom row near `Y=278`
-- Shape: rounded pills, approximately 102x32 px
-- Active state: accent blue background with black text
+- Canvas: 102x32 px per family
+- Active state: lit green icon
+- Inactive state: dark gray icon matching the gauge background treatment
+- Dolby and DTS use approved brand logo source assets.
+- PCM uses a custom pulse-code step waveform icon.
+- Other uses a custom uncategorized-audio waveform icon.
+- If receiver status is unavailable, all family icons are inactive.
+
+## Icon Assets
+
+The durable icon inventory is `assets/icons/inventory.md`. It records each icon's source, usage note,
+target size, generated firmware symbol, screen usage, and runtime colors.
+
+Source artwork is stored in `assets/icons/source/`. Generated previews are stored in
+`assets/icons/generated/`. Firmware bitmap masks are generated into `src/ui/assets/`.
+
+Use Material-compatible geometry and visual weight for non-brand icons. Icons supplement setup text;
+do not remove labels needed for setup comprehension.
+
+Run icon generation from the repository root after changing source artwork:
+
+```bash
+python3 scripts/icons/generate-icons.py
+```
+
+The firmware build uses checked-in generated masks and does not decode SVG or PNG files at runtime.
+
+## Settings Screen
+
+- Settings navigation rows use bitmap chevron icons that match the row text color.
+- Row labels remain visible and the existing row touch targets remain unchanged.
+
+## Keyboard Icons
+
+- Caps lock, password visibility, backspace, OK, and Cancel use bitmap icons.
+- Caps lock inactive uses the normal function-key foreground color.
+- Caps lock active uses selected-state foreground treatment.
+- Password visibility swaps between visibility and visibility-off icons as masking changes.
+- OK and Cancel retain their semantic button backgrounds.
 
 ## Color Palette
 
@@ -66,6 +102,7 @@ status text, and restrained animation so the device behaves like a passive appli
 | Text secondary   | `#A0A0A0` |
 | Text dimmed      | `#606060` |
 | Accent/fill      | `#3DAEFF` |
+| Icon active      | `#35D06E` |
 | Gauge background | `#303030` |
 
 ## Touch Targets

@@ -3,7 +3,9 @@
 #include "NetworkListScreen.h"
 #include "CalibrationScreen.h"
 #include "ReceiverListScreen.h"
+#include "../IconRenderer.h"
 #include "../ScreenManager.h"
+#include "../assets/IconBitmaps.h"
 #include "../../network/WiFiManager.h"
 
 HomeScreen::HomeScreen() {
@@ -191,16 +193,8 @@ void HomeScreen::drawLayoutUnified() {
     tft.setTextDatum(MR_DATUM);
     tft.drawString("Dolby TrueHD", 440, 255, 4);
 
-    // 4. Tiles (10px margin from bottom)
-    String families[] = {"Dolby", "DTS", "PCM", "Other"};
-    for(int i=0; i<4; i++) {
-        int tx = 25 + (i*112);
-        int ty = 278;
-        tft.fillRoundRect(tx, ty, 102, 32, 16, DisplayManager::COLOR_BAR_BG);
-        tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY);
-        tft.setTextDatum(MC_DATUM);
-        tft.drawString(families[i], tx + 51, ty + 16, 2);
-    }
+    // 4. Audio family status icons (10px margin from bottom)
+    drawAudioFamilyIcons();
 }
 
 void HomeScreen::drawVolumeArc(int x, int y, int r, float volume) {
@@ -336,19 +330,44 @@ void HomeScreen::drawTiles(const String& mode) {
 
 void HomeScreen::drawSettingsButton() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
-    int centerX = 450;
-    int centerY = 28;
+    IconRenderer::drawCentered(tft, Icons::SETTINGS, 450, 28, DisplayManager::COLOR_TEXT_SECONDARY);
+}
 
-    tft.fillCircle(centerX, centerY, 10, DisplayManager::COLOR_PANEL);
-    tft.drawCircle(centerX, centerY, 10, DisplayManager::COLOR_BAR_BG);
-    tft.drawCircle(centerX, centerY, 4, DisplayManager::COLOR_TEXT_SECONDARY);
+void HomeScreen::drawAudioFamilyIcons() {
+    TFT_eSPI& tft = DisplayManager::getInstance().getTft();
+    const Icons::IconBitmap* icons[] = {
+        &Icons::AUDIO_DOLBY,
+        &Icons::AUDIO_DTS,
+        &Icons::AUDIO_PCM,
+        &Icons::AUDIO_OTHER
+    };
+    int activeIndex = activeAudioFamilyIndex();
 
-    for (int i = 0; i < 8; ++i) {
-        float angle = i * PI / 4.0;
-        int innerX = centerX + (int)(6 * cos(angle));
-        int innerY = centerY + (int)(6 * sin(angle));
-        int outerX = centerX + (int)(9 * cos(angle));
-        int outerY = centerY + (int)(9 * sin(angle));
-        tft.drawLine(innerX, innerY, outerX, outerY, DisplayManager::COLOR_TEXT_SECONDARY);
+    for (int i = 0; i < 4; i++) {
+        int tx = 25 + (i * 112);
+        int ty = 278;
+        uint16_t color = (i == activeIndex) ? DisplayManager::COLOR_ICON_ACTIVE
+                                            : DisplayManager::COLOR_ICON_INACTIVE;
+        tft.fillRoundRect(tx, ty, 102, 32, 16, DisplayManager::COLOR_BACKGROUND);
+        IconRenderer::drawCentered(tft, *icons[i], tx + 51, ty + 16, color);
     }
+}
+
+int HomeScreen::activeAudioFamilyIndex() const {
+    if (!_lastStatus.isValid || _lastStatus.mode.length() == 0) {
+        return -1;
+    }
+
+    String mode = _lastStatus.mode;
+    mode.toLowerCase();
+    if (mode.indexOf("dolby") >= 0 || mode.indexOf("atmos") >= 0 || mode.indexOf("truehd") >= 0) {
+        return 0;
+    }
+    if (mode.indexOf("dts") >= 0) {
+        return 1;
+    }
+    if (mode.indexOf("pcm") >= 0 || mode.indexOf("multi ch") >= 0 || mode.indexOf("multichannel") >= 0) {
+        return 2;
+    }
+    return 3;
 }

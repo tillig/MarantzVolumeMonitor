@@ -1,8 +1,10 @@
 #include "KeyboardScreen.h"
 #include "NetworkListScreen.h"
 #include "SetupStatusScreen.h"
+#include "../IconRenderer.h"
 #include "../ScreenManager.h"
 #include "../DisplayManager.h"
+#include "../assets/IconBitmaps.h"
 
 // Explicit Control Chars to avoid ASCII collisions
 #define KEY_SHIFT     '\x01'
@@ -94,27 +96,31 @@ void KeyboardScreen::initKeys() {
     _keys.clear();
 
     std::vector<std::vector<char>> layout;
+    const bool isPasswordEntry = _ssid != "";
     if (_currentMode == Mode::Uppercase) {
         layout = {
             {'1','2','3','4','5','6','7','8','9','0'},
             {'Q','W','E','R','T','Y','U','I','O','P'},
             {'A','S','D','F','G','H','J','K','L'},
-            {'Z','X','C','V','B','N','M', KEY_BACKSPACE, KEY_EYE}
+            {'Z','X','C','V','B','N','M', KEY_BACKSPACE}
         };
     } else if (_currentMode == Mode::Lowercase) {
         layout = {
             {'1','2','3','4','5','6','7','8','9','0'},
             {'q','w','e','r','t','y','u','i','o','p'},
             {'a','s','d','f','g','h','j','k','l'},
-            {'z','x','c','v','b','n','m', KEY_BACKSPACE, KEY_EYE}
+            {'z','x','c','v','b','n','m', KEY_BACKSPACE}
         };
     } else {
         layout = {
             {'!','@','#','$','%','^','&','*','(',')'},
             {'-','_','=','+','[',']','{','}',';',':'},
             {'\'','"',',','.','/','?','|','\\','`','~'},
-            {'<','>', KEY_BACKSPACE, KEY_EYE}
+            {'<','>', KEY_BACKSPACE}
         };
+    }
+    if (isPasswordEntry) {
+        layout.back().push_back(KEY_EYE);
     }
 
     int startY = 85;
@@ -176,20 +182,23 @@ void KeyboardScreen::drawKeys() {
         int midY = key.y + key.h/2;
 
         if (key.label == KEY_EYE) {
-            drawEyeIcon(midX, midY, _showPassword);
+            const Icons::IconBitmap& icon = _showPassword ? Icons::KEYBOARD_VISIBILITY_OFF : Icons::KEYBOARD_VISIBILITY;
+            IconRenderer::drawCentered(tft, icon, midX, midY, textColor);
+        } else if (key.label == KEY_BACKSPACE) {
+            IconRenderer::drawCentered(tft, Icons::KEYBOARD_BACKSPACE, midX, midY, textColor);
         } else if (key.label == KEY_OK) {
-            drawCheckIcon(midX, midY);
+            IconRenderer::drawCentered(tft, Icons::KEYBOARD_OK, midX, midY, TFT_WHITE);
         } else if (key.label == KEY_CANCEL) {
-            drawCancelIcon(midX, midY);
+            IconRenderer::drawCentered(tft, Icons::KEYBOARD_CANCEL, midX, midY, TFT_WHITE);
         } else if (key.label == KEY_SHIFT) {
-            drawShiftIcon(midX, midY, _capsLock);
+            uint16_t iconColor = _capsLock ? DisplayManager::COLOR_TEXT_DARK : textColor;
+            IconRenderer::drawCentered(tft, Icons::KEYBOARD_CAPS_LOCK, midX, midY, iconColor);
         } else {
             tft.setTextColor(textColor);
             tft.setTextDatum(MC_DATUM);
 
             String label;
-            if (key.label == KEY_BACKSPACE) label = "<-";
-            else if (key.label == KEY_MODE) label = (_currentMode == Mode::Symbols) ? "ABC" : "!@#$";
+            if (key.label == KEY_MODE) label = (_currentMode == Mode::Symbols) ? "ABC" : "!@#$";
             else if (key.label == KEY_SPACE) label = "SPACE";
             else label = String(key.label);
 
@@ -217,38 +226,4 @@ void KeyboardScreen::drawInputArea() {
 
     if (displayStr.length() > 28) displayStr = "..." + displayStr.substring(displayStr.length() - 25);
     tft.drawString(displayStr, 30, 55, 4);
-}
-
-void KeyboardScreen::drawEyeIcon(int x, int y, bool open) {
-    TFT_eSPI& tft = DisplayManager::getInstance().getTft();
-    tft.drawEllipse(x, y, 12, 7, TFT_WHITE);
-    tft.fillCircle(x, y, 3, TFT_WHITE);
-    if (!open) tft.drawLine(x - 10, y + 5, x + 10, y - 5, TFT_RED);
-}
-
-void KeyboardScreen::drawCheckIcon(int x, int y) {
-    TFT_eSPI& tft = DisplayManager::getInstance().getTft();
-    // Draw 3px thick checkmark icon, vertically centered at y
-    // Left leg: from (x-8, y+4) to (x-2, y+10)
-    // Right leg: from (x-2, y+10) to (x+10, y-6)
-    for (int i = -1; i <= 1; ++i) {
-        tft.drawLine(x - 8, y + 4 + i, x - 2, y + 10 + i, TFT_WHITE);
-        tft.drawLine(x - 2, y + 10 + i, x + 10, y - 6 + i, TFT_WHITE);
-    }
-}
-
-void KeyboardScreen::drawCancelIcon(int x, int y) {
-    TFT_eSPI& tft = DisplayManager::getInstance().getTft();
-    // Draw 3px thick cancel (X) icon
-    for (int i = -1; i <= 1; ++i) {
-        tft.drawLine(x - 8 + i, y - 8, x + 8 + i, y + 8, TFT_WHITE);
-        tft.drawLine(x + 8 + i, y - 8, x - 8 + i, y + 8, TFT_WHITE);
-    }
-}
-
-void KeyboardScreen::drawShiftIcon(int x, int y, bool active) {
-    TFT_eSPI& tft = DisplayManager::getInstance().getTft();
-    uint16_t color = active ? TFT_BLACK : TFT_WHITE;
-    tft.drawTriangle(x, y - 10, x - 8, y, x + 8, y, color);
-    tft.fillRect(x - 4, y, 9, 8, color);
 }

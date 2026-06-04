@@ -1,7 +1,9 @@
 #include "ReceiverIpScreen.h"
 #include "ReceiverListScreen.h"
 #include "ReceiverStatusScreen.h"
+#include "../IconRenderer.h"
 #include "../ScreenManager.h"
+#include "../assets/IconBitmaps.h"
 #include "../../network/ReceiverDiscovery.h"
 
 ReceiverIpScreen::ReceiverIpScreen(ScreenReturnTarget returnTarget)
@@ -13,9 +15,10 @@ void ReceiverIpScreen::draw() {
 
     tft.setTextDatum(TL_DATUM);
     tft.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY);
-    tft.drawString("Manual Receiver IP", 20, 14, 4);
+    IconRenderer::drawCentered(tft, Icons::RECEIVER, 32, 28, DisplayManager::COLOR_TEXT_SECONDARY);
+    tft.drawString("Manual Receiver IP", 56, 14, 4);
     tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
-    tft.drawString("IPv4 only", 20, 44, 2);
+    tft.drawString("IPv4 only", 56, 44, 2);
 
     drawInput(tft);
     drawKeypad(tft);
@@ -83,13 +86,19 @@ void ReceiverIpScreen::drawKeypad(TFT_eSPI& tft) {
         tft.drawRoundRect(x, y, 88, 38, 6, DisplayManager::COLOR_BAR_BG);
         tft.setTextDatum(MC_DATUM);
         tft.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY);
-        tft.drawString(labels[i], x + 44, y + 19, 4);
+        if (String(labels[i]) == "<") {
+            IconRenderer::drawCentered(tft, Icons::KEYBOARD_BACKSPACE, x + 44, y + 19, DisplayManager::COLOR_TEXT_PRIMARY);
+        } else {
+            tft.drawString(labels[i], x + 44, y + 19, 4);
+        }
     }
 
     tft.fillRoundRect(44, 280, 136, 36, 6, DisplayManager::COLOR_BAR_BG);
     tft.fillRoundRect(300, 280, 136, 36, 6, TFT_DARKGREEN);
     tft.setTextDatum(MC_DATUM);
     tft.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY);
+    IconRenderer::drawCentered(tft, Icons::KEYBOARD_CANCEL, 76, 298, DisplayManager::COLOR_TEXT_PRIMARY);
+    IconRenderer::drawCentered(tft, Icons::KEYBOARD_OK, 332, 298, DisplayManager::COLOR_TEXT_PRIMARY);
     tft.drawString("Cancel", 112, 298, 2);
     tft.drawString("Verify", 368, 298, 2);
 }

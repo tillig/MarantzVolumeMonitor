@@ -35,6 +35,16 @@ platformio run
 pre-commit run --all-files
 ```
 
+If you change icon source artwork in `assets/icons/source/`, regenerate firmware icon masks before
+building:
+
+```bash
+python3 scripts/icons/generate-icons.py
+```
+
+Run the generator twice when reviewing icon changes; the second run should produce no additional
+diff.
+
 To flash a connected ESP32, use PlatformIO's upload action or:
 
 ```bash
@@ -58,6 +68,7 @@ platformio run --target upload
 - Update `docs/hardware.md` for wiring, power, touch calibration, or physical assembly changes.
 - Update `docs/ui-reference.md` for durable visual language, layout, or touch-target guidance.
 - Update `docs/architecture.md` for durable layer, ownership, or source-layout changes.
+- Update `assets/icons/inventory.md` when adding, replacing, or reusing icon assets.
 - Keep feature-specific requirements, contracts, quickstarts, and implementation tasks in `specs/NNN-*`.
 
 ## AI Contributor Guidelines

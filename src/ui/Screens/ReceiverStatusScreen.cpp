@@ -3,7 +3,9 @@
 #include "ReceiverIpScreen.h"
 #include "ReceiverListScreen.h"
 #include "SettingsScreen.h"
+#include "../IconRenderer.h"
 #include "../ScreenManager.h"
+#include "../assets/IconBitmaps.h"
 #include "../../network/MarantzClient.h"
 #include "../../network/WiFiManager.h"
 #include "../../storage/ConfigStore.h"
@@ -17,6 +19,7 @@ void ReceiverStatusScreen::draw() {
 
     tft.setTextDatum(TC_DATUM);
     tft.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY);
+    IconRenderer::drawCentered(tft, Icons::RECEIVER, 132, 28, DisplayManager::COLOR_TEXT_SECONDARY);
     tft.drawString("Verify Receiver", 240, 14, 4);
 
     tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY);
@@ -25,25 +28,31 @@ void ReceiverStatusScreen::draw() {
 
     if (!_complete) {
         tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
+        IconRenderer::drawCentered(tft, Icons::SCAN, 240, 132, DisplayManager::COLOR_TEXT_SECONDARY);
         tft.drawString("Requesting live receiver status...", 240, 166, 2);
         return;
     }
 
     if (_result.success) {
-        tft.setTextColor(TFT_GREEN);
+        IconRenderer::drawCentered(tft, Icons::SUCCESS, 240, 122, DisplayManager::COLOR_ICON_ACTIVE);
+        tft.setTextColor(DisplayManager::COLOR_ICON_ACTIVE);
         tft.drawString("Receiver saved", 240, 166, 4);
         tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
         String returnText = _returnTarget == ScreenReturnTarget::Settings ? "Returning to Settings"
                                                                           : "Returning to Home";
         tft.drawString(returnText, 240, 204, 2);
     } else {
-        tft.setTextColor(TFT_RED);
+        IconRenderer::drawCentered(tft, Icons::FAILURE, 240, 108, DisplayManager::COLOR_ERROR);
+        tft.setTextColor(DisplayManager::COLOR_ERROR);
         tft.drawString(failureText(), 240, 156, 2);
 
         tft.fillRoundRect(24, 246, 128, 44, 6, DisplayManager::COLOR_PANEL);
         tft.fillRoundRect(176, 246, 128, 44, 6, DisplayManager::COLOR_PANEL);
         tft.fillRoundRect(328, 246, 128, 44, 6, DisplayManager::COLOR_PANEL);
         tft.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY);
+        IconRenderer::drawCentered(tft, Icons::RETRY, 52, 268, DisplayManager::COLOR_TEXT_PRIMARY);
+        IconRenderer::drawCentered(tft, Icons::MANUAL_ENTRY, 204, 268, DisplayManager::COLOR_TEXT_PRIMARY);
+        IconRenderer::drawCentered(tft, Icons::SCAN, 356, 268, DisplayManager::COLOR_TEXT_PRIMARY);
         tft.drawString("Retry", 88, 268, 2);
         tft.drawString("Manual", 240, 268, 2);
         tft.drawString("Discover", 392, 268, 2);

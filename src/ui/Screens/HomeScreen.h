@@ -36,11 +36,13 @@ private:
     void drawMode(const String& mode);
     void drawTiles(const String& mode);
     void drawSettingsButton();
+    void drawAudioFamilyIcons();
     void drawSetupState();
     void loadStoredConfig();
     void refreshState();
     bool isCalibrationButtonPressed(TS_Point p) const;
     bool isSettingsButtonPressed(TS_Point p) const;
+    int activeAudioFamilyIndex() const;
 
     // Layout-specific drawing
     void drawLayoutClassic();

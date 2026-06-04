@@ -3,7 +3,9 @@
 #include "HomeScreen.h"
 #include "NetworkListScreen.h"
 #include "ReceiverListScreen.h"
+#include "../IconRenderer.h"
 #include "../ScreenManager.h"
+#include "../assets/IconBitmaps.h"
 
 void SettingsScreen::draw() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
@@ -16,9 +18,12 @@ void SettingsScreen::draw() {
     tft.drawFastHLine(20, 50, 440, DisplayManager::COLOR_TEXT_DIMMED);
 
     tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY);
-    tft.drawString("Touch Calibration ->", 20, 80, 4);
-    tft.drawString("Wi-Fi Setup ->", 20, 140, 4);
-    tft.drawString("Receiver Setup ->", 20, 200, 4);
+    tft.drawString("Touch Calibration", 20, 80, 4);
+    tft.drawString("Wi-Fi Setup", 20, 140, 4);
+    tft.drawString("Receiver Setup", 20, 200, 4);
+    IconRenderer::drawCentered(tft, Icons::CHEVRON_RIGHT, 440, 92, DisplayManager::COLOR_TEXT_SECONDARY);
+    IconRenderer::drawCentered(tft, Icons::CHEVRON_RIGHT, 440, 152, DisplayManager::COLOR_TEXT_SECONDARY);
+    IconRenderer::drawCentered(tft, Icons::CHEVRON_RIGHT, 440, 212, DisplayManager::COLOR_TEXT_SECONDARY);
 
     tft.fillRoundRect(360, 270, 96, 38, 8, DisplayManager::COLOR_PANEL);
     tft.drawRoundRect(360, 270, 96, 38, 8, DisplayManager::COLOR_BAR_BG);
