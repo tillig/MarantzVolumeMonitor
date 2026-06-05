@@ -3,6 +3,7 @@
 #include "ReceiverStatusScreen.h"
 #include "../IconRenderer.h"
 #include "../ScreenManager.h"
+#include "../MaterialStyle.h"
 #include "../assets/IconBitmaps.h"
 #include "../../network/ReceiverDiscovery.h"
 
@@ -13,12 +14,9 @@ void ReceiverIpScreen::draw() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
     tft.fillScreen(DisplayManager::COLOR_BACKGROUND);
 
-    tft.setTextDatum(TL_DATUM);
-    tft.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY);
     IconRenderer::drawCentered(tft, Icons::RECEIVER, 32, 28, DisplayManager::COLOR_TEXT_SECONDARY);
-    tft.drawString("Manual Receiver IP", 56, 14, 4);
-    tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
-    tft.drawString("IPv4 only", 56, 44, 2);
+    MaterialStyle::drawText(tft, "Manual Receiver IP", 56, 14, MaterialStyle::TextRole::ScreenTitle, TL_DATUM);
+    MaterialStyle::drawText(tft, "IPv4 only", 56, 44, MaterialStyle::TextRole::Body, TL_DATUM);
 
     drawInput(tft);
     drawKeypad(tft);
@@ -49,7 +47,8 @@ void ReceiverIpScreen::handleTouch(TS_Point p) {
         }
     }
 
-    if (p.y >= 280 && p.y <= 318) {
+    if (p.y >= MaterialStyle::BottomActionY &&
+        p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight) {
         if (p.x >= 44 && p.x <= 180) {
             ScreenManager::getInstance().setScreen(new ReceiverListScreen(_returnTarget));
         } else if (p.x >= 300 && p.x <= 436) {
@@ -60,18 +59,14 @@ void ReceiverIpScreen::handleTouch(TS_Point p) {
 
 void ReceiverIpScreen::drawInput(TFT_eSPI& tft) {
     tft.fillRect(20, 66, 440, 28, DisplayManager::COLOR_BACKGROUND);
-    tft.fillRoundRect(20, 66, 440, 28, 4, DisplayManager::COLOR_PANEL);
-    tft.drawRoundRect(20, 66, 440, 28, 4, DisplayManager::COLOR_BAR_BG);
-    tft.setTextDatum(ML_DATUM);
-    tft.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY);
     String display = _ipAddress + "_";
-    tft.drawString(display, 32, 80, 4);
+    MaterialStyle::drawInputField(tft, 20, 66, 440, 28, display, MaterialStyle::TextRole::SectionLabel);
 
     tft.fillRect(20, 266, 440, 12, DisplayManager::COLOR_BACKGROUND);
     if (_errorMessage.length() > 0) {
-        tft.setTextDatum(MC_DATUM);
-        tft.setTextColor(TFT_RED);
-        tft.drawString(_errorMessage, 240, 272, 1);
+        MaterialStyle::drawText(tft, _errorMessage, 240, 272,
+                                MaterialStyle::TextRole::CompactMetadata, MC_DATUM,
+                                MaterialStyle::ComponentState::Error);
     }
 }
 
@@ -82,25 +77,19 @@ void ReceiverIpScreen::drawKeypad(TFT_eSPI& tft) {
         int row = i / 3;
         int x = 84 + col * 104;
         int y = 96 + row * 44;
-        tft.fillRoundRect(x, y, 88, 38, 6, DisplayManager::COLOR_PANEL);
-        tft.drawRoundRect(x, y, 88, 38, 6, DisplayManager::COLOR_BAR_BG);
-        tft.setTextDatum(MC_DATUM);
-        tft.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY);
         if (String(labels[i]) == "<") {
-            IconRenderer::drawCentered(tft, Icons::KEYBOARD_BACKSPACE, x + 44, y + 19, DisplayManager::COLOR_TEXT_PRIMARY);
+            MaterialStyle::drawKeyboardIconButton(tft, x, y, 88, 38, Icons::KEYBOARD_BACKSPACE);
         } else {
-            tft.drawString(labels[i], x + 44, y + 19, 4);
+            MaterialStyle::drawKeyboardTextButton(tft, x, y, 88, 38, labels[i]);
         }
     }
 
-    tft.fillRoundRect(44, 280, 136, 36, 6, DisplayManager::COLOR_BAR_BG);
-    tft.fillRoundRect(300, 280, 136, 36, 6, TFT_DARKGREEN);
-    tft.setTextDatum(MC_DATUM);
-    tft.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY);
-    IconRenderer::drawCentered(tft, Icons::KEYBOARD_CANCEL, 76, 298, DisplayManager::COLOR_TEXT_PRIMARY);
-    IconRenderer::drawCentered(tft, Icons::KEYBOARD_OK, 332, 298, DisplayManager::COLOR_TEXT_PRIMARY);
-    tft.drawString("Cancel", 112, 298, 2);
-    tft.drawString("Verify", 368, 298, 2);
+    MaterialStyle::drawStandardButton(tft, 44, MaterialStyle::BottomActionY, 136, MaterialStyle::ButtonHeight,
+                                      Icons::KEYBOARD_CANCEL, "Cancel",
+                                      MaterialStyle::ComponentState::Error);
+    MaterialStyle::drawStandardButton(tft, 300, MaterialStyle::BottomActionY, 136, MaterialStyle::ButtonHeight,
+                                      Icons::KEYBOARD_OK, "Verify",
+                                      MaterialStyle::ComponentState::Success);
 }
 
 void ReceiverIpScreen::submit() {

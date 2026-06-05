@@ -31,6 +31,7 @@ extern const IconBitmap SUCCESS;
 extern const IconBitmap WARNING;
 extern const IconBitmap FAILURE;
 extern const IconBitmap WIFI;
+extern const IconBitmap TOUCH_CALIBRATION;
 extern const IconBitmap RECEIVER;
 
 } // namespace Icons

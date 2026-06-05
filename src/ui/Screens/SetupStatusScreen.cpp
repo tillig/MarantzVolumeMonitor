@@ -2,9 +2,9 @@
 #include "HomeScreen.h"
 #include "KeyboardScreen.h"
 #include "SettingsScreen.h"
-#include "../IconRenderer.h"
 #include "../ScreenManager.h"
 #include "../DisplayManager.h"
+#include "../MaterialStyle.h"
 #include "../assets/IconBitmaps.h"
 #include "../../network/WiFiManager.h"
 #include "../../storage/ConfigStore.h"
@@ -16,30 +16,37 @@ void SetupStatusScreen::draw() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
     tft.fillScreen(DisplayManager::COLOR_BACKGROUND);
 
-    tft.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY);
-    tft.setTextDatum(TC_DATUM);
-    tft.drawString("Wi-Fi Setup", 240, 10, 4);
+    MaterialStyle::drawText(tft, "Wi-Fi Setup", 240, 10, MaterialStyle::TextRole::ScreenTitle, TC_DATUM);
 
     if (!_isConnecting && !_failed) {
-        IconRenderer::drawCentered(tft, Icons::WIFI, 240, 72, DisplayManager::COLOR_TEXT_SECONDARY);
-        tft.drawString("Connecting to", 240, 100, 2);
-        tft.drawString(_ssid, 240, 130, 4);
+        MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Unavailable,
+                                       "Connecting to",
+                                       MaterialStyle::truncateToWidth(tft, _ssid, 380, 4),
+                                       Icons::WIFI, _progressFrame);
         WiFiManager::getInstance().startConnect(_ssid, _password);
         _isConnecting = true;
         _startTime = millis();
+        _lastProgressAtMs = _startTime;
     } else if (_failed) {
-        IconRenderer::drawCentered(tft, Icons::FAILURE, 240, 92, DisplayManager::COLOR_ERROR);
-        tft.setTextColor(DisplayManager::COLOR_ERROR);
-        tft.drawString(_failureMessage, 240, 140, 4);
-
-        tft.fillRoundRect(140, 240, 200, 40, 20, DisplayManager::COLOR_BAR_BG);
-        tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY);
-        tft.setTextDatum(MC_DATUM);
-        IconRenderer::drawCentered(tft, Icons::RETRY, 190, 260, DisplayManager::COLOR_TEXT_SECONDARY);
-        tft.drawString("Retry", 240, 260, 2);
+        MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Error,
+                                       _failureMessage, "Check credentials and try again.",
+                                       Icons::FAILURE);
+        MaterialStyle::drawStandardButton(tft, 140, MaterialStyle::BottomActionY, 200,
+                                          MaterialStyle::ButtonHeight,
+                                          Icons::RETRY, "Retry");
     } else {
-        IconRenderer::drawCentered(tft, Icons::SCAN, 240, 132, DisplayManager::COLOR_TEXT_SECONDARY);
-        tft.drawString("Connecting...", 240, 180, 2);
+        bool showProgress = millis() - _startTime >= MaterialStyle::ProgressThresholdMs;
+        if (showProgress) {
+            MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Loading,
+                                           "Connecting...",
+                                           MaterialStyle::truncateToWidth(tft, _ssid, 380, 2),
+                                           Icons::WIFI, _progressFrame);
+        } else {
+            MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Unavailable,
+                                           "Connecting...",
+                                           MaterialStyle::truncateToWidth(tft, _ssid, 380, 2),
+                                           Icons::WIFI);
+        }
     }
 }
 
@@ -73,12 +80,21 @@ void SetupStatusScreen::update() {
             _failed = true;
             _failureMessage = "Connection Failed";
             draw();
+        } else {
+            uint32_t now = millis();
+            if (now - _startTime >= MaterialStyle::ProgressThresholdMs &&
+                now - _lastProgressAtMs >= MaterialStyle::ProgressFrameMs) {
+                _lastProgressAtMs = now;
+                _progressFrame++;
+                draw();
+            }
         }
     }
 }
 
 void SetupStatusScreen::handleTouch(TS_Point p) {
-    if (_failed && p.y > 220) {
+    if (_failed && p.y >= MaterialStyle::BottomActionY &&
+        p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight) {
         ScreenManager::getInstance().setScreen(new KeyboardScreen(_ssid, _returnTarget));
     }
 }

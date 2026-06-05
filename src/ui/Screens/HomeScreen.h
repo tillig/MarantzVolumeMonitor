@@ -38,6 +38,7 @@ private:
     void drawSettingsButton();
     void drawAudioFamilyIcons();
     void drawSetupState();
+    void drawCalibrationButton();
     void loadStoredConfig();
     void refreshState();
     bool isCalibrationButtonPressed(TS_Point p) const;

@@ -4,6 +4,7 @@
 #include "../IconRenderer.h"
 #include "../ScreenManager.h"
 #include "../DisplayManager.h"
+#include "../MaterialStyle.h"
 #include "../assets/IconBitmaps.h"
 
 // Explicit Control Chars to avoid ASCII collisions
@@ -26,10 +27,9 @@ void KeyboardScreen::draw() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
     tft.fillScreen(DisplayManager::COLOR_BACKGROUND);
 
-    tft.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY);
-    tft.setTextDatum(TC_DATUM);
     String title = (_ssid == "") ? "Manual SSID Entry" : "Wi-Fi Password: " + _ssid;
-    tft.drawString(title, 240, 5, 2);
+    MaterialStyle::drawText(tft, MaterialStyle::truncateToWidth(tft, title, 440, 2),
+                            240, 5, MaterialStyle::TextRole::Body, TC_DATUM);
 
     drawInputArea();
     drawKeys();
@@ -124,8 +124,8 @@ void KeyboardScreen::initKeys() {
     }
 
     int startY = 85;
-    int keyH = 40;
-    int margin = 6;
+    int keyH = MaterialStyle::KeyboardKeyHeight;
+    int margin = MaterialStyle::KeyboardKeyGap;
 
     // 1. Draw Alphanumeric/Symbol Rows
     for (int r = 0; r < layout.size(); ++r) {
@@ -167,42 +167,33 @@ void KeyboardScreen::drawKeys() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
 
     for (const auto& key : _keys) {
-        uint16_t bgColor = DisplayManager::COLOR_BAR_BG;
-        uint16_t textColor = DisplayManager::COLOR_TEXT_PRIMARY;
-
-        if (key.isFunction) {
-            if (key.label == KEY_OK) bgColor = tft.color565(39, 174, 96); // Bright Emerald Green
-            else if (key.label == KEY_CANCEL) bgColor = tft.color565(192, 57, 43); // Bright Alizarin Red
-            else if (key.label == KEY_SHIFT && _capsLock) bgColor = DisplayManager::COLOR_ACCENT;
-            else bgColor = DisplayManager::COLOR_PANEL;
-        }
-
-        tft.fillRoundRect(key.x, key.y, key.w, key.h, 6, bgColor);
-        int midX = key.x + key.w/2;
-        int midY = key.y + key.h/2;
-
         if (key.label == KEY_EYE) {
             const Icons::IconBitmap& icon = _showPassword ? Icons::KEYBOARD_VISIBILITY_OFF : Icons::KEYBOARD_VISIBILITY;
-            IconRenderer::drawCentered(tft, icon, midX, midY, textColor);
+            MaterialStyle::drawKeyboardIconButton(tft, key.x, key.y, key.w, key.h, icon);
         } else if (key.label == KEY_BACKSPACE) {
-            IconRenderer::drawCentered(tft, Icons::KEYBOARD_BACKSPACE, midX, midY, textColor);
+            MaterialStyle::drawKeyboardIconButton(tft, key.x, key.y, key.w, key.h, Icons::KEYBOARD_BACKSPACE);
         } else if (key.label == KEY_OK) {
-            IconRenderer::drawCentered(tft, Icons::KEYBOARD_OK, midX, midY, TFT_WHITE);
+            MaterialStyle::drawKeyboardIconButton(tft, key.x, key.y, key.w, key.h,
+                                                  Icons::KEYBOARD_OK,
+                                                  MaterialStyle::ComponentState::Success);
         } else if (key.label == KEY_CANCEL) {
-            IconRenderer::drawCentered(tft, Icons::KEYBOARD_CANCEL, midX, midY, TFT_WHITE);
+            MaterialStyle::drawKeyboardIconButton(tft, key.x, key.y, key.w, key.h,
+                                                  Icons::KEYBOARD_CANCEL, MaterialStyle::ComponentState::Error);
         } else if (key.label == KEY_SHIFT) {
-            uint16_t iconColor = _capsLock ? DisplayManager::COLOR_TEXT_DARK : textColor;
-            IconRenderer::drawCentered(tft, Icons::KEYBOARD_CAPS_LOCK, midX, midY, iconColor);
+            MaterialStyle::drawKeyboardIconButton(tft, key.x, key.y, key.w, key.h,
+                                                  Icons::KEYBOARD_CAPS_LOCK,
+                                                  _capsLock ? MaterialStyle::ComponentState::Selected
+                                                            : MaterialStyle::ComponentState::Normal);
         } else {
-            tft.setTextColor(textColor);
-            tft.setTextDatum(MC_DATUM);
-
             String label;
             if (key.label == KEY_MODE) label = (_currentMode == Mode::Symbols) ? "ABC" : "!@#$";
             else if (key.label == KEY_SPACE) label = "SPACE";
             else label = String(key.label);
 
-            tft.drawString(label, midX, midY, 2);
+            MaterialStyle::ComponentState state = key.isFunction
+                                                     ? MaterialStyle::ComponentState::Normal
+                                                     : MaterialStyle::ComponentState::Inactive;
+            MaterialStyle::drawKeyboardTextButton(tft, key.x, key.y, key.w, key.h, label, state);
         }
     }
 }
@@ -210,12 +201,6 @@ void KeyboardScreen::drawKeys() {
 void KeyboardScreen::drawInputArea() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
     tft.fillRect(20, 35, 440, 40, DisplayManager::COLOR_BACKGROUND);
-    tft.fillRoundRect(20, 35, 440, 40, 4, DisplayManager::COLOR_PANEL);
-    tft.drawRoundRect(20, 35, 440, 40, 4, DisplayManager::COLOR_BAR_BG);
-
-    tft.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY);
-    tft.setTextDatum(ML_DATUM);
-
     String displayStr = "";
     if (_showPassword || _ssid == "") {
         displayStr = _password;
@@ -224,6 +209,5 @@ void KeyboardScreen::drawInputArea() {
     }
     displayStr += "_";
 
-    if (displayStr.length() > 28) displayStr = "..." + displayStr.substring(displayStr.length() - 25);
-    tft.drawString(displayStr, 30, 55, 4);
+    MaterialStyle::drawInputField(tft, 20, 35, 440, 40, displayStr, MaterialStyle::TextRole::SectionLabel);
 }

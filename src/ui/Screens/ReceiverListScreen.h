@@ -15,6 +15,8 @@ private:
     ScreenReturnTarget _returnTarget;
     ReceiverDiscoveryState _lastState = ReceiverDiscoveryState::Idle;
     size_t _lastCandidateCount = 0;
+    uint8_t _progressFrame = 0;
+    uint32_t _lastProgressAtMs = 0;
 
     void drawHeader(TFT_eSPI& tft);
     void drawActions(TFT_eSPI& tft);

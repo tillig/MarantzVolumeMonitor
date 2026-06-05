@@ -5,6 +5,7 @@
 #include "HomeScreen.h"
 #include "SettingsScreen.h"
 #include "../DisplayManager.h"
+#include "../MaterialStyle.h"
 #include "../ScreenManager.h"
 #include "../TouchManager.h"
 
@@ -24,35 +25,35 @@ void CalibrationScreen::draw() {
     }
 
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
-    tft.fillScreen(TFT_BLACK);
+    tft.fillScreen(DisplayManager::COLOR_BACKGROUND);
 
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
-    tft.setTextDatum(TC_DATUM);
-    tft.drawString("TOUCH CALIBRATION", 240, 12, 2);
+    MaterialStyle::drawText(tft, "Touch Calibration", 240, 12, MaterialStyle::TextRole::ScreenTitle, TC_DATUM);
 
     if (_isComplete) {
-        tft.drawString("Capture complete", 240, 90, 4);
-        tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY, TFT_BLACK);
-        tft.drawString("Copy the serial log from this run.", 240, 140, 2);
         String returnText = _returnTarget == ScreenReturnTarget::Settings ? "Tap anywhere to return to Settings."
                                                                           : "Tap anywhere to return home.";
-        tft.drawString(returnText, 240, 170, 2);
-        tft.drawString("No new constants are applied yet.", 240, 200, 2);
+        MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Success,
+                                       "Capture complete",
+                                       "Copy the serial log from this run.", Icons::SUCCESS);
+        MaterialStyle::drawText(tft, returnText, 240, 220, MaterialStyle::TextRole::Body, TC_DATUM);
+        MaterialStyle::drawText(tft, "No new constants are applied yet.", 240, 244,
+                                MaterialStyle::TextRole::Body, TC_DATUM);
         return;
     }
 
     const CalibrationPoint& point = _points[_step];
 
-    tft.drawString("Tap the center of each crosshair once.", 240, 40, 2);
-    tft.drawString("Serial capture only. This does not recalibrate live.", 240, 62, 2);
-    tft.drawString("Use a deliberate press and release.", 240, 84, 2);
+    MaterialStyle::drawText(tft, "Tap the center of each crosshair once.", 240, 48,
+                            MaterialStyle::TextRole::Body, TC_DATUM);
+    MaterialStyle::drawText(tft, "Serial capture only. This does not recalibrate live.", 240, 72,
+                            MaterialStyle::TextRole::Body, TC_DATUM);
+    MaterialStyle::drawText(tft, "Use a deliberate press and release.", 240, 96,
+                            MaterialStyle::TextRole::Body, TC_DATUM);
 
-    tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY, TFT_BLACK);
     String progress = "Point " + String(_step + 1) + " of " + String(PointCount);
-    tft.drawString(progress, 240, 116, 2);
-    tft.drawString(point.label, 240, 138, 2);
+    MaterialStyle::drawText(tft, progress, 240, 126, MaterialStyle::TextRole::CompactMetadata, TC_DATUM);
+    MaterialStyle::drawText(tft, point.label, 240, 148, MaterialStyle::TextRole::CompactMetadata, TC_DATUM);
 
-    tft.setTextColor(TFT_RED, TFT_BLACK);
     tft.drawLine(point.x - 14, point.y, point.x + 14, point.y, TFT_RED);
     tft.drawLine(point.x, point.y - 14, point.x, point.y + 14, TFT_RED);
     tft.drawCircle(point.x, point.y, 8, TFT_RED);

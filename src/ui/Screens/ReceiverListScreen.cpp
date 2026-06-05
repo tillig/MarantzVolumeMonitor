@@ -3,8 +3,8 @@
 #include "ReceiverIpScreen.h"
 #include "ReceiverStatusScreen.h"
 #include "SettingsScreen.h"
-#include "../IconRenderer.h"
 #include "../ScreenManager.h"
+#include "../MaterialStyle.h"
 #include "../assets/IconBitmaps.h"
 
 ReceiverListScreen::ReceiverListScreen(ScreenReturnTarget returnTarget)
@@ -15,26 +15,23 @@ ReceiverListScreen::ReceiverListScreen(ScreenReturnTarget returnTarget)
 void ReceiverListScreen::draw() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
     tft.fillScreen(DisplayManager::COLOR_BACKGROUND);
-    drawHeader(tft);
 
     ReceiverDiscovery& discovery = ReceiverDiscovery::getInstance();
     const std::vector<ReceiverCandidate>& candidates = discovery.getCandidates();
     ReceiverDiscoveryState state = discovery.getState();
 
-    tft.setTextDatum(MC_DATUM);
     if (state == ReceiverDiscoveryState::Searching) {
-        tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY);
-        tft.drawString("Searching for receivers...", 240, 84, 2);
-        IconRenderer::drawCentered(tft, Icons::SCAN, 240, 122, DisplayManager::COLOR_TEXT_SECONDARY);
+        MaterialStyle::drawSearchingState(tft, "Receiver Setup", "Searching for receivers...",
+                                          Icons::SCAN, _progressFrame);
     } else if (candidates.empty()) {
-        tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY);
-        IconRenderer::drawCentered(tft, Icons::WARNING, 240, 58, DisplayManager::COLOR_WARNING);
-        tft.drawString("No receivers found", 240, 92, 4);
-        tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
-        tft.drawString("Retry discovery or enter an IP address.", 240, 130, 2);
+        drawHeader(tft);
+        MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Empty, "No receivers found",
+                                       "Rescan or enter an IP address.", Icons::WARNING);
     } else {
+        drawHeader(tft);
         for (size_t i = 0; i < candidates.size() && i < 3; ++i) {
-            drawCandidateRow(tft, candidates[i], i, 72 + (int)i * 56);
+            drawCandidateRow(tft, candidates[i], i,
+                             MaterialStyle::SetupListTopY + (int)i * 56);
         }
     }
 
@@ -51,6 +48,20 @@ void ReceiverListScreen::update() {
     size_t candidateCount = discovery.getCandidates().size();
     if (state != _lastState || candidateCount != _lastCandidateCount) {
         draw();
+    } else if (state == ReceiverDiscoveryState::Searching) {
+        uint32_t now = millis();
+        if (now - _lastProgressAtMs >= MaterialStyle::ProgressFrameMs) {
+            _lastProgressAtMs = now;
+            _progressFrame++;
+            TFT_eSPI& tft = DisplayManager::getInstance().getTft();
+            MaterialStyle::clearProgressBar(tft, MaterialStyle::SearchingProgressX,
+                                            MaterialStyle::SearchingProgressY,
+                                            MaterialStyle::SearchingProgressW);
+            MaterialStyle::drawProgressBar(tft, MaterialStyle::SearchingProgressX,
+                                           MaterialStyle::SearchingProgressY,
+                                           MaterialStyle::SearchingProgressW,
+                                           _progressFrame);
+        }
     }
 }
 
@@ -63,14 +74,15 @@ void ReceiverListScreen::handleTouch(TS_Point p) {
         return;
     }
 
-    if (p.y >= 248 && p.y <= 302) {
-        if (p.x >= 24 && p.x <= 152) {
-            startDiscovery();
-            draw();
-        } else if (p.x >= 176 && p.x <= 304) {
+    if (p.y >= MaterialStyle::BottomActionY &&
+        p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight) {
+        if (p.x >= 20 && p.x <= 150) {
             ReceiverDiscovery::getInstance().stop();
             ScreenManager::getInstance().setScreen(new ReceiverIpScreen(_returnTarget));
-        } else if (p.x >= 328 && p.x <= 456) {
+        } else if (p.x >= 175 && p.x <= 305) {
+            startDiscovery();
+            draw();
+        } else if (p.x >= 330 && p.x <= 460) {
             ReceiverDiscovery::getInstance().stop();
             if (_returnTarget == ScreenReturnTarget::Settings) {
                 ScreenManager::getInstance().setScreen(new SettingsScreen());
@@ -82,48 +94,39 @@ void ReceiverListScreen::handleTouch(TS_Point p) {
 }
 
 void ReceiverListScreen::drawHeader(TFT_eSPI& tft) {
-    tft.setTextDatum(TL_DATUM);
-    tft.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY);
-    tft.drawString("Receiver Setup", 20, 16, 4);
-    tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
-    tft.drawString("Select a discovered receiver", 20, 46, 2);
+    MaterialStyle::drawSetupHeader(tft, "Receiver Setup", "Select a discovered receiver");
 }
 
 void ReceiverListScreen::drawActions(TFT_eSPI& tft) {
-    const char* labels[] = {"Retry", "Manual", "Cancel"};
+    const char* labels[] = {"Manual", "Rescan", "Cancel"};
     for (int i = 0; i < 3; ++i) {
-        int x = 24 + i * 152;
-        tft.fillRoundRect(x, 248, 128, 44, 6, DisplayManager::COLOR_PANEL);
-        tft.drawRoundRect(x, 248, 128, 44, 6, DisplayManager::COLOR_BAR_BG);
-        tft.setTextDatum(MC_DATUM);
-        tft.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY);
-        const Icons::IconBitmap* icon = i == 0 ? &Icons::RETRY : i == 1 ? &Icons::MANUAL_ENTRY : &Icons::KEYBOARD_CANCEL;
-        IconRenderer::drawCentered(tft, *icon, x + 28, 270, DisplayManager::COLOR_TEXT_PRIMARY);
-        tft.drawString(labels[i], x + 64, 270, 2);
+        int x = 20 + i * 155;
+        const Icons::IconBitmap* icon = i == 0 ? &Icons::MANUAL_ENTRY : i == 1 ? &Icons::RETRY : &Icons::KEYBOARD_CANCEL;
+        MaterialStyle::ComponentState state = i == 2 ? MaterialStyle::ComponentState::Error
+                                                     : MaterialStyle::ComponentState::Normal;
+        MaterialStyle::drawStandardButton(tft, x, MaterialStyle::BottomActionY, 130,
+                                          MaterialStyle::ButtonHeight, *icon, labels[i], state);
     }
 }
 
 void ReceiverListScreen::drawCandidateRow(TFT_eSPI& tft, const ReceiverCandidate& candidate, int index, int y) {
-    int x = 24;
-    tft.fillRoundRect(x, y, 432, 46, 6, DisplayManager::COLOR_PANEL);
-    tft.drawRoundRect(x, y, 432, 46, 6, DisplayManager::COLOR_BAR_BG);
-
-    tft.setTextDatum(ML_DATUM);
-    tft.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY);
-    IconRenderer::drawCentered(tft, Icons::RECEIVER, x + 24, y + 23, DisplayManager::COLOR_TEXT_SECONDARY);
-    tft.drawString(candidate.name, x + 48, y + 15, 2);
-    tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY);
-    tft.drawString(candidate.ipAddress, x + 48, y + 34, 2);
-
-    tft.setTextDatum(MR_DATUM);
-    tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
-    tft.drawNumber(index + 1, x + 410, y + 23, 4);
+    MaterialStyle::drawListRow(tft, {
+        24, y, 432, MaterialStyle::ListRowHeight,
+        &Icons::RECEIVER,
+        0,
+        candidate.name,
+        candidate.ipAddress,
+        String(index + 1),
+        MaterialStyle::ComponentState::Normal
+    });
 }
 
 void ReceiverListScreen::startDiscovery() {
     ReceiverDiscovery::getInstance().start();
     _lastState = ReceiverDiscoveryState::Idle;
     _lastCandidateCount = 0;
+    _progressFrame = 0;
+    _lastProgressAtMs = millis();
 }
 
 int ReceiverListScreen::touchedCandidateIndex(TS_Point p) const {
@@ -132,7 +135,7 @@ int ReceiverListScreen::touchedCandidateIndex(TS_Point p) const {
     }
 
     for (int i = 0; i < 3; ++i) {
-        int y = 72 + i * 56;
+        int y = MaterialStyle::SetupListTopY + i * 56;
         if (p.y >= y && p.y <= y + 46) {
             return i;
         }

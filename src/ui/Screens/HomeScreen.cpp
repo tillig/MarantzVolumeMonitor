@@ -5,6 +5,7 @@
 #include "ReceiverListScreen.h"
 #include "../IconRenderer.h"
 #include "../ScreenManager.h"
+#include "../MaterialStyle.h"
 #include "../assets/IconBitmaps.h"
 #include "../../network/WiFiManager.h"
 
@@ -93,50 +94,40 @@ void HomeScreen::handleTouch(TS_Point p) {
 
 void HomeScreen::drawSetupState() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
-    tft.setTextDatum(MC_DATUM);
 
     if (!_hasWifiConfig) {
-        tft.setTextColor(TFT_WHITE);
-        tft.drawString("UNCONFIGURED", 240, 90, 4);
-
-        tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
-        tft.drawString("Tap anywhere to configure Wi-Fi", 240, 138, 2);
+        MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Warning,
+                                       "Unconfigured", "Tap anywhere to configure Wi-Fi.",
+                                       Icons::WARNING);
     } else if (_isWifiConnected && !_hasReceiverConfig) {
-        tft.setTextColor(TFT_WHITE);
-        tft.drawString("WI-FI CONNECTED", 240, 80, 4);
-
-        tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY);
-        tft.drawString(_config.wifiSsid, 240, 122, 2);
+        MaterialStyle::drawText(tft, "Wi-Fi Connected", 240, 80,
+                                MaterialStyle::TextRole::StatusMessage, TC_DATUM,
+                                MaterialStyle::ComponentState::Success);
+        MaterialStyle::drawText(tft, MaterialStyle::truncateToWidth(tft, _config.wifiSsid, 380, 2),
+                                240, 122, MaterialStyle::TextRole::Body, TC_DATUM);
         if (_ipAddress.length() > 0) {
-            tft.drawString(_ipAddress, 240, 146, 2);
+            MaterialStyle::drawText(tft, _ipAddress, 240, 146, MaterialStyle::TextRole::Body, TC_DATUM);
         }
 
-        tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
-        tft.drawString("Receiver setup is still required.", 240, 188, 2);
-        tft.drawString("Tap to configure receiver.", 240, 212, 2);
+        MaterialStyle::drawText(tft, "Receiver setup is still required.", 240, 188,
+                                MaterialStyle::TextRole::Body, TC_DATUM,
+                                MaterialStyle::ComponentState::Warning);
+        MaterialStyle::drawText(tft, "Tap to configure receiver.", 240, 212,
+                                MaterialStyle::TextRole::Body, TC_DATUM);
     } else if (!_isWifiConnected) {
-        tft.setTextColor(TFT_WHITE);
-        tft.drawString("CONNECTING WI-FI", 240, 90, 4);
-
-        tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY);
-        tft.drawString(_config.wifiSsid, 240, 134, 2);
-
-        tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
-        tft.drawString("Saved credentials found. Waiting for connection.", 240, 182, 2);
-        tft.drawString("Tap to reconfigure Wi-Fi.", 240, 206, 2);
+        MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Unavailable,
+                                       "Connecting Wi-Fi",
+                                       MaterialStyle::truncateToWidth(tft, _config.wifiSsid, 360, 2),
+                                       Icons::WIFI);
+        MaterialStyle::drawText(tft, "Saved credentials found. Tap to reconfigure Wi-Fi.", 240, 224,
+                                MaterialStyle::TextRole::Body, TC_DATUM);
     } else {
-        tft.setTextColor(TFT_WHITE);
-        tft.drawString("RECEIVER UNAVAILABLE", 240, 90, 4);
-
-        tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
-        tft.drawString("Wi-Fi is connected, but receiver status is unavailable.", 240, 142, 2);
-        tft.drawString("Tap to change receiver settings.", 240, 166, 2);
+        MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Unavailable,
+                                       "Receiver unavailable",
+                                       "Tap to change receiver settings.", Icons::RECEIVER);
     }
 
-    tft.fillRoundRect(390, 286, 72, 24, 12, DisplayManager::COLOR_PANEL);
-    tft.drawRoundRect(390, 286, 72, 24, 12, DisplayManager::COLOR_BAR_BG);
-    tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
-    tft.drawString("CAL", 426, 298, 1);
+    drawCalibrationButton();
 }
 
 void HomeScreen::loadStoredConfig() {
@@ -163,7 +154,9 @@ void HomeScreen::refreshState() {
 }
 
 bool HomeScreen::isCalibrationButtonPressed(TS_Point p) const {
-    return p.x >= 390 && p.x <= 462 && p.y >= 286 && p.y <= 310;
+    return p.x >= 300 && p.x <= 456 &&
+           p.y >= MaterialStyle::BottomActionY &&
+           p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight;
 }
 
 bool HomeScreen::isSettingsButtonPressed(TS_Point p) const {
@@ -331,6 +324,13 @@ void HomeScreen::drawTiles(const String& mode) {
 void HomeScreen::drawSettingsButton() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
     IconRenderer::drawCentered(tft, Icons::SETTINGS, 450, 28, DisplayManager::COLOR_TEXT_SECONDARY);
+}
+
+void HomeScreen::drawCalibrationButton() {
+    TFT_eSPI& tft = DisplayManager::getInstance().getTft();
+    MaterialStyle::drawStandardButton(tft, 300, MaterialStyle::BottomActionY, 156,
+                                      MaterialStyle::ButtonHeight,
+                                      Icons::TOUCH_CALIBRATION, "Calibrate");
 }
 
 void HomeScreen::drawAudioFamilyIcons() {

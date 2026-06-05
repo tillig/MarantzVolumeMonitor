@@ -126,6 +126,21 @@ ICON_SPECS: list[IconSpec] = [
     IconSpec("warning", "WARNING", 48, 48, material_svg("M1 21h22L12 2 1 21zm12-3h-2v-2h2zm0-4h-2v-4h2z")),
     IconSpec("failure", "FAILURE", 48, 48, material_svg("M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12z")),
     IconSpec("wifi", "WIFI", 32, 32, material_svg("M1 9 3 11c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8 3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4 2 2c2.76-2.76 7.24-2.76 10 0l2-2c-3.86-3.86-10.14-3.86-14 0z")),
+    IconSpec(
+        "touch-calibration",
+        "TOUCH_CALIBRATION",
+        24,
+        24,
+        simple_svg(
+            24,
+            24,
+            '<circle cx="12" cy="12" r="5"/>'
+            '<path d="M12 2V6"/>'
+            '<path d="M12 18V22"/>'
+            '<path d="M2 12H6"/>'
+            '<path d="M18 12H22"/>',
+        ),
+    ),
     IconSpec("receiver", "RECEIVER", 32, 32, simple_svg(32, 32, '<rect x="5" y="8" width="22" height="14" rx="2"/><path d="M9 25H23"/><path d="M10 14H16"/><circle cx="22" cy="15" r="2"/>', "0 0 32 32")),
 ]
 

@@ -1,27 +1,11 @@
 #include "NetworkListScreen.h"
 #include "KeyboardScreen.h"
 #include "SettingsScreen.h"
-#include "../IconRenderer.h"
 #include "../ScreenManager.h"
 #include "../DisplayManager.h"
+#include "../MaterialStyle.h"
 #include "../assets/IconBitmaps.h"
 #include "../../storage/ConfigStore.h"
-
-namespace {
-void drawIconLabelButton(TFT_eSPI& tft, const Icons::IconBitmap& icon, const char* label,
-                         int x, int y, int w, int h, uint16_t color) {
-    constexpr int gap = 8;
-    int textWidth = tft.textWidth(label, 2);
-    int groupWidth = icon.width + gap + textWidth;
-    int startX = x + (w - groupWidth) / 2;
-    int centerY = y + h / 2;
-    IconRenderer::drawCentered(tft, icon, startX + icon.width / 2, centerY, color);
-    tft.setTextDatum(ML_DATUM);
-    tft.setTextColor(color);
-    tft.drawString(label, startX + icon.width + gap, centerY, 2);
-    tft.setTextDatum(MC_DATUM);
-}
-}
 
 NetworkListScreen::NetworkListScreen(ScreenReturnTarget returnTarget)
     : _returnTarget(returnTarget) {
@@ -34,16 +18,21 @@ void NetworkListScreen::draw() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
     tft.fillScreen(DisplayManager::COLOR_BACKGROUND);
 
-    tft.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY);
-    tft.setTextDatum(TC_DATUM);
-    tft.drawString("Select Wi-Fi Network", 240, 10, 4);
-
-    if (!_isScanning && _networks.empty()) {
-        IconRenderer::drawCentered(tft, Icons::SCAN, 240, 100, DisplayManager::COLOR_TEXT_SECONDARY);
-        tft.drawString("Scanning...", 240, 140, 4);
+    if (!_isScanning && !_hasScanned) {
         WiFiManager::getInstance().startScan();
         _isScanning = true;
+        _progressFrame = 0;
+        _lastProgressAtMs = millis();
+    }
+
+    if (_isScanning) {
+        MaterialStyle::drawSearchingState(tft, "Wi-Fi Setup", "Scanning for networks...", Icons::SCAN, _progressFrame);
+    } else if (_networks.empty()) {
+        MaterialStyle::drawSetupHeader(tft, "Wi-Fi Setup", "Select a Wi-Fi network");
+        MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Empty, "No networks found",
+                                       "Use Rescan or enter a network manually.", Icons::WARNING);
     } else {
+        MaterialStyle::drawSetupHeader(tft, "Wi-Fi Setup", "Select a Wi-Fi network");
         drawList();
     }
 
@@ -56,19 +45,36 @@ void NetworkListScreen::update() {
         if (status >= 0) {
             _networks = WiFiManager::getInstance().getScanResults();
             _isScanning = false;
+            _hasScanned = true;
             draw();
+        } else {
+            uint32_t now = millis();
+            if (now - _lastProgressAtMs >= MaterialStyle::ProgressFrameMs) {
+                _lastProgressAtMs = now;
+                _progressFrame++;
+                TFT_eSPI& tft = DisplayManager::getInstance().getTft();
+                MaterialStyle::clearProgressBar(tft, MaterialStyle::SearchingProgressX,
+                                                MaterialStyle::SearchingProgressY,
+                                                MaterialStyle::SearchingProgressW);
+                MaterialStyle::drawProgressBar(tft, MaterialStyle::SearchingProgressX,
+                                               MaterialStyle::SearchingProgressY,
+                                               MaterialStyle::SearchingProgressW,
+                                               _progressFrame);
+            }
         }
     }
 }
 
 void NetworkListScreen::handleTouch(TS_Point p) {
-    // 1. Bottom Buttons (Manual / Rescan) — drawn at y=275, height=35
-    if (p.y > 270) {
+    // 1. Bottom Buttons (Manual / Rescan)
+    if (p.y >= MaterialStyle::BottomActionY &&
+        p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight) {
         if (_canCancel) {
             if (p.x >= 20 && p.x <= 150) {
                 ScreenManager::getInstance().setScreen(new KeyboardScreen("", _returnTarget));
             } else if (p.x >= 175 && p.x <= 305) {
                 _networks.clear();
+                _hasScanned = false;
                 _isScanning = false;
                 _scrollOffset = 0;
                 draw();
@@ -80,6 +86,7 @@ void NetworkListScreen::handleTouch(TS_Point p) {
                 ScreenManager::getInstance().setScreen(new KeyboardScreen("", _returnTarget));
             } else {
                 _networks.clear();
+                _hasScanned = false;
                 _isScanning = false;
                 _scrollOffset = 0;
                 draw();
@@ -88,21 +95,22 @@ void NetworkListScreen::handleTouch(TS_Point p) {
         return;
     }
 
-    // 2. Pagination Controls — drawn around y=230–270
-    if (p.y > 230 && p.y < 270) {
+    // 2. Pagination Controls
+    if (p.y >= 230 && p.y <= 266) {
         if (p.x < 120 && _scrollOffset > 0) {
-            _scrollOffset -= 5;
+            _scrollOffset -= 3;
             draw();
-        } else if (p.x > 360 && (_scrollOffset + 5) < _networks.size()) {
-            _scrollOffset += 5;
+        } else if (p.x > 360 && (_scrollOffset + 3) < _networks.size()) {
+            _scrollOffset += 3;
             draw();
         }
         return;
     }
 
-    // 3. Network list items — drawn at y = 50 + i*36, height=32
-    if (p.y > 50 && p.y < 230) {
-        int index = _scrollOffset + ((p.y - 50) / 36);
+    // 3. Network list items
+    if (p.y >= MaterialStyle::SetupListTopY && p.y < 240) {
+        int index = _scrollOffset + ((p.y - MaterialStyle::SetupListTopY) /
+                                     (MaterialStyle::ListRowHeight + MaterialStyle::RowGap));
         if (index < _networks.size()) {
             ScreenManager::getInstance().setScreen(new KeyboardScreen(_networks[index].ssid, _returnTarget));
         }
@@ -112,57 +120,56 @@ void NetworkListScreen::handleTouch(TS_Point p) {
 void NetworkListScreen::drawList() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
 
-    int itemsToShow = 5;
+    int itemsToShow = 3;
     for (int i = 0; i < itemsToShow; ++i) {
         int index = _scrollOffset + i;
-        int y = 50 + (i * 36);
+        int y = MaterialStyle::SetupListTopY + (i * (MaterialStyle::ListRowHeight + MaterialStyle::RowGap));
 
         if (index < _networks.size()) {
-            tft.fillRoundRect(10, y, 460, 32, 6, DisplayManager::COLOR_BAR_BG);
-            tft.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY);
-            tft.setTextDatum(ML_DATUM);
-
-            String ssid = _networks[index].ssid;
-            if (ssid.length() > 25) ssid = ssid.substring(0, 22) + "...";
-            tft.drawString(ssid, 25, y + 16, 2);
-
-            // RSSI indicator
             int32_t rssi = _networks[index].rssi;
-            uint16_t color = TFT_GREEN;
-            if (rssi < -80) color = TFT_RED;
-            else if (rssi < -70) color = TFT_YELLOW;
-            tft.fillCircle(445, y + 16, 6, color);
+            int signalLevel = rssi < -80 ? 1 : rssi < -70 ? 2 : 3;
+            MaterialStyle::drawListRow(tft, {
+                20, y, 440, MaterialStyle::ListRowHeight,
+                nullptr,
+                signalLevel,
+                _networks[index].ssid,
+                "",
+                String(index + 1),
+                MaterialStyle::ComponentState::Normal
+            });
         }
     }
 
     // Draw Pagination Status
-    tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
-    tft.setTextDatum(MC_DATUM);
-    String pageInfo = "Page " + String((_scrollOffset / 5) + 1) + " of " + String((_networks.size() + 4) / 5);
-    tft.drawString(pageInfo, 240, 245, 1);
+    String pageInfo = "Page " + String((_scrollOffset / itemsToShow) + 1) + " of " +
+                      String((_networks.size() + itemsToShow - 1) / itemsToShow);
+    MaterialStyle::drawText(tft, pageInfo, 240, 246,
+                            MaterialStyle::TextRole::CompactMetadata, MC_DATUM);
 
-    if (_scrollOffset > 0) tft.drawString("< PREV", 60, 245, 2);
-    if ((_scrollOffset + 5) < _networks.size()) tft.drawString("NEXT >", 420, 245, 2);
+    if (_scrollOffset > 0) {
+        MaterialStyle::drawTextButton(tft, 20, 230, 96, 32, "PREV");
+    }
+    if ((_scrollOffset + itemsToShow) < _networks.size()) {
+        MaterialStyle::drawTextButton(tft, 364, 230, 96, 32, "NEXT");
+    }
 }
 
 void NetworkListScreen::drawActions(TFT_eSPI& tft) {
-    tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY);
-    tft.setTextDatum(MC_DATUM);
-
     if (_canCancel) {
         const char* labels[] = {"Manual", "Rescan", "Cancel"};
         for (int i = 0; i < 3; ++i) {
             int x = 20 + i * 155;
-            tft.fillRoundRect(x, 275, 130, 35, 17, DisplayManager::COLOR_BAR_BG);
             const Icons::IconBitmap* icon = i == 0 ? &Icons::MANUAL_ENTRY : i == 1 ? &Icons::RETRY : &Icons::KEYBOARD_CANCEL;
-            drawIconLabelButton(tft, *icon, labels[i], x, 275, 130, 35, DisplayManager::COLOR_TEXT_SECONDARY);
+            MaterialStyle::ComponentState state = i == 2 ? MaterialStyle::ComponentState::Error
+                                                         : MaterialStyle::ComponentState::Normal;
+            MaterialStyle::drawStandardButton(tft, x, MaterialStyle::BottomActionY, 130,
+                                              MaterialStyle::ButtonHeight, *icon, labels[i], state);
         }
         return;
     }
 
-    tft.fillRoundRect(20, 275, 200, 35, 17, DisplayManager::COLOR_BAR_BG);
-    drawIconLabelButton(tft, Icons::MANUAL_ENTRY, "Manual Entry", 20, 275, 200, 35, DisplayManager::COLOR_TEXT_SECONDARY);
-
-    tft.fillRoundRect(260, 275, 200, 35, 17, DisplayManager::COLOR_BAR_BG);
-    drawIconLabelButton(tft, Icons::RETRY, "Rescan", 260, 275, 200, 35, DisplayManager::COLOR_TEXT_SECONDARY);
+    MaterialStyle::drawStandardButton(tft, 20, MaterialStyle::BottomActionY, 200, MaterialStyle::ButtonHeight,
+                                      Icons::MANUAL_ENTRY, "Manual Entry");
+    MaterialStyle::drawStandardButton(tft, 260, MaterialStyle::BottomActionY, 200, MaterialStyle::ButtonHeight,
+                                      Icons::RETRY, "Rescan");
 }

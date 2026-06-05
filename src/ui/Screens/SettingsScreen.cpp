@@ -3,33 +3,47 @@
 #include "HomeScreen.h"
 #include "NetworkListScreen.h"
 #include "ReceiverListScreen.h"
-#include "../IconRenderer.h"
 #include "../ScreenManager.h"
+#include "../MaterialStyle.h"
 #include "../assets/IconBitmaps.h"
 
 void SettingsScreen::draw() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
     tft.fillScreen(DisplayManager::COLOR_BACKGROUND);
 
-    tft.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY);
-    tft.setTextDatum(TL_DATUM);
-    tft.drawString("Settings", 20, 20, 4);
+    MaterialStyle::drawText(tft, "Settings", 20, 20, MaterialStyle::TextRole::ScreenTitle, TL_DATUM);
 
-    tft.drawFastHLine(20, 50, 440, DisplayManager::COLOR_TEXT_DIMMED);
+    MaterialStyle::drawListRow(tft, {
+        20, 68, 440, MaterialStyle::ListRowHeight,
+        &Icons::WIFI,
+        0,
+        "Wi-Fi Setup",
+        "Choose network and password",
+        ">",
+        MaterialStyle::ComponentState::Normal
+    });
+    MaterialStyle::drawListRow(tft, {
+        20, 128, 440, MaterialStyle::ListRowHeight,
+        &Icons::RECEIVER,
+        0,
+        "Receiver Setup",
+        "Discover or enter receiver",
+        ">",
+        MaterialStyle::ComponentState::Normal
+    });
+    MaterialStyle::drawListRow(tft, {
+        20, 188, 440, MaterialStyle::ListRowHeight,
+        &Icons::TOUCH_CALIBRATION,
+        0,
+        "Touch Calibration",
+        "Capture raw touch samples",
+        ">",
+        MaterialStyle::ComponentState::Normal
+    });
 
-    tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY);
-    tft.drawString("Touch Calibration", 20, 80, 4);
-    tft.drawString("Wi-Fi Setup", 20, 140, 4);
-    tft.drawString("Receiver Setup", 20, 200, 4);
-    IconRenderer::drawCentered(tft, Icons::CHEVRON_RIGHT, 440, 92, DisplayManager::COLOR_TEXT_SECONDARY);
-    IconRenderer::drawCentered(tft, Icons::CHEVRON_RIGHT, 440, 152, DisplayManager::COLOR_TEXT_SECONDARY);
-    IconRenderer::drawCentered(tft, Icons::CHEVRON_RIGHT, 440, 212, DisplayManager::COLOR_TEXT_SECONDARY);
-
-    tft.fillRoundRect(360, 270, 96, 38, 8, DisplayManager::COLOR_PANEL);
-    tft.drawRoundRect(360, 270, 96, 38, 8, DisplayManager::COLOR_BAR_BG);
-    tft.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY);
-    tft.setTextDatum(MC_DATUM);
-    tft.drawString("OK", 408, 289, 2);
+    MaterialStyle::drawStandardButton(tft, 340, MaterialStyle::BottomActionY, 116, MaterialStyle::ButtonHeight,
+                                      Icons::KEYBOARD_OK, "OK",
+                                      MaterialStyle::ComponentState::Success);
 }
 
 void SettingsScreen::update() {
@@ -37,13 +51,14 @@ void SettingsScreen::update() {
 }
 
 void SettingsScreen::handleTouch(TS_Point p) {
-    if (p.x >= 360 && p.x <= 456 && p.y >= 270 && p.y <= 308) {
+    if (p.x >= 340 && p.x <= 456 && p.y >= MaterialStyle::BottomActionY &&
+        p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight) {
         ScreenManager::getInstance().setScreen(new HomeScreen());
-    } else if (p.y >= 132 && p.y <= 176) {
+    } else if (p.y >= 68 && p.y <= 114) {
         ScreenManager::getInstance().setScreen(new NetworkListScreen(ScreenReturnTarget::Settings));
-    } else if (p.y >= 192 && p.y <= 236) {
+    } else if (p.y >= 128 && p.y <= 174) {
         ScreenManager::getInstance().setScreen(new ReceiverListScreen(ScreenReturnTarget::Settings));
-    } else if (p.y >= 72 && p.y <= 116) {
+    } else if (p.y >= 188 && p.y <= 234) {
         ScreenManager::getInstance().setScreen(new CalibrationScreen(ScreenReturnTarget::Settings));
     }
 }

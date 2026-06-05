@@ -3,8 +3,8 @@
 #include "ReceiverIpScreen.h"
 #include "ReceiverListScreen.h"
 #include "SettingsScreen.h"
-#include "../IconRenderer.h"
 #include "../ScreenManager.h"
+#include "../MaterialStyle.h"
 #include "../assets/IconBitmaps.h"
 #include "../../network/MarantzClient.h"
 #include "../../network/WiFiManager.h"
@@ -17,79 +17,86 @@ void ReceiverStatusScreen::draw() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
     tft.fillScreen(DisplayManager::COLOR_BACKGROUND);
 
-    tft.setTextDatum(TC_DATUM);
-    tft.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY);
-    IconRenderer::drawCentered(tft, Icons::RECEIVER, 132, 28, DisplayManager::COLOR_TEXT_SECONDARY);
-    tft.drawString("Verify Receiver", 240, 14, 4);
+    MaterialStyle::drawText(tft, "Receiver Setup", 240, 14,
+                            MaterialStyle::TextRole::ScreenTitle, TC_DATUM);
 
-    tft.setTextColor(DisplayManager::COLOR_TEXT_SECONDARY);
-    tft.drawString(_candidate.name, 240, 78, 2);
-    tft.drawString(_candidate.ipAddress, 240, 104, 4);
-
-    if (!_complete) {
-        tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
-        IconRenderer::drawCentered(tft, Icons::SCAN, 240, 132, DisplayManager::COLOR_TEXT_SECONDARY);
-        tft.drawString("Requesting live receiver status...", 240, 166, 2);
+    if (_complete && _result.success) {
+        MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Success,
+                                       "Receiver saved",
+                                       "Tap OK to continue.", Icons::SUCCESS);
+        MaterialStyle::drawStandardButton(tft, 182, MaterialStyle::BottomActionY, 116,
+                                          MaterialStyle::ButtonHeight,
+                                          Icons::KEYBOARD_OK, "OK",
+                                          MaterialStyle::ComponentState::Success);
         return;
     }
 
-    if (_result.success) {
-        IconRenderer::drawCentered(tft, Icons::SUCCESS, 240, 122, DisplayManager::COLOR_ICON_ACTIVE);
-        tft.setTextColor(DisplayManager::COLOR_ICON_ACTIVE);
-        tft.drawString("Receiver saved", 240, 166, 4);
-        tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
-        String returnText = _returnTarget == ScreenReturnTarget::Settings ? "Returning to Settings"
-                                                                          : "Returning to Home";
-        tft.drawString(returnText, 240, 204, 2);
-    } else {
-        IconRenderer::drawCentered(tft, Icons::FAILURE, 240, 108, DisplayManager::COLOR_ERROR);
-        tft.setTextColor(DisplayManager::COLOR_ERROR);
-        tft.drawString(failureText(), 240, 156, 2);
-
-        tft.fillRoundRect(24, 246, 128, 44, 6, DisplayManager::COLOR_PANEL);
-        tft.fillRoundRect(176, 246, 128, 44, 6, DisplayManager::COLOR_PANEL);
-        tft.fillRoundRect(328, 246, 128, 44, 6, DisplayManager::COLOR_PANEL);
-        tft.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY);
-        IconRenderer::drawCentered(tft, Icons::RETRY, 52, 268, DisplayManager::COLOR_TEXT_PRIMARY);
-        IconRenderer::drawCentered(tft, Icons::MANUAL_ENTRY, 204, 268, DisplayManager::COLOR_TEXT_PRIMARY);
-        IconRenderer::drawCentered(tft, Icons::SCAN, 356, 268, DisplayManager::COLOR_TEXT_PRIMARY);
-        tft.drawString("Retry", 88, 268, 2);
-        tft.drawString("Manual", 240, 268, 2);
-        tft.drawString("Discover", 392, 268, 2);
+    if (!_complete) {
+        bool showProgress = _started && millis() - _startedAtMs >= MaterialStyle::ProgressThresholdMs;
+        MaterialStyle::drawStatusBlock(tft,
+                                       showProgress ? MaterialStyle::StatusKind::Loading
+                                                    : MaterialStyle::StatusKind::Unavailable,
+                                       "Verifying...",
+                                       MaterialStyle::truncateToWidth(tft, _candidate.name, 340, 2),
+                                       Icons::SCAN, _progressFrame);
+        return;
     }
+
+    MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Error,
+                                   failureText(), "Choose a recovery action.", Icons::FAILURE);
+    MaterialStyle::drawStandardButton(tft, 20, MaterialStyle::BottomActionY, 130, MaterialStyle::ButtonHeight,
+                                      Icons::RETRY, "Retry");
+    MaterialStyle::drawStandardButton(tft, 175, MaterialStyle::BottomActionY, 130, MaterialStyle::ButtonHeight,
+                                      Icons::MANUAL_ENTRY, "Manual");
+    MaterialStyle::drawStandardButton(tft, 330, MaterialStyle::BottomActionY, 130, MaterialStyle::ButtonHeight,
+                                      Icons::SCAN, "Discover");
 }
 
 void ReceiverStatusScreen::update() {
     if (!_started) {
         _started = true;
         _startedAtMs = millis();
+        _lastProgressAtMs = _startedAtMs;
         verify();
         draw();
     }
 
-    if (_complete && _result.success && millis() - _startedAtMs >= 1200) {
-        if (_returnTarget == ScreenReturnTarget::Settings) {
-            ScreenManager::getInstance().setScreen(new SettingsScreen());
-        } else {
-            ScreenManager::getInstance().setScreen(new HomeScreen());
-        }
+    if (!_complete && millis() - _startedAtMs >= MaterialStyle::ProgressThresholdMs &&
+        millis() - _lastProgressAtMs >= MaterialStyle::ProgressFrameMs) {
+        _lastProgressAtMs = millis();
+        _progressFrame++;
+        draw();
     }
 }
 
 void ReceiverStatusScreen::handleTouch(TS_Point p) {
-    if (!_complete || _result.success) {
+    if (!_complete) {
         return;
     }
 
-    if (p.y >= 246 && p.y <= 290) {
-        if (p.x >= 24 && p.x <= 152) {
+    if (p.y >= MaterialStyle::BottomActionY &&
+        p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight) {
+        if (_result.success && p.x >= 182 && p.x <= 298) {
+            if (_returnTarget == ScreenReturnTarget::Settings) {
+                ScreenManager::getInstance().setScreen(new SettingsScreen());
+            } else {
+                ScreenManager::getInstance().setScreen(new HomeScreen());
+            }
+            return;
+        }
+
+        if (_result.success) {
+            return;
+        }
+
+        if (p.x >= 20 && p.x <= 150) {
             _started = false;
             _complete = false;
             _result = ReceiverVerificationResult();
             draw();
-        } else if (p.x >= 176 && p.x <= 304) {
+        } else if (p.x >= 175 && p.x <= 305) {
             ScreenManager::getInstance().setScreen(new ReceiverIpScreen(_returnTarget));
-        } else if (p.x >= 328 && p.x <= 456) {
+        } else if (p.x >= 330 && p.x <= 460) {
             ScreenManager::getInstance().setScreen(new ReceiverListScreen(_returnTarget));
         }
     }

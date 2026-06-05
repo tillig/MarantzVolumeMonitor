@@ -31,6 +31,8 @@ out/
 # OS files
 .DS_Store
 Thumbs.db
+*.tmp
+.env*
 
 # Private files
 src/secrets.h
