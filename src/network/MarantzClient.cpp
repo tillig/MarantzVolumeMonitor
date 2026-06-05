@@ -1,5 +1,14 @@
 #include "MarantzClient.h"
 
+namespace {
+const char* const ModeTags[] = {
+    "selectSurround",
+    "SurrMode",
+    "SurroundMode",
+    "selectNOS"
+};
+}
+
 void MarantzClient::setReceiverIp(const String& ip) {
     _receiverIp = ip;
 }
@@ -31,16 +40,23 @@ MarantzStatus MarantzClient::fetchStatus(const String& ip) {
         if (httpCode == HTTP_CODE_OK) {
             String payload = http.getString();
 
-            String powerStr = extractValue(payload, "Power");
-            status.power = (powerStr == "ON");
-
-            String volStr = extractValue(payload, "MasterVolume");
+            String volStr = extractStatusValue(payload, "MasterVolume");
             if (volStr != "") {
                 status.volume = volStr.toFloat();
+                status.hasVolume = true;
             }
 
-            status.input = extractValue(payload, "InputFuncSelect");
-            status.mode = extractValue(payload, "selectNOS");
+            String powerStr = extractStatusValue(payload, "Power");
+            status.powerKnown = powerStr.length() > 0;
+            status.power = (powerStr == "ON");
+            if (!status.powerKnown && status.hasVolume) {
+                status.powerKnown = true;
+                status.power = true;
+            }
+
+            status.input = extractStatusValue(payload, "InputFuncSelect");
+            status.mode = extractFirstStatusValue(payload, ModeTags,
+                                                  sizeof(ModeTags) / sizeof(ModeTags[0]));
             status.isValid = true;
         }
         http.end();
@@ -66,4 +82,35 @@ String MarantzClient::extractValue(const String& xml, const String& tag) {
     value.replace("&amp;", "&");
 
     return value;
+}
+
+String MarantzClient::extractStatusValue(const String& xml, const String& tag) {
+    String value = extractValue(xml, tag);
+    value.trim();
+
+    if (value.indexOf('<') >= 0) {
+        String nestedValue = extractValue(value, "value");
+        if (nestedValue.length() == 0) {
+            nestedValue = extractValue(value, "Value");
+        }
+        if (nestedValue.length() > 0) {
+            value = nestedValue;
+            value.trim();
+        }
+    }
+
+    value.replace("&amp;", "&");
+    value.trim();
+    return value;
+}
+
+String MarantzClient::extractFirstStatusValue(const String& xml, const char* const tags[],
+                                              size_t tagCount) {
+    for (size_t i = 0; i < tagCount; ++i) {
+        String value = extractStatusValue(xml, tags[i]);
+        if (value.length() > 0) {
+            return value;
+        }
+    }
+    return "";
 }

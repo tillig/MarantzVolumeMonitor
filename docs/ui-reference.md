@@ -30,15 +30,20 @@ status text, and restrained animation so the device behaves like a passive appli
 
 - Center point: `(240, 140)`
 - Volume number: white, Font 8, centered near `Y=125`
+- Live volume always shows one decimal place.
 - Volume caption: dimmed gray, Font 2, centered near `Y=185`
 - Gauge arc: outer radius 125 px, inner radius 109 px, 240-degree span
 - Gauge colors: green/yellow/red fill over `#303030` background
 - These home fonts are intentionally larger than setup-screen roles so the main status remains
   readable from 15 feet.
+- Powered-off and unavailable receiver states do not reuse the live volume region or show stale
+  last-known values as if they were current.
 
 ### Settings Entry
 
 - A small bitmap settings icon in the top-right corner opens Settings from the normal Home Screen.
+- The same settings icon remains available from powered-off and receiver-unavailable home states so
+  receiver setup can be changed without rebooting.
 - Settings exposes touch calibration, Wi-Fi setup, and receiver setup.
 - Flows launched from Settings should return to Settings when complete; the Settings OK button
   returns to the Home Screen.
@@ -123,7 +128,16 @@ screen-specific hitbox offsets. Touch coordinates are globally calibrated in `To
 
 ## Animation
 
-- Volume arc updates should complete quickly, around 200 ms.
+- Live volume motion uses one shared standard-motion treatment for both the arc and the number.
+- Target duration should stay brief but visible on the TFT, roughly `420-820 ms` depending on
+  change size.
+- Motion should start promptly and decelerate smoothly into the final value without bounce.
+- Rapid retargeting should continue from the in-flight value instead of snapping back to an older
+  start point.
+- Per-frame volume animation should redraw only changed gauge shapes and changed numeric glyphs.
+  Do not push the whole gauge/value region per frame; full-screen redraws are reserved for coarse
+  state changes such as switching between live, powered-off, unavailable, and setup-required
+  layouts.
 - Screen transitions may be used for settings/setup navigation when they do not distract from the
   passive display behavior.
 

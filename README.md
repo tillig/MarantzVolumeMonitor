@@ -51,6 +51,9 @@ enabled.
 Receiver setup stores `receiverIp` in the same `config.json` file only after the receiver responds to
 a live status request. If a saved receiver is temporarily offline, the saved receiver configuration is
 kept and the Home Screen shows the receiver as unavailable until it becomes reachable or is replaced.
+If the receiver is reachable but powered off, the Home Screen shows `Receiver off` instead of the
+last live volume. Both powered-off and unavailable receiver states keep the top-right Settings path
+available so Wi-Fi or receiver setup can be reopened without restarting the device.
 
 If touch alignment is off, open Settings and choose touch calibration. The calibration screen records
 a 9-point touch dataset to the serial console so the touch transform can be recalculated from

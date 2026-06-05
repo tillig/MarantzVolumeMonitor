@@ -7,12 +7,16 @@
 
 struct MarantzStatus {
     bool power;
+    bool powerKnown;
     float volume;
+    bool hasVolume;
     String input;
     String mode;
     bool isValid;
 
-    MarantzStatus() : power(false), volume(-80.0), input(""), mode(""), isValid(false) {}
+    MarantzStatus()
+        : power(false), powerKnown(false), volume(-80.0), hasVolume(false),
+          input(""), mode(""), isValid(false) {}
 };
 
 class MarantzClient {
@@ -32,6 +36,8 @@ private:
 
     MarantzStatus fetchStatus(const String& ip);
     String extractValue(const String& xml, const String& tag);
+    String extractStatusValue(const String& xml, const String& tag);
+    String extractFirstStatusValue(const String& xml, const char* const tags[], size_t tagCount);
 };
 
 #endif
