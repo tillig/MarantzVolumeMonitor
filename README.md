@@ -54,6 +54,10 @@ kept and the Home Screen shows the receiver as unavailable until it becomes reac
 If the receiver is reachable but powered off, the Home Screen shows `Receiver off` instead of the
 last live volume. Both powered-off and unavailable receiver states keep the top-right Settings path
 available so Wi-Fi or receiver setup can be reopened without restarting the device.
+When powered-off status remains confirmed, `Receiver off` stays visible for about 3 seconds and then
+the Home Screen blanks to a quiet black screen until the receiver becomes active again or the screen
+is tapped. A wake tap only restores the Home Screen; opening Settings still requires a separate tap
+on the visible gear icon.
 
 If touch alignment is off, open Settings and choose touch calibration. The calibration screen records
 a 9-point touch dataset to the serial console so the touch transform can be recalculated from

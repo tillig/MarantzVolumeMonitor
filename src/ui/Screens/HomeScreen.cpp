@@ -46,7 +46,7 @@ HomeScreen::HomeScreen() {
     _textColors[6] = TFT_CYAN;
 
     refreshState();
-    _displayState = classifyDisplayState(_lastStatus);
+    setDisplayState(classifyDisplayState(_lastStatus), millis());
     if (_displayState == DisplayState::Live) {
         syncDisplayedVolume(displayVolume(_lastStatus.volume));
     } else {
@@ -71,11 +71,13 @@ void HomeScreen::draw() {
             }
             drawSettingsButton();
             break;
-        case DisplayState::ReceiverOff:
+        case DisplayState::ReceiverOffVisible:
             drawReceiverStatusState("Receiver off",
                                     "Open Settings to change receiver setup.",
                                     MaterialStyle::StatusKind::Warning);
             drawSettingsButton();
+            break;
+        case DisplayState::ReceiverOffBlank:
             break;
         case DisplayState::ReceiverUnavailable:
             drawReceiverStatusState("Receiver unavailable",
@@ -106,7 +108,9 @@ void HomeScreen::update() {
         String previousReceiverIp = _config.receiverIp;
 
         refreshState();
-        _displayState = classifyDisplayState(_lastStatus);
+        DisplayState classifiedState = classifyDisplayState(_lastStatus);
+        DisplayState resolvedState = resolveDisplayState(classifiedState);
+        setDisplayState(resolvedState, millis());
         now = millis();
 
         bool requiresFullRedraw = previousDisplayState != _displayState ||
@@ -143,15 +147,34 @@ void HomeScreen::update() {
         }
     }
 
+    if (_displayState == DisplayState::ReceiverOffVisible &&
+        isReceiverOffTimerExpired(now)) {
+        setDisplayState(DisplayState::ReceiverOffBlank, now);
+        draw();
+        return;
+    }
+
     if (_displayState == DisplayState::Live) {
         tickVolumeAnimation(now);
     }
 }
 
 void HomeScreen::handleTouch(TS_Point p) {
+    if (_displayState == DisplayState::ReceiverOffBlank) {
+        DisplayState wakeState = classifyDisplayState(_lastStatus);
+        setDisplayState(wakeState, millis());
+        draw();
+        return;
+    }
+
     if (isSettingsAccessible()) {
         if (isSettingsButtonPressed(p)) {
             ScreenManager::getInstance().setScreen(new SettingsScreen());
+            return;
+        }
+
+        if (_displayState == DisplayState::ReceiverOffVisible) {
+            startReceiverOffTimer(millis());
         }
         return;
     }
@@ -254,12 +277,64 @@ HomeScreen::DisplayState HomeScreen::classifyDisplayState(const MarantzStatus& s
         return DisplayState::ReceiverSetupRequired;
     }
     if (status.isValid && status.powerKnown && !status.power) {
-        return DisplayState::ReceiverOff;
+        return DisplayState::ReceiverOffVisible;
     }
     if (status.isValid && status.power && status.hasVolume) {
         return DisplayState::Live;
     }
     return DisplayState::ReceiverUnavailable;
+}
+
+HomeScreen::DisplayState HomeScreen::resolveDisplayState(DisplayState classifiedState) const {
+    if (_displayState == DisplayState::ReceiverOffBlank) {
+        if (classifiedState == DisplayState::Live) {
+            return DisplayState::Live;
+        }
+        return DisplayState::ReceiverOffBlank;
+    }
+
+    return classifiedState;
+}
+
+void HomeScreen::setDisplayState(DisplayState state, uint32_t now) {
+    if (state == _displayState) {
+        if (state == DisplayState::ReceiverOffVisible && !_receiverOffTimer.active) {
+            startReceiverOffTimer(now);
+        }
+        return;
+    }
+
+    DisplayState previousState = _displayState;
+    _displayState = state;
+
+    if (state == DisplayState::ReceiverOffVisible) {
+        startReceiverOffTimer(now);
+    } else {
+        stopReceiverOffTimer();
+    }
+
+    if (previousState == DisplayState::Live && state != DisplayState::Live) {
+        stopVolumeAnimation();
+    }
+}
+
+void HomeScreen::startReceiverOffTimer(uint32_t now) {
+    _receiverOffTimer.startedAtMs = now;
+    _receiverOffTimer.active = true;
+}
+
+void HomeScreen::stopReceiverOffTimer() {
+    _receiverOffTimer.active = false;
+}
+
+bool HomeScreen::isReceiverOffTimerExpired(uint32_t now) const {
+    return _receiverOffTimer.active &&
+           now - _receiverOffTimer.startedAtMs >= _receiverOffTimer.durationMs;
+}
+
+bool HomeScreen::isReceiverOffDisplayState(DisplayState state) const {
+    return state == DisplayState::ReceiverOffVisible ||
+           state == DisplayState::ReceiverOffBlank;
 }
 
 bool HomeScreen::isCalibrationButtonPressed(TS_Point p) const {
@@ -274,7 +349,7 @@ bool HomeScreen::isSettingsButtonPressed(TS_Point p) const {
 
 bool HomeScreen::isSettingsAccessible() const {
     return _displayState == DisplayState::Live ||
-           _displayState == DisplayState::ReceiverOff ||
+           _displayState == DisplayState::ReceiverOffVisible ||
            _displayState == DisplayState::ReceiverUnavailable;
 }
 

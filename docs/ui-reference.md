@@ -44,9 +44,18 @@ status text, and restrained animation so the device behaves like a passive appli
 - A small bitmap settings icon in the top-right corner opens Settings from the normal Home Screen.
 - The same settings icon remains available from powered-off and receiver-unavailable home states so
   receiver setup can be changed without rebooting.
+- Confirmed powered-off receiver state first shows `Receiver off`, then the Home Screen software-
+  blanks after 3 seconds so no idle status remains visible in the room.
+- While the Home Screen is blank because receiver-off was confirmed, touch wake remains active and
+  the first tap wakes only. A separate visible tap on the settings icon is still required to open
+  Settings.
+- A non-Settings tap on visible `Receiver off` restarts the 3-second timer and keeps the message
+  visible briefly.
 - Settings exposes touch calibration, Wi-Fi setup, and receiver setup.
 - Flows launched from Settings should return to Settings when complete; the Settings OK button
   returns to the Home Screen.
+- Returning Home while the receiver is still confirmed off shows `Receiver off` again and restarts
+  the 3-second blanking timer. Settings and settings-launched setup flows stay visible while active.
 - Setup/boot states expose a bottom-right `Calibrate` maintenance action using the shared bottom
   action button size, position, and icon-with-text treatment.
 

@@ -20,7 +20,8 @@ public:
         WifiConnecting,
         ReceiverSetupRequired,
         ReceiverUnavailable,
-        ReceiverOff,
+        ReceiverOffVisible,
+        ReceiverOffBlank,
         Live
     };
 
@@ -50,6 +51,12 @@ private:
         uint32_t lastFrameMs = 0;
     };
 
+    struct ReceiverOffTimer {
+        uint32_t startedAtMs = 0;
+        uint32_t durationMs = 3000;
+        bool active = false;
+    };
+
     MarantzStatus _lastStatus;
     DeviceConfig _config;
     uint16_t _textColors[7];
@@ -62,6 +69,7 @@ private:
     String _ipAddress;
     uint32_t _lastRefreshMs = 0;
     VolumeAnimation _volumeAnimation;
+    ReceiverOffTimer _receiverOffTimer;
 
     void drawVolume(float volume);
     void drawSource(const String& source);
@@ -74,6 +82,12 @@ private:
     void loadStoredConfig();
     void refreshState();
     DisplayState classifyDisplayState(const MarantzStatus& status) const;
+    DisplayState resolveDisplayState(DisplayState classifiedState) const;
+    void setDisplayState(DisplayState state, uint32_t now);
+    void startReceiverOffTimer(uint32_t now);
+    void stopReceiverOffTimer();
+    bool isReceiverOffTimerExpired(uint32_t now) const;
+    bool isReceiverOffDisplayState(DisplayState state) const;
     bool isCalibrationButtonPressed(TS_Point p) const;
     bool isSettingsButtonPressed(TS_Point p) const;
     bool isSettingsAccessible() const;
