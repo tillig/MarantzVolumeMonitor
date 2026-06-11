@@ -34,8 +34,7 @@ Verify on the 480x320 touchscreen with a saved receiver target:
 - Visible receiver-off state blanks after 3 seconds with +/-0.5 second tolerance.
 - Blank state contains no visible live volume, source, mode, audio-family, or status message content.
 - Touch in blank state wakes to visible `Receiver off`.
-- If receiver-off confirmation is lost after blanking, the monitor remains blank until user touch or
-  active receiver status.
+- If receiver-off confirmation is lost after blanking, the monitor remains blank until user touch or active receiver status.
 - Touch after receiver-off confirmation is lost wakes to the latest current visible state.
 - Wake touch does not open Settings or setup in the same event.
 - Non-Settings touches on visible `Receiver off` reset the 3-second timeout.

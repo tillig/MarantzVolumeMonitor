@@ -106,7 +106,7 @@ Command ends after Phase 2 planning. Report branch, IMPL_PLAN path, and generate
 
 ## Phases
 
-### Phase 0: Outline & Research
+### Phase 0: Outline and Research
 
 1. **Extract unknowns from Technical Context** above:
    - For each NEEDS CLARIFICATION → research task
@@ -129,7 +129,7 @@ Command ends after Phase 2 planning. Report branch, IMPL_PLAN path, and generate
 
 **Output**: research.md with all NEEDS CLARIFICATION resolved
 
-### Phase 1: Design & Contracts
+### Phase 1: Design and Contracts
 
 **Prerequisites:** `research.md` complete
 

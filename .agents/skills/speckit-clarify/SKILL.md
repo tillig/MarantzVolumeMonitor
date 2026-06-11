@@ -68,20 +68,20 @@ Execution steps:
 
 2. **IF EXISTS**: Load `.specify/memory/constitution.md` for project principles and governance constraints.
 
-3. Load the current spec file. Perform a structured ambiguity & coverage scan using this taxonomy. For each category, mark status: Clear / Partial / Missing. Produce an internal coverage map used for prioritization (do not output raw map unless no questions will be asked).
+3. Load the current spec file. Perform a structured ambiguity and coverage scan using this taxonomy. For each category, mark status: Clear / Partial / Missing. Produce an internal coverage map used for prioritization (do not output raw map unless no questions will be asked).
 
-   Functional Scope & Behavior:
-   - Core user goals & success criteria
+   Functional Scope and Behavior:
+   - Core user goals and success criteria
    - Explicit out-of-scope declarations
    - User roles / personas differentiation
 
-   Domain & Data Model:
+   Domain and Data Model:
    - Entities, attributes, relationships
-   - Identity & uniqueness rules
+   - Identity and uniqueness rules
    - Lifecycle/state transitions
    - Data volume / scale assumptions
 
-   Interaction & UX Flow:
+   Interaction and UX Flow:
    - Critical user journeys / sequences
    - Error/empty/loading states
    - Accessibility or localization notes
@@ -89,26 +89,26 @@ Execution steps:
    Non-Functional Quality Attributes:
    - Performance (latency, throughput targets)
    - Scalability (horizontal/vertical, limits)
-   - Reliability & availability (uptime, recovery expectations)
+   - Reliability and availability (uptime, recovery expectations)
    - Observability (logging, metrics, tracing signals)
-   - Security & privacy (authN/Z, data protection, threat assumptions)
+   - Security and privacy (authN/Z, data protection, threat assumptions)
    - Compliance / regulatory constraints (if any)
 
-   Integration & External Dependencies:
+   Integration and External Dependencies:
    - External services/APIs and failure modes
    - Data import/export formats
    - Protocol/versioning assumptions
 
-   Edge Cases & Failure Handling:
+   Edge Cases and Failure Handling:
    - Negative scenarios
    - Rate limiting / throttling
    - Conflict resolution (e.g., concurrent edits)
 
-   Constraints & Tradeoffs:
+   Constraints and Tradeoffs:
    - Technical constraints (language, storage, hosting)
    - Explicit tradeoffs or rejected alternatives
 
-   Terminology & Consistency:
+   Terminology and Consistency:
    - Canonical glossary terms
    - Avoided synonyms / deprecated terms
 
@@ -267,7 +267,7 @@ Check if `.specify/extensions.yml` exists in the project root.
 ## Completion Report
 
 Report completion (after questioning loop ends or early termination):
-- Number of questions asked & answered.
+- Number of questions asked and answered.
 - Path to updated spec.
 - Sections touched (list names).
 - Spec quality checklist status (if `FEATURE_DIR/checklists/requirements.md` was re-validated): show before/after pass counts (e.g., "Spec Quality Checklist: 12/16 → 15/16 items passing") and list any items that changed state — both newly checked (unchecked → checked) and any regressions (checked → unchecked). If any items remain unchecked, list them as areas needing attention.

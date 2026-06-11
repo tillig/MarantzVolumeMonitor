@@ -22,8 +22,7 @@ Generated outputs must include:
 - Optional generated preview files under `assets/icons/generated/`.
 - Updated `assets/icons/inventory.md` entries linking each source to generated outputs.
 
-Generated firmware masks must be deterministic. Running the generation command twice from the same
-inputs must produce byte-identical firmware asset files.
+Generated firmware masks must be deterministic. Running the generation command twice from the same inputs must produce byte-identical firmware asset files.
 
 ## Target Sizes
 
@@ -35,8 +34,7 @@ inputs must produce byte-identical firmware asset files.
 
 ## Color Handling
 
-The generated bitmap data should be a monochrome mask. Runtime rendering selects foreground color
-from the screen context:
+The generated bitmap data should be a monochrome mask. Runtime rendering selects foreground color from the screen context:
 
 - Active audio family: lit green.
 - Inactive audio family: dark gray.

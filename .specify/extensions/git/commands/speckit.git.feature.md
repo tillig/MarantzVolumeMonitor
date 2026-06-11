@@ -37,17 +37,14 @@ Determine the branch numbering strategy by checking configuration in this order:
 
 ## Branch Convention Integration
 
-If `.specify/branch-convention.yml` exists and defines `convention.branch_pattern`, the feature
-script MUST use that branch pattern as the source of truth for generated branch names. This allows
-the git feature hook to stay aligned with configured conventions such as `feature/{seq}-{kebab}`.
+If `.specify/branch-convention.yml` exists and defines `convention.branch_pattern`, the feature script MUST use that branch pattern as the source of truth for generated branch names. This allows the git feature hook to stay aligned with configured conventions such as `feature/{seq}-{kebab}`.
 
 When a branch convention is active:
 
 - Use the configured `type_prefix` and `default_type` to resolve `{type}`
 - Use the configured `seq_padding` for `{seq}`
 - Use the configured `date_format` for `{date}`
-- Extract `{ticket}` from the feature description using `ticket_pattern`, or fail with a clear
-  error if no matching ticket is present
+- Extract `{ticket}` from the feature description using `ticket_pattern`, or fail with a clear error if no matching ticket is present
 - Continue to honor `GIT_BRANCH_NAME` as an explicit override
 
 ## Execution

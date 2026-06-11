@@ -89,7 +89,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    Generation algorithm:
    1. Extract signals: feature domain keywords (e.g., auth, latency, UX, API), risk indicators ("critical", "must", "compliance"), stakeholder hints ("QA", "review", "security team"), and explicit deliverables ("a11y", "rollback", "contracts").
    2. Cluster signals into candidate focus areas (max 4) ranked by relevance.
-   3. Identify probable audience & timing (author, reviewer, QA, release) if not explicit.
+   3. Identify probable audience and timing (author, reviewer, QA, release) if not explicit.
    4. Detect missing dimensions: scope breadth, depth/rigor, risk emphasis, exclusion boundaries, measurable acceptance criteria.
    5. Formulate questions chosen from these archetypes:
       - Scope refinement (e.g., "Should this include integration touchpoints with X and Y or stay limited to local module correctness?")
@@ -139,8 +139,7 @@ You **MUST** consider the user input before proceeding (if not empty).
      - If file exists: Append new items to existing file, continuing from the last CHK ID (e.g., if last item is CHK015, start new items at CHK016)
    - Never delete or replace existing checklist content - always preserve and append
 
-   **CORE PRINCIPLE - Test the Requirements, Not the Implementation**:
-   Every checklist item MUST evaluate the REQUIREMENTS THEMSELVES for:
+   **CORE PRINCIPLE - Test the Requirements, Not the Implementation**: Every checklist item MUST evaluate the REQUIREMENTS THEMSELVES for:
    - **Completeness**: Are all necessary requirements present?
    - **Clarity**: Are requirements unambiguous and specific?
    - **Consistency**: Do requirements align with each other?
@@ -155,8 +154,8 @@ You **MUST** consider the user input before proceeding (if not empty).
    - **Scenario Coverage** (Are all flows/cases addressed?)
    - **Edge Case Coverage** (Are boundary conditions defined?)
    - **Non-Functional Requirements** (Performance, Security, Accessibility, etc. - are they specified?)
-   - **Dependencies & Assumptions** (Are they documented and validated?)
-   - **Ambiguities & Conflicts** (What needs clarification?)
+   - **Dependencies and Assumptions** (Are they documented and validated?)
+   - **Ambiguities and Conflicts** (What needs clarification?)
 
    **HOW TO WRITE CHECKLIST ITEMS - "Unit Tests for English"**:
 
@@ -207,7 +206,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - "Are visual hierarchy requirements measurable/testable? [Acceptance Criteria, Spec §FR-1]"
    - "Can 'balanced visual weight' be objectively verified? [Measurability, Spec §FR-2]"
 
-   **Scenario Classification & Coverage** (Requirements Quality Focus):
+   **Scenario Classification and Coverage** (Requirements Quality Focus):
    - Check if requirements exist for: Primary, Alternate, Exception/Error, Recovery, Non-Functional scenarios
    - For each scenario class, ask: "Are [scenario type] requirements complete, clear, and consistent?"
    - If scenario class missing: "Are [scenario type] requirements intentionally excluded or missing? [Gap]"
@@ -216,10 +215,9 @@ You **MUST** consider the user input before proceeding (if not empty).
    **Traceability Requirements**:
    - MINIMUM: ≥80% of items MUST include at least one traceability reference
    - Each item should reference: spec section `[Spec §X.Y]`, or use markers: `[Gap]`, `[Ambiguity]`, `[Conflict]`, `[Assumption]`
-   - If no ID system exists: "Is a requirement & acceptance criteria ID scheme established? [Traceability]"
+   - If no ID system exists: "Is a requirement and acceptance criteria ID scheme established? [Traceability]"
 
-   **Surface & Resolve Issues** (Requirements Quality Problems):
-   Ask questions about the requirements themselves:
+   **Surface and Resolve Issues** (Requirements Quality Problems): Ask questions about the requirements themselves:
    - Ambiguities: "Is the term 'fast' quantified with specific metrics? [Ambiguity, Spec §NFR-1]"
    - Conflicts: "Do navigation requirements conflict between §FR-10 and §FR-10a? [Conflict]"
    - Assumptions: "Is the assumption of 'always available podcast API' validated? [Assumption]"
@@ -263,7 +261,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 To avoid clutter, use descriptive types and clean up obsolete checklists when done.
 
-## Example Checklist Types & Sample Items
+## Example Checklist Types and Sample Items
 
 **UX Requirements Quality:** `ux.md`
 
@@ -339,8 +337,7 @@ Sample items:
 
 ## Post-Execution Checks
 
-**Check for extension hooks (after checklist generation)**:
-Check if `.specify/extensions.yml` exists in the project root.
+**Check for extension hooks (after checklist generation)**: Check if `.specify/extensions.yml` exists in the project root.
 - If it exists, read it and look for entries under the `hooks.after_checklist` key
 - If the YAML cannot be parsed or is invalid, skip hook checking silently and continue normally
 - Filter out hooks where `enabled` is explicitly `false`. Treat hooks without an `enabled` field as enabled by default.

@@ -36,38 +36,17 @@ Upon first boot, use the on-screen menus to:
 1. Connect to your Wi-Fi network.
 2. Select your Marantz receiver with auto-discovery or enter its IPv4 address manually.
 
-After setup, tap the small gear icon in the top-right corner of the Home Screen to reopen Settings.
-Settings provides touch calibration, Wi-Fi setup, and receiver setup. Use the Settings OK button to
-return to the Home Screen.
+After setup, tap the small gear icon in the top-right corner of the Home Screen to reopen Settings. Settings provides touch calibration, Wi-Fi setup, and receiver setup. Use the Settings OK button to return to the Home Screen.
 
-Successful Wi-Fi setup stores credentials in `config.json` on LittleFS. On later boots, the device
-attempts to reconnect automatically using the saved SSID and password.
+Successful Wi-Fi setup stores credentials in `config.json` on LittleFS. On later boots, the device attempts to reconnect automatically using the saved SSID and password.
 
-Receiver auto-discovery uses local-network SSDP/UPnP multicast. If a receiver is not discovered,
-confirm the ESP32 and receiver are on the same subnet and that the router allows multicast between
-clients. Standby discovery may also require the receiver's network/IP control standby setting to be
-enabled.
+Receiver auto-discovery uses local-network SSDP/UPnP multicast. If a receiver is not discovered, confirm the ESP32 and receiver are on the same subnet and that the router allows multicast between clients. Standby discovery may also require the receiver's network/IP control standby setting to be enabled.
 
-Receiver setup stores `receiverIp` in the same `config.json` file only after the receiver responds to
-a live status request. If a saved receiver is temporarily offline, the saved receiver configuration is
-kept and the Home Screen shows the receiver as unavailable until it becomes reachable or is replaced.
-If the receiver is reachable but powered off, the Home Screen shows `Receiver off` instead of the
-last live volume. Both powered-off and unavailable receiver states keep the top-right Settings path
-available so Wi-Fi or receiver setup can be reopened without restarting the device.
-When powered-off status remains confirmed, `Receiver off` stays visible for about 3 seconds and then
-the Home Screen blanks to a quiet black screen until the receiver becomes active again or the screen
-is tapped. A wake tap only restores the Home Screen; opening Settings still requires a separate tap
-on the visible gear icon. Touch input is filtered through a short stable-contact confirmation window
-so single-sample controller noise does not wake the blanked screen.
+Receiver setup stores `receiverIp` in the same `config.json` file only after the receiver responds to a live status request. If a saved receiver is temporarily offline, the saved receiver configuration is kept and the Home Screen shows the receiver as unavailable until it becomes reachable or is replaced. If the receiver is reachable but powered off, the Home Screen shows `Receiver off` instead of the last live volume. Both powered-off and unavailable receiver states keep the top-right Settings path available so Wi-Fi or receiver setup can be reopened without restarting the device. When powered-off status remains confirmed, `Receiver off` stays visible for about 3 seconds and then the Home Screen blanks to a quiet black screen until the receiver becomes active again or the screen is tapped. A wake tap only restores the Home Screen; opening Settings still requires a separate tap on the visible gear icon. Touch input is filtered through a short stable-contact confirmation window so single-sample controller noise does not wake the blanked screen.
 
-If the optional receiver-off backlight circuit in `docs/hardware.md` is wired and validated, the same
-receiver-off blanking transition also turns off the TFT backlight through GPIO13. The display/touch
-power path still comes from the ESP32 power pins after USB power enters the ESP32; no separate direct
-display supply is used.
+If the optional receiver-off backlight circuit in `docs/hardware.md` is wired and validated, the same receiver-off blanking transition also turns off the TFT backlight through GPIO13. The display/touch power path still comes from the ESP32 power pins after USB power enters the ESP32; no separate direct display supply is used.
 
-If touch alignment is off, open Settings and choose touch calibration. The calibration screen records
-a 9-point touch dataset to the serial console so the touch transform can be recalculated from
-measured hardware data instead of per-screen offsets.
+If touch alignment is off, open Settings and choose touch calibration. The calibration screen records a 9-point touch dataset to the serial console so the touch transform can be recalculated from measured hardware data instead of per-screen offsets.
 
 ## Project Structure
 

@@ -61,6 +61,7 @@ Follow this execution flow:
 
 1. Load the existing constitution at `.specify/memory/constitution.md`.
    - Identify every placeholder token of the form `[ALL_CAPS_IDENTIFIER]`.
+
    **IMPORTANT**: The user might require less or more principles than the ones used in the template. If a number is specified, respect that - follow the general template. You will update the doc accordingly.
 
 2. Collect/derive values for placeholders:
@@ -107,7 +108,7 @@ Follow this execution flow:
    - Any files flagged for manual follow-up.
    - Suggested commit message (e.g., `docs: amend constitution to vX.Y.Z (principle additions + governance update)`).
 
-Formatting & Style Requirements:
+Formatting and Style Requirements:
 
 - Use Markdown headings exactly as in the template (do not demote/promote levels).
 - Wrap long rationale lines to keep readability (<100 chars ideally) but do not hard enforce with awkward breaks.
@@ -122,8 +123,7 @@ Do not create a new template; always operate on the existing `.specify/memory/co
 
 ## Post-Execution Checks
 
-**Check for extension hooks (after constitution update)**:
-Check if `.specify/extensions.yml` exists in the project root.
+**Check for extension hooks (after constitution update)**: Check if `.specify/extensions.yml` exists in the project root.
 - If it exists, read it and look for entries under the `hooks.after_constitution` key
 - If the YAML cannot be parsed or is invalid, skip hook checking silently and continue normally
 - Filter out hooks where `enabled` is explicitly `false`. Treat hooks without an `enabled` field as enabled by default.

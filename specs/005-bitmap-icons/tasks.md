@@ -4,16 +4,13 @@
 
 **Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/, quickstart.md
 
-**Tests**: Automated test tasks are not included because the specification does not request TDD or
-automated tests for this embedded UI asset feature. Validation tasks are included in the final phase.
+**Tests**: Automated test tasks are not included because the specification does not request TDD or automated tests for this embedded UI asset feature. Validation tasks are included in the final phase.
 
-**Organization**: Tasks are grouped by user story to enable independent implementation and testing of
-each story.
+**Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
 ## Format: `[ID] [P?] [Story] Description`
 
-- **[P]**: Can run in parallel with other marked tasks in the same phase when assigned to different
-  files.
+- **[P]**: Can run in parallel with other marked tasks in the same phase when assigned to different files.
 - **[Story]**: Maps task to a user story from `spec.md`.
 - Every task includes an exact file path.
 
@@ -32,8 +29,7 @@ each story.
 
 ## Phase 2: Foundational (Blocking Prerequisites)
 
-**Purpose**: Establish icon rendering, source asset conventions, and inventory records before screen
-work begins.
+**Purpose**: Establish icon rendering, source asset conventions, and inventory records before screen work begins.
 
 **Critical**: No user story work should begin until this phase is complete.
 
@@ -54,12 +50,9 @@ work begins.
 
 ## Phase 3: User Story 1 - Recognize Primary Controls at a Distance (Priority: P1)
 
-**Goal**: Users can recognize primary controls and status indicators from normal room distance, with
-the home settings control using a bitmap icon instead of a manually drawn gear.
+**Goal**: Users can recognize primary controls and status indicators from normal room distance, with the home settings control using a bitmap icon instead of a manually drawn gear.
 
-**Independent Test**: Review the home, settings, Wi-Fi setup, and receiver setup screens. Confirm
-every primary control and persistent status indicator has a high-contrast inventory-backed icon, and
-the top-right home settings control is no longer manually drawn.
+**Independent Test**: Review the home, settings, Wi-Fi setup, and receiver setup screens. Confirm every primary control and persistent status indicator has a high-contrast inventory-backed icon, and the top-right home settings control is no longer manually drawn.
 
 ### Implementation for User Story 1
 
@@ -76,12 +69,9 @@ the top-right home settings control is no longer manually drawn.
 
 ## Phase 4: User Story 2 - Show Audio Family Icons on the Home Screen (Priority: P1)
 
-**Goal**: Dolby, DTS, PCM, and Other render as home-screen audio-family icons with green lit active
-state and dark gray inactive state.
+**Goal**: Dolby, DTS, PCM, and Other render as home-screen audio-family icons with green lit active state and dark gray inactive state.
 
-**Independent Test**: Display the home screen with Dolby, DTS, PCM, Other, and unavailable receiver
-states. Confirm all four audio-family areas render as icons, not text, with exactly one green active
-icon for a valid classified mode and all icons inactive when status is unavailable.
+**Independent Test**: Display the home screen with Dolby, DTS, PCM, Other, and unavailable receiver states. Confirm all four audio-family areas render as icons, not text, with exactly one green active icon for a valid classified mode and all icons inactive when status is unavailable.
 
 ### Implementation for User Story 2
 
@@ -97,18 +87,15 @@ icon for a valid classified mode and all icons inactive when status is unavailab
 - [X] T032 [US2] Apply lit green active and dark gray inactive icon colors in `src/ui/Screens/HomeScreen.cpp`
 - [X] T033 [P] [US2] Update home audio-family icon state guidance in `docs/ui-reference.md`
 
-**Checkpoint**: User Story 2 is independently testable on the home screen with simulated or live mode
-values.
+**Checkpoint**: User Story 2 is independently testable on the home screen with simulated or live mode values.
 
 ---
 
 ## Phase 5: User Story 3 - Replace Setup and Keyboard Glyphs (Priority: P2)
 
-**Goal**: Settings navigation arrows and keyboard function glyphs use polished bitmap icons matching
-their intended foreground colors.
+**Goal**: Settings navigation arrows and keyboard function glyphs use polished bitmap icons matching their intended foreground colors.
 
-**Independent Test**: Open Settings and Keyboard. Confirm settings rows use bitmap chevrons and the
-keyboard caps lock, password visibility, backspace, OK, and Cancel controls use bitmap icons.
+**Independent Test**: Open Settings and Keyboard. Confirm settings rows use bitmap chevrons and the keyboard caps lock, password visibility, backspace, OK, and Cancel controls use bitmap icons.
 
 ### Implementation for User Story 3
 
@@ -134,11 +121,9 @@ keyboard caps lock, password visibility, backspace, OK, and Cancel controls use 
 
 ## Phase 6: User Story 4 - Cover Setup and Receiver States (Priority: P2)
 
-**Goal**: Wi-Fi and receiver setup screens use inventory-backed icons for searching, manual entry,
-retry, success, warning, failure, Wi-Fi, and receiver states where those states appear.
+**Goal**: Wi-Fi and receiver setup screens use inventory-backed icons for searching, manual entry, retry, success, warning, failure, Wi-Fi, and receiver states where those states appear.
 
-**Independent Test**: Walk through Wi-Fi and receiver setup success and failure paths. Confirm each
-major state has an appropriate readable icon and no placeholder artwork is visible.
+**Independent Test**: Walk through Wi-Fi and receiver setup success and failure paths. Confirm each major state has an appropriate readable icon and no placeholder artwork is visible.
 
 ### Implementation for User Story 4
 
@@ -165,11 +150,9 @@ major state has an appropriate readable icon and no placeholder artwork is visib
 
 ## Phase 7: User Story 5 - Maintain Asset Consistency Over Time (Priority: P3)
 
-**Goal**: Contributors can audit and reuse the icon set without introducing duplicate or mismatched
-assets.
+**Goal**: Contributors can audit and reuse the icon set without introducing duplicate or mismatched assets.
 
-**Independent Test**: Inspect the icon inventory and documentation. Confirm every delivered asset has
-a stable name, meaning, source, usage note, target size, runtime colors, and screen usage.
+**Independent Test**: Inspect the icon inventory and documentation. Confirm every delivered asset has a stable name, meaning, source, usage note, target size, runtime colors, and screen usage.
 
 ### Implementation for User Story 5
 
@@ -185,7 +168,7 @@ a stable name, meaning, source, usage note, target size, runtime colors, and scr
 
 ---
 
-## Phase 8: Polish & Cross-Cutting Concerns
+## Phase 8: Polish and Cross-Cutting Concerns
 
 **Purpose**: Validate the full feature and clean up cross-story issues.
 
@@ -200,7 +183,7 @@ a stable name, meaning, source, usage note, target size, runtime colors, and scr
 
 ---
 
-## Dependencies & Execution Order
+## Dependencies and Execution Order
 
 ### Phase Dependencies
 
@@ -214,10 +197,8 @@ a stable name, meaning, source, usage note, target size, runtime colors, and scr
 - **User Story 1 (P1)**: Can start after Foundation; no dependency on other stories.
 - **User Story 2 (P1)**: Can start after Foundation; no dependency on other stories.
 - **User Story 3 (P2)**: Can start after Foundation; no dependency on other stories.
-- **User Story 4 (P2)**: Can start after Foundation; benefits from US1/US3 renderer usage but is
-  independently testable.
-- **User Story 5 (P3)**: Can start after Foundation but should finish after all chosen assets are
-  known.
+- **User Story 4 (P2)**: Can start after Foundation; benefits from US1/US3 renderer usage but is independently testable.
+- **User Story 5 (P3)**: Can start after Foundation but should finish after all chosen assets are known.
 
 ### Within Each User Story
 
@@ -232,8 +213,7 @@ a stable name, meaning, source, usage note, target size, runtime colors, and scr
 - Setup file shells T003-T006 can run in parallel after T001-T002.
 - Source asset tasks within US2, US3, and US4 can run in parallel.
 - Documentation tasks marked [P] can run in parallel with screen code after behavior is known.
-- US1, US2, and US3 can be implemented in parallel after Foundation if the shared generated bitmap
-  files are coordinated.
+- US1, US2, and US3 can be implemented in parallel after Foundation if the shared generated bitmap files are coordinated.
 
 ---
 
@@ -304,6 +284,5 @@ Task: "Document setup and status icon usage in docs/ui-reference.md"
 
 - [P] tasks use different files or source assets and can run in parallel with coordination.
 - User story labels map directly to `spec.md`.
-- Generated firmware bitmap files are shared; coordinate edits before parallel story work touches
-  `src/ui/assets/IconBitmaps.h` or `src/ui/assets/IconBitmaps.cpp`.
+- Generated firmware bitmap files are shared; coordinate edits before parallel story work touches `src/ui/assets/IconBitmaps.h` or `src/ui/assets/IconBitmaps.cpp`.
 - Do not add runtime SVG or PNG decoding to firmware.

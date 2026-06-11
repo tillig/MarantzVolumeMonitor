@@ -25,24 +25,19 @@ Define the Home Screen behavior when the saved receiver is confirmed powered off
 - When the timer expires and receiver-off remains confirmed, render a black/blank display.
 - Continue normal receiver status polling.
 - Continue normal touch detection.
-- Do not show any persistent status message, live-volume content, source, mode, or audio-family
-  content.
+- Do not show any persistent status message, live-volume content, source, mode, or audio-family content.
 - Do not require physical backlight control.
-- If receiver-off confirmation is later lost while blanked, remain blank until touch or fresh active
-  receiver status.
+- If receiver-off confirmation is later lost while blanked, remain blank until touch or fresh active receiver status.
 
 ## Exit Conditions
 
 - If fresh active receiver status becomes available, return to normal live volume display.
-- If the user touches the blank display and receiver-off remains current, wake to visible
-  `Receiver off` and restart the timer.
-- If the user touches the blank display after receiver-off can no longer be confirmed, wake to the
-  latest current visible state.
+- If the user touches the blank display and receiver-off remains current, wake to visible `Receiver off` and restart the timer.
+- If the user touches the blank display after receiver-off can no longer be confirmed, wake to the latest current visible state.
 
 ## Acceptance Rules
 
 - The blank state is reachable only from confirmed receiver-off status.
-- Unavailable receiver, Wi-Fi disconnected, missing receiver config, and unknown power state do not
-  enter this display cycle.
+- Unavailable receiver, Wi-Fi disconnected, missing receiver config, and unknown power state do not enter this display cycle.
 - The first touch while blanked wakes only; it does not activate Settings in the same event.
 - Non-Settings touches while `Receiver off` is visible reset the timeout.

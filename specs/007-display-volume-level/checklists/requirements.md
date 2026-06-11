@@ -1,8 +1,6 @@
 # Specification Quality Checklist: Display Volume Level
 
-**Purpose**: Validate specification completeness and quality before proceeding to planning
-**Created**: 2026-06-05
-**Feature**: [Link to spec.md](../spec.md)
+**Purpose**: Validate specification completeness and quality before proceeding to planning **Created**: 2026-06-05 **Feature**: [Link to spec.md](../spec.md)
 
 ## Content Quality
 
@@ -31,7 +29,4 @@
 
 ## Notes
 
-- Validation remains passing after refining the spec to distinguish powered-off and unavailable
-  receiver states, to require smooth animated gauge and numeric volume transitions, and to require
-  partial redraws during animation instead of full-screen flashing. No clarification round was
-  required.
+- Validation remains passing after refining the spec to distinguish powered-off and unavailable receiver states, to require smooth animated gauge and numeric volume transitions, and to require partial redraws during animation instead of full-screen flashing. No clarification round was required.

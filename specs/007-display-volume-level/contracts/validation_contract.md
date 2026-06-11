@@ -14,8 +14,7 @@ pre-commit run --all-files
 git diff --check
 ```
 
-If the PlatformIO environment is unavailable in the current environment, record that limitation and
-run the other checks.
+If the PlatformIO environment is unavailable in the current environment, record that limitation and run the other checks.
 
 ## Documentation Validation
 

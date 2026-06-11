@@ -16,8 +16,7 @@ Represents the current user-visible receiver condition used by the Home Screen.
 ### Receiver Power Validation Rules
 
 - `receiverOff` requires fresh current receiver status with known powered-off state.
-- Missing volume, failed refresh, unknown power state, missing Wi-Fi, or missing receiver
-  configuration must not produce `receiverOff`.
+- Missing volume, failed refresh, unknown power state, missing Wi-Fi, or missing receiver configuration must not produce `receiverOff`.
 - `live` requires fresh current receiver status with powered-on state and usable volume.
 
 ## HomeDisplayMode
@@ -35,30 +34,23 @@ Represents what the Home Screen is currently presenting for the receiver conditi
 ### State Transitions
 
 - `liveVisible -> receiverOffVisible`: Fresh status confirms receiver has powered off.
-- `receiverOffVisible -> receiverOffBlank`: 3 seconds pass with receiver still off and no visible
-  receiver-off interaction requiring the timer to remain visible.
-- `receiverOffBlank -> receiverOffVisible`: User touches the blank display while receiver remains
-  off.
-- `receiverOffBlank -> receiverUnavailableVisible`: User touches the blank display after
-  receiver-off status can no longer be confirmed and receiver status is unavailable.
-- `receiverOffVisible -> receiverOffVisible`: User touches the visible receiver-off screen outside
-  Settings before the timeout expires, restarting the 3-second timer.
+- `receiverOffVisible -> receiverOffBlank`: 3 seconds pass with receiver still off and no visible receiver-off interaction requiring the timer to remain visible.
+- `receiverOffBlank -> receiverOffVisible`: User touches the blank display while receiver remains off.
+- `receiverOffBlank -> receiverUnavailableVisible`: User touches the blank display after receiver-off status can no longer be confirmed and receiver status is unavailable.
+- `receiverOffVisible -> receiverOffVisible`: User touches the visible receiver-off screen outside Settings before the timeout expires, restarting the 3-second timer.
 - `receiverOffBlank -> liveVisible`: Fresh active receiver status resumes while blanked.
 - `receiverOffVisible -> liveVisible`: Fresh active receiver status resumes before the timeout.
-- `receiverOffVisible -> settingsSession`: User taps Settings while the visible receiver-off screen is
-  active.
+- `receiverOffVisible -> settingsSession`: User taps Settings while the visible receiver-off screen is active.
 - `settingsSession -> receiverOffVisible`: User exits Settings and receiver is still confirmed off.
 - `settingsSession -> liveVisible`: User exits Settings and fresh active receiver status is available.
-- `receiverOffVisible -> receiverUnavailableVisible`: Receiver-off status can no longer be freshly
-  confirmed before the display has blanked and receiver status is unavailable.
+- `receiverOffVisible -> receiverUnavailableVisible`: Receiver-off status can no longer be freshly confirmed before the display has blanked and receiver status is unavailable.
 
 ### Home Display Validation Rules
 
 - `receiverOffBlank` is reachable only from `receiverOffVisible`.
 - `receiverOffBlank` must not show stale live volume, source, mode, or audio-family details.
 - `receiverOffBlank` must continue to allow touch wake and status refresh.
-- `receiverOffBlank` remains blank if receiver-off confirmation is lost after blanking, unless active
-  receiver status resumes or the user touches the screen.
+- `receiverOffBlank` remains blank if receiver-off confirmation is lost after blanking, unless active receiver status resumes or the user touches the screen.
 - `receiverUnavailableVisible` and setup states must not enter `receiverOffBlank`.
 
 ## ReceiverOffTimer
@@ -77,8 +69,7 @@ Tracks the visible receiver-off period before software blanking.
 - Timer restarts when the monitor wakes from `receiverOffBlank` to `receiverOffVisible`.
 - Timer restarts when the user touches visible `receiverOffVisible` outside the Settings entry.
 - Timer restarts when returning Home from Settings while receiver-off remains confirmed.
-- Timer is inactive while Home is live, unavailable, setup-required, or while another screen is
-  active.
+- Timer is inactive while Home is live, unavailable, setup-required, or while another screen is active.
 
 ## WakeInteraction
 
@@ -104,5 +95,4 @@ Represents Settings or settings-launched setup screens while the receiver may be
 
 - Receiver-off timeout does not apply during Settings or settings-launched setup screens.
 - Settings remains visible and usable while receiver stays off.
-- Returning Home re-evaluates receiver status and chooses live, receiver-off visible, unavailable, or
-  setup-visible state.
+- Returning Home re-evaluates receiver status and chooses live, receiver-off visible, unavailable, or setup-visible state.

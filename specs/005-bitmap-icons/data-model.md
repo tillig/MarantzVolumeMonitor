@@ -13,12 +13,10 @@ Represents one source icon and its generated firmware outputs.
 - `sourcePath`: Repository path to the source asset after implementation.
 - `sourceUrl`: Original upstream URL when the source came from outside the repository.
 - `licenseOrUsageNote`: License, trademark note, or owner approval note.
-- `targetSizes`: One or more generated display sizes, such as `24x24`, `32x32`, `48x48`, or
-  `102x32`.
+- `targetSizes`: One or more generated display sizes, such as `24x24`, `32x32`, `48x48`, or `102x32`.
 - `minimumDisplaySize`: Smallest approved rendered size.
 - `generatedSymbol`: Firmware symbol name for the generated bitmap mask.
-- `foregroundModes`: Approved foreground treatments, such as active green, inactive dark gray, text
-  primary, text secondary, selected dark text, warning, or error.
+- `foregroundModes`: Approved foreground treatments, such as active green, inactive dark gray, text primary, text secondary, selected dark text, warning, or error.
 
 ### IconAsset Validation Rules
 

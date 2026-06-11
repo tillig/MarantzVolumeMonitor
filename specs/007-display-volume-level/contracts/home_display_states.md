@@ -2,8 +2,7 @@
 
 ## Purpose
 
-Define the user-visible home-screen states for live, powered-off, unavailable, and setup-related
-conditions.
+Define the user-visible home-screen states for live, powered-off, unavailable, and setup-related conditions.
 
 ## Live State
 
@@ -33,8 +32,7 @@ conditions.
 ## State Transition Rules
 
 - `live -> poweredOff`: occurs when a valid receiver response reports `power == false`.
-- `live -> receiverUnavailable`: occurs when the configured receiver no longer returns usable live
-  status.
+- `live -> receiverUnavailable`: occurs when the configured receiver no longer returns usable live status.
 - `poweredOff -> live`: occurs when valid receiver status resumes with `power == true`.
 - `receiverUnavailable -> live`: occurs when valid receiver status resumes.
 - Setup-required states continue to follow existing Wi-Fi and receiver-configuration transitions.

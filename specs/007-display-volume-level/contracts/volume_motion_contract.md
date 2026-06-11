@@ -24,8 +24,7 @@ Define the required home-screen motion behavior for gauge and numeric volume upd
   - numeric value
   - any live labels that actually changed
 - Per-frame motion updates must not fill and repaint the full screen.
-- Full-screen redraws are reserved for coarse state changes such as switching between live,
-  powered-off, unavailable, and setup-required layouts.
+- Full-screen redraws are reserved for coarse state changes such as switching between live, powered-off, unavailable, and setup-required layouts.
 
 ## Responsiveness Rules
 
@@ -35,7 +34,6 @@ Define the required home-screen motion behavior for gauge and numeric volume upd
 
 ## Acceptance Rules
 
-- Rapid consecutive receiver changes settle on the newest value without visibly restarting from stale
-  positions.
+- Rapid consecutive receiver changes settle on the newest value without visibly restarting from stale positions.
 - Unaffected screen regions do not flash during motion.
 - The final displayed value matches the latest live receiver value with one decimal place.

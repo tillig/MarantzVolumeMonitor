@@ -2,15 +2,11 @@
 
 **Input**: Design documents from `/specs/007-display-volume-level/`
 
-**Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md,
-contracts/
+**Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
-**Tests**: No separate automated test tasks were generated because the feature specification does not
-explicitly request TDD or new automated tests. Static validation and hardware verification remain
-required.
+**Tests**: No separate automated test tasks were generated because the feature specification does not explicitly request TDD or new automated tests. Static validation and hardware verification remain required.
 
-**Organization**: Tasks are grouped by user story to enable independent implementation and testing of
-each story.
+**Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
 ## Format: `[ID] [P?] [Story] Description`
 
@@ -20,8 +16,7 @@ each story.
 
 ## Phase 1: Setup (Shared Infrastructure)
 
-**Purpose**: Confirm the feature workspace and review existing home-screen contracts before editing
-implementation files.
+**Purpose**: Confirm the feature workspace and review existing home-screen contracts before editing implementation files.
 
 - [X] T001 Review `specs/007-display-volume-level/spec.md`, `specs/007-display-volume-level/plan.md`, and `specs/007-display-volume-level/contracts/volume_motion_contract.md`
 - [X] T002 Inspect current home-screen and receiver-status implementation in `src/ui/Screens/HomeScreen.h`, `src/ui/Screens/HomeScreen.cpp`, `src/network/MarantzClient.h`, and `src/network/MarantzClient.cpp`
@@ -44,12 +39,9 @@ implementation files.
 
 ## Phase 3: User Story 1 - Read The Current Volume At A Glance (Priority: P1) 🎯 MVP
 
-**Goal**: Present live volume as the dominant readable home-screen value with one decimal place and
-smooth synchronized gauge/value motion.
+**Goal**: Present live volume as the dominant readable home-screen value with one decimal place and smooth synchronized gauge/value motion.
 
-**Independent Test**: With a configured live receiver, confirm the home screen shows volume with one
-decimal place, and small/large volume changes animate the gauge and numeric value together without
-blocking the UI.
+**Independent Test**: With a configured live receiver, confirm the home screen shows volume with one decimal place, and small/large volume changes animate the gauge and numeric value together without blocking the UI.
 
 ### Implementation for User Story 1
 
@@ -64,12 +56,9 @@ blocking the UI.
 
 ## Phase 4: User Story 2 - Understand Why Live Volume Is Not Shown (Priority: P2)
 
-**Goal**: Distinguish powered-off and unavailable receiver states without showing stale live volume,
-while keeping Settings accessible for receiver reconfiguration.
+**Goal**: Distinguish powered-off and unavailable receiver states without showing stale live volume, while keeping Settings accessible for receiver reconfiguration.
 
-**Independent Test**: Verify the home screen once with a reachable powered-off receiver and once with
-an unavailable receiver; each state should show different messaging, hide stale live volume, and keep
-Settings reachable.
+**Independent Test**: Verify the home screen once with a reachable powered-off receiver and once with an unavailable receiver; each state should show different messaging, hide stale live volume, and keep Settings reachable.
 
 ### Implementation for User Story 2
 
@@ -84,11 +73,9 @@ Settings reachable.
 
 ## Phase 5: User Story 3 - Keep The Display Calm While Volume Changes (Priority: P3)
 
-**Goal**: Make motion feel calm and appliance-appropriate, with no full-screen flashing and no
-decorative bounce.
+**Goal**: Make motion feel calm and appliance-appropriate, with no full-screen flashing and no decorative bounce.
 
-**Independent Test**: Trigger rapid consecutive volume updates and visually confirm calm motion,
-smooth retargeting, no visible full-screen flashing, and stable unaffected regions during animation.
+**Independent Test**: Trigger rapid consecutive volume updates and visually confirm calm motion, smooth retargeting, no visible full-screen flashing, and stable unaffected regions during animation.
 
 ### Implementation for User Story 3
 
@@ -100,7 +87,7 @@ smooth retargeting, no visible full-screen flashing, and stable unaffected regio
 
 ---
 
-## Phase 6: Polish & Cross-Cutting Concerns
+## Phase 6: Polish and Cross-Cutting Concerns
 
 **Purpose**: Update durable docs and run final validation across all stories
 
@@ -111,24 +98,21 @@ smooth retargeting, no visible full-screen flashing, and stable unaffected regio
 
 ---
 
-## Dependencies & Execution Order
+## Dependencies and Execution Order
 
 ### Phase Dependencies
 
 - **Setup (Phase 1)**: No dependencies - can start immediately
 - **Foundational (Phase 2)**: Depends on Setup completion - BLOCKS all user stories
 - **User Stories (Phase 3+)**: All depend on Foundational phase completion
-  - User stories can then proceed in priority order; US2 may run alongside US1, while US3 follows
-    US1 animation scaffolding
+  - User stories can then proceed in priority order; US2 may run alongside US1, while US3 follows US1 animation scaffolding
 - **Polish (Phase 6)**: Depends on all desired user stories being complete
 
 ### User Story Dependencies
 
 - **User Story 1 (P1)**: Can start after Foundational (Phase 2) - No dependencies on other stories
-- **User Story 2 (P2)**: Can start after Foundational (Phase 2) - Builds on shared home-state
-  scaffolding but should remain independently testable
-- **User Story 3 (P3)**: Depends on User Story 1 completion because it refines the live animation
-  behavior introduced there, but remains independently testable once that scaffolding exists
+- **User Story 2 (P2)**: Can start after Foundational (Phase 2) - Builds on shared home-state scaffolding but should remain independently testable
+- **User Story 3 (P3)**: Depends on User Story 1 completion because it refines the live animation behavior introduced there, but remains independently testable once that scaffolding exists
 
 ### Within Each User Story
 
@@ -138,8 +122,7 @@ smooth retargeting, no visible full-screen flashing, and stable unaffected regio
 
 ### Parallel Opportunities
 
-- `T017` and `T018` can run in parallel after implementation stabilizes because they update different
-  documentation files.
+- `T017` and `T018` can run in parallel after implementation stabilizes because they update different documentation files.
 - Final validation tasks remain sequential because each depends on the complete implementation state.
 
 ---
@@ -161,8 +144,7 @@ Task: "Update user-facing receiver-state behavior notes in README.md"
 1. Complete Phase 1: Setup
 2. Complete Phase 2: Foundational
 3. Complete Phase 3: User Story 1
-4. **STOP and VALIDATE**: Verify live volume readability, one-decimal formatting, and synchronized
-   animation on hardware
+4. **STOP and VALIDATE**: Verify live volume readability, one-decimal formatting, and synchronized animation on hardware
 
 ### Incremental Delivery
 
@@ -180,8 +162,7 @@ With multiple developers:
 2. Once Foundational is done:
    - Developer A: User Story 1 live volume presentation and animation
    - Developer B: User Story 2 non-live state rendering and Settings access
-   - Developer C: Prepare follow-up polish for User Story 3, then implement it after User Story 1
-     animation scaffolding lands
+   - Developer C: Prepare follow-up polish for User Story 3, then implement it after User Story 1 animation scaffolding lands
 3. Rejoin for documentation and final validation
 
 ---
@@ -190,5 +171,4 @@ With multiple developers:
 
 - All tasks follow the required checklist format with IDs and file paths.
 - `[P]` is used only where tasks can be completed independently without file conflicts.
-- Hardware verification is mandatory because the constitution requires it for UI and networking
-  changes.
+- Hardware verification is mandatory because the constitution requires it for UI and networking changes.

@@ -14,8 +14,7 @@ platformio run
 git diff --check
 ```
 
-If `platformio` is not available in the current environment, record the limitation and run the other
-checks.
+If `platformio` is not available in the current environment, record the limitation and run the other checks.
 
 ## Documentation Validation
 
@@ -49,8 +48,7 @@ Use the 480x320 touchscreen device and inspect every current screen:
 
 ## Required Visual Checks
 
-- Home volume, source, listening mode, and audio-family state are identifiable from 15 feet within 5
-  seconds.
+- Home volume, source, listening mode, and audio-family state are identifiable from 15 feet within 5 seconds.
 - Standard actions use icon-with-text buttons across equivalent contexts.
 - Keyboard icon-only buttons are aligned and visually centered.
 - Buttons use consistent shape, typography, icon placement, and state treatment.
@@ -65,6 +63,5 @@ Use the 480x320 touchscreen device and inspect every current screen:
 
 - All static validation steps pass or have an environment limitation recorded.
 - Hardware visual verification covers every screen listed above.
-- Any documented exception includes a reason and still passes touch, readability, and consistency
-  checks.
+- Any documented exception includes a reason and still passes touch, readability, and consistency checks.
 - The final implementation satisfies every measurable outcome in the feature spec.

@@ -1,8 +1,6 @@
 # Specification Quality Checklist: Bitmap Icon Assets
 
-**Purpose**: Validate specification completeness and quality before proceeding to planning
-**Created**: 2026-06-04
-**Feature**: [spec.md](../spec.md)
+**Purpose**: Validate specification completeness and quality before proceeding to planning **Created**: 2026-06-04 **Feature**: [spec.md](../spec.md)
 
 ## Content Quality
 
@@ -31,13 +29,8 @@
 
 ## Notes
 
-- Validation pass 4 completed on 2026-06-04 after recording the supplied DTS SVG source candidate and
-  project-owner approval for both Dolby and DTS logo sources. No blocking issues found.
-- Validation pass 3 completed on 2026-06-04 after recording the supplied Dolby SVG source candidate.
-  No blocking issues found.
-- Validation pass 2 completed on 2026-06-04 after adding explicit home, settings, keyboard, Material
-  Design, and audio-family icon requirements. No blocking issues found.
+- Validation pass 4 completed on 2026-06-04 after recording the supplied DTS SVG source candidate and project-owner approval for both Dolby and DTS logo sources. No blocking issues found.
+- Validation pass 3 completed on 2026-06-04 after recording the supplied Dolby SVG source candidate. No blocking issues found.
+- Validation pass 2 completed on 2026-06-04 after adding explicit home, settings, keyboard, Material Design, and audio-family icon requirements. No blocking issues found.
 - Validation pass 1 completed on 2026-06-04. No blocking issues found.
-- The feature description explicitly requests bitmap icon assets, so the specification treats bitmap
-  assets as the desired deliverable while avoiding implementation-specific storage, encoding, or code
-  integration details.
+- The feature description explicitly requests bitmap icon assets, so the specification treats bitmap assets as the desired deliverable while avoiding implementation-specific storage, encoding, or code integration details.

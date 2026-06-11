@@ -15,7 +15,7 @@
 - Q: Should we expand the foundation scope to include layout skeletons from `docs/ui-reference.md`? → A: Yes, include Volume bar, Source/Mode labels, and Audio Tile placeholders.
 - Q: How should the system behave in an "unconfigured" state (no WiFi/Receiver set)? → A: Show a prominent "UNCONFIGURED" message with "Tap for Settings" instructions.
 
-## User Scenarios & Testing
+## User Scenarios and Testing
 
 ### User Story 1 - Clean UI Layer Initialization (Priority: P1)
 

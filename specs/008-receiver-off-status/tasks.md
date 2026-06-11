@@ -4,17 +4,13 @@
 
 **Prerequisites**: `plan.md`, `spec.md`, `research.md`, `data-model.md`, `contracts/`, `quickstart.md`
 
-**Tests**: No automated TDD task set was requested. Validation tasks are included from `quickstart.md`
-and `contracts/validation_contract.md`.
+**Tests**: No automated TDD task set was requested. Validation tasks are included from `quickstart.md` and `contracts/validation_contract.md`.
 
-**Organization**: Tasks are grouped by user story so each story can be implemented and validated as
-an independent increment. Hardware backlight switching and receiver power control remain out of
-scope.
+**Organization**: Tasks are grouped by user story so each story can be implemented and validated as an independent increment. Hardware backlight switching and receiver power control remain out of scope.
 
 ## Phase 1: Setup (Shared Context)
 
-**Purpose**: Confirm the current implementation surface and validation scope before making code
-changes.
+**Purpose**: Confirm the current implementation surface and validation scope before making code changes.
 
 - [X] T001 Review receiver-off requirements in `specs/008-receiver-off-status/spec.md` and current Home Screen receiver status handling in `src/ui/Screens/HomeScreen.cpp`
 - [X] T002 [P] Review receiver-off validation expectations in `specs/008-receiver-off-status/contracts/validation_contract.md` and `specs/008-receiver-off-status/quickstart.md`
@@ -39,12 +35,9 @@ changes.
 
 ## Phase 3: User Story 1 - Let The Monitor Go Dark When Receiver Is Off (Priority: P1) MVP
 
-**Goal**: Confirmed receiver-off status shows `Receiver off` briefly, then software-blanks the
-monitor display without showing stale live content.
+**Goal**: Confirmed receiver-off status shows `Receiver off` briefly, then software-blanks the monitor display without showing stale live content.
 
-**Independent Test**: With a saved receiver that responds with confirmed powered-off status,
-`Receiver off` appears, no stale live volume is shown, and the display blanks to black after 3
-seconds +/-0.5 seconds.
+**Independent Test**: With a saved receiver that responds with confirmed powered-off status, `Receiver off` appears, no stale live volume is shown, and the display blanks to black after 3 seconds +/-0.5 seconds.
 
 ### Implementation for User Story 1
 
@@ -61,11 +54,9 @@ seconds +/-0.5 seconds.
 
 ## Phase 4: User Story 2 - Wake The Monitor For Recovery Actions (Priority: P2)
 
-**Goal**: A tap on the blank receiver-off display wakes the monitor without also activating Settings
-or setup, then the user can intentionally open Settings from the visible screen.
+**Goal**: A tap on the blank receiver-off display wakes the monitor without also activating Settings or setup, then the user can intentionally open Settings from the visible screen.
 
-**Independent Test**: Let the receiver-off display blank, tap once, verify visible `Receiver off`
-returns without opening Settings, then tap the Settings icon and verify Settings opens.
+**Independent Test**: Let the receiver-off display blank, tap once, verify visible `Receiver off` returns without opening Settings, then tap the Settings icon and verify Settings opens.
 
 ### Implementation for User Story 2
 
@@ -82,11 +73,9 @@ returns without opening Settings, then tap the Settings icon and verify Settings
 
 ## Phase 5: User Story 3 - Keep Settings Usable While Receiver Is Off (Priority: P3)
 
-**Goal**: Settings and settings-launched setup flows remain visible while the receiver is off, and
-the receiver-off timeout resumes only after returning Home.
+**Goal**: Settings and settings-launched setup flows remain visible while the receiver is off, and the receiver-off timeout resumes only after returning Home.
 
-**Independent Test**: Wake from blank receiver-off state, open Settings, remain in Settings longer
-than 3 seconds, then return Home and confirm receiver-off blanking resumes only after Home is shown.
+**Independent Test**: Wake from blank receiver-off state, open Settings, remain in Settings longer than 3 seconds, then return Home and confirm receiver-off blanking resumes only after Home is shown.
 
 ### Implementation for User Story 3
 
@@ -101,12 +90,9 @@ than 3 seconds, then return Home and confirm receiver-off blanking resumes only 
 
 ## Phase 6: User Story 4 - Avoid Misleading Screen-Off Behavior (Priority: P4)
 
-**Goal**: The monitor blanks only for confirmed receiver-off status and does not hide unavailable,
-unknown, Wi-Fi, or setup-required states.
+**Goal**: The monitor blanks only for confirmed receiver-off status and does not hide unavailable, unknown, Wi-Fi, or setup-required states.
 
-**Independent Test**: Compare confirmed receiver-off status with unreachable receiver, missing
-receiver configuration, Wi-Fi disconnected, and unknown power state; only confirmed receiver-off
-status enters the receiver-off blank cycle.
+**Independent Test**: Compare confirmed receiver-off status with unreachable receiver, missing receiver configuration, Wi-Fi disconnected, and unknown power state; only confirmed receiver-off status enters the receiver-off blank cycle.
 
 ### Implementation for User Story 4
 
@@ -116,12 +102,11 @@ status enters the receiver-off blank cycle.
 - [X] T027 [US4] Preserve visible unavailable, Wi-Fi connecting, Wi-Fi setup-required, and receiver setup-required states instead of entering receiver-off blanking in `src/ui/Screens/HomeScreen.cpp`
 - [X] T028 [US4] Validate unreachable receiver, unknown power state, Wi-Fi disconnected, setup-required, and active-status recovery scenarios from `specs/008-receiver-off-status/contracts/validation_contract.md`
 
-**Checkpoint**: User Story 4 prevents receiver-off blanking from masking setup or troubleshooting
-states.
+**Checkpoint**: User Story 4 prevents receiver-off blanking from masking setup or troubleshooting states.
 
 ---
 
-## Phase 7: Polish & Cross-Cutting Concerns
+## Phase 7: Polish and Cross-Cutting Concerns
 
 **Purpose**: Update durable documentation and run the complete validation sequence.
 
@@ -135,7 +120,7 @@ states.
 
 ---
 
-## Dependencies & Execution Order
+## Dependencies and Execution Order
 
 ### Phase Dependencies
 
@@ -193,5 +178,4 @@ Task: "Add a concise user-facing receiver-off blank/wake note in README.md"
 
 - Do not add receiver power-control UI or commands.
 - Do not add hardware backlight switching or wiring guidance in this feature.
-- Do not add storage schema, network protocol, dependency, or platform configuration changes unless
-  a validation failure proves they are necessary for the specified behavior.
+- Do not add storage schema, network protocol, dependency, or platform configuration changes unless a validation failure proves they are necessary for the specified behavior.

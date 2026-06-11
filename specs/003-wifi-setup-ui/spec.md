@@ -15,9 +15,9 @@
 - Q: Should we provide a "Manual Entry" option for hidden SSIDs? → A: Yes, provide a "Manual Entry" button.
 - Q: Which security types should be supported? → A: WPA2-PSK Only.
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios and Testing *(mandatory)*
 
-### User Story 1 - Network Scanning & Selection (Priority: P1)
+### User Story 1 - Network Scanning and Selection (Priority: P1)
 
 As a user, I want to see a list of available WiFi networks so I can select the correct one for my home theater setup.
 

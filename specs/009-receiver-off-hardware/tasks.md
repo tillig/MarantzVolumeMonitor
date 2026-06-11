@@ -4,17 +4,13 @@
 
 **Prerequisites**: `plan.md`, `spec.md`, `research.md`, `data-model.md`, `contracts/`, `quickstart.md`
 
-**Tests**: No automated TDD task set was requested. Validation tasks are included from `quickstart.md`
-and `contracts/validation_contract.md`.
+**Tests**: No automated TDD task set was requested. Validation tasks are included from `quickstart.md` and `contracts/validation_contract.md`.
 
-**Organization**: Tasks are grouped by user story so each story can be implemented and validated as
-an independent increment. The canonical hardware path is high-side `LED/BL` backlight switching via
-Pololu item `2810`; `2N7000FS-ND` is documented as evaluated but rejected for the planned switch.
+**Organization**: Tasks are grouped by user story so each story can be implemented and validated as an independent increment. The canonical hardware path is high-side `LED/BL` backlight switching via Pololu item `2810`; `2N7000FS-ND` is documented as evaluated but rejected for the planned switch.
 
 ## Phase 1: Setup (Shared Context)
 
-**Purpose**: Confirm the current implementation and hardware documentation surface before making
-changes.
+**Purpose**: Confirm the current implementation and hardware documentation surface before making changes.
 
 - [X] T001 Review receiver-off hardware requirements in `specs/009-receiver-off-hardware/spec.md` and current receiver-off state handling in `src/ui/Screens/HomeScreen.cpp`
 - [X] T002 [P] Review backlight signal rules in `specs/009-receiver-off-hardware/contracts/backlight_control_contract.md` and current display initialization in `src/ui/DisplayManager.cpp`
@@ -25,8 +21,7 @@ changes.
 
 ## Phase 2: Foundational (Blocking Prerequisites)
 
-**Purpose**: Add the shared backlight-control API and tracked pin definition required by every
-hardware behavior story.
+**Purpose**: Add the shared backlight-control API and tracked pin definition required by every hardware behavior story.
 
 **CRITICAL**: No user story work should begin until this phase is complete.
 
@@ -36,19 +31,15 @@ hardware behavior story.
 - [X] T008 Implement `DisplayManager` backlight on/off behavior that is safe when GPIO13 is unconnected in `src/ui/DisplayManager.cpp`
 - [X] T009 Update `DisplayManager::begin()` to initialize the backlight-control signal before visible UI drawing in `src/ui/DisplayManager.cpp`
 
-**Checkpoint**: Display hardware control exists behind `DisplayManager`; Home Screen can call it
-without owning GPIO details.
+**Checkpoint**: Display hardware control exists behind `DisplayManager`; Home Screen can call it without owning GPIO details.
 
 ---
 
 ## Phase 3: User Story 1 - Physically Quiet The Display When Receiver Is Off (Priority: P1) MVP
 
-**Goal**: Confirmed receiver-off status shows `Receiver off`, then turns off hardware
-backlight/illumination instead of leaving display glow.
+**Goal**: Confirmed receiver-off status shows `Receiver off`, then turns off hardware backlight/illumination instead of leaving display glow.
 
-**Independent Test**: With the canonical backlight circuit wired, confirmed receiver-off status shows
-`Receiver off`, then the backlight turns off after 3 seconds +/-0.5 seconds while no stale content or
-glow remains visible from 15 feet.
+**Independent Test**: With the canonical backlight circuit wired, confirmed receiver-off status shows `Receiver off`, then the backlight turns off after 3 seconds +/-0.5 seconds while no stale content or glow remains visible from 15 feet.
 
 ### Implementation for User Story 1
 
@@ -64,12 +55,9 @@ glow remains visible from 15 feet.
 
 ## Phase 4: User Story 2 - Wake Reliably From Hardware-Off Display State (Priority: P2)
 
-**Goal**: A tap while the backlight is off restores visible output without triggering a second action,
-then Settings can be opened by a separate visible tap.
+**Goal**: A tap while the backlight is off restores visible output without triggering a second action, then Settings can be opened by a separate visible tap.
 
-**Independent Test**: Let receiver-off hardware display-off state occur, tap once, verify the
-backlight turns on and the current visible state appears without opening Settings; then tap Settings
-and verify Settings opens.
+**Independent Test**: Let receiver-off hardware display-off state occur, tap once, verify the backlight turns on and the current visible state appears without opening Settings; then tap Settings and verify Settings opens.
 
 ### Implementation for User Story 2
 
@@ -87,8 +75,7 @@ and verify Settings opens.
 
 **Goal**: Software-only or unmodified hardware remains safe and usable when GPIO13 is unconnected.
 
-**Independent Test**: Leave GPIO13 unconnected, run the receiver-off flow, and verify the existing
-software blanking, touch wake, active receiver restore, setup, and Settings behavior still work.
+**Independent Test**: Leave GPIO13 unconnected, run the receiver-off flow, and verify the existing software blanking, touch wake, active receiver restore, setup, and Settings behavior still work.
 
 ### Implementation for User Story 3
 
@@ -102,11 +89,9 @@ software blanking, touch wake, active receiver restore, setup, and Settings beha
 
 ## Phase 6: User Story 4 - Keep Configuration And Recovery Visible (Priority: P4)
 
-**Goal**: Settings and settings-launched setup flows stay visible with the backlight on while the
-receiver is off.
+**Goal**: Settings and settings-launched setup flows stay visible with the backlight on while the receiver is off.
 
-**Independent Test**: Wake from receiver-off hardware display-off state, open Settings, remain there
-for at least 60 seconds, and verify the backlight stays on until returning Home.
+**Independent Test**: Wake from receiver-off hardware display-off state, open Settings, remain there for at least 60 seconds, and verify the backlight stays on until returning Home.
 
 ### Implementation for User Story 4
 
@@ -120,12 +105,9 @@ for at least 60 seconds, and verify the backlight stays on until returning Home.
 
 ## Phase 7: User Story 5 - Follow A Specific Hardware Upgrade Guide (Priority: P5)
 
-**Goal**: Durable hardware documentation tells the builder exactly what to buy, how to wire it, what
-not to use, and how to validate the upgrade safely.
+**Goal**: Durable hardware documentation tells the builder exactly what to buy, how to wire it, what not to use, and how to validate the upgrade safely.
 
-**Independent Test**: Review `docs/hardware.md` and confirm it includes the required BOM, canonical
-circuit, wiring table, safety warnings, validation steps, 2N7000 rejection, and last-resort
-modification limits.
+**Independent Test**: Review `docs/hardware.md` and confirm it includes the required BOM, canonical circuit, wiring table, safety warnings, validation steps, 2N7000 rejection, and last-resort modification limits.
 
 ### Implementation for User Story 5
 
@@ -142,7 +124,7 @@ modification limits.
 
 ---
 
-## Phase 8: Polish & Cross-Cutting Concerns
+## Phase 8: Polish and Cross-Cutting Concerns
 
 **Purpose**: Align user-facing references and run the full validation sequence.
 
@@ -157,21 +139,17 @@ modification limits.
 
 ---
 
-## Dependencies & Execution Order
+## Dependencies and Execution Order
 
 ### Phase Dependencies
 
 - **Setup (Phase 1)**: No dependencies.
 - **Foundational (Phase 2)**: Depends on Setup completion and blocks all user stories.
 - **User Story 1 (Phase 3)**: Depends on Foundational and is the MVP.
-- **User Story 2 (Phase 4)**: Depends on Foundational; safest after User Story 1 because it wakes the
-  hardware-off state introduced there.
-- **User Story 3 (Phase 5)**: Depends on Foundational; can be validated after User Story 1 because it
-  verifies unconnected GPIO fallback.
-- **User Story 4 (Phase 6)**: Depends on Foundational; safest after User Story 2 because Settings is
-  reached after wake.
-- **User Story 5 (Phase 7)**: Depends on plan/research/contracts and can proceed in parallel with
-  code stories, but final acceptance depends on actual implementation choices.
+- **User Story 2 (Phase 4)**: Depends on Foundational; safest after User Story 1 because it wakes the hardware-off state introduced there.
+- **User Story 3 (Phase 5)**: Depends on Foundational; can be validated after User Story 1 because it verifies unconnected GPIO fallback.
+- **User Story 4 (Phase 6)**: Depends on Foundational; safest after User Story 2 because Settings is reached after wake.
+- **User Story 5 (Phase 7)**: Depends on plan/research/contracts and can proceed in parallel with code stories, but final acceptance depends on actual implementation choices.
 - **Polish (Phase 8)**: Depends on all desired user stories being complete.
 
 ### User Story Dependencies
@@ -180,17 +158,14 @@ modification limits.
 - **US2 (P2)**: Requires US1's hardware-off state for full validation.
 - **US3 (P3)**: Requires Foundational and US1 behavior; proves safe fallback without hardware.
 - **US4 (P4)**: Requires US2 wake path and visible Settings entry.
-- **US5 (P5)**: Can be drafted from plan artifacts independently but should be final-reviewed after
-  implementation and validation.
+- **US5 (P5)**: Can be drafted from plan artifacts independently but should be final-reviewed after implementation and validation.
 
 ### Parallel Opportunities
 
 - T002, T003, and T004 can run in parallel during Setup.
-- US5 documentation tasks T026-T032 can run in parallel with firmware tasks after Phase 2 if one
-  person owns reconciliation in T033.
+- US5 documentation tasks T026-T032 can run in parallel with firmware tasks after Phase 2 if one person owns reconciliation in T033.
 - T034 and T035 can run in parallel during Polish.
-- Most firmware tasks touch `src/ui/DisplayManager.*` or `src/ui/Screens/HomeScreen.cpp`, so do not
-  run those concurrently in the same worktree.
+- Most firmware tasks touch `src/ui/DisplayManager.*` or `src/ui/Screens/HomeScreen.cpp`, so do not run those concurrently in the same worktree.
 
 ---
 
@@ -211,8 +186,7 @@ Task: "Add safety warnings for GPIO current limits, 3.3V logic, no direct backli
 1. Complete Phase 1: Setup.
 2. Complete Phase 2: Foundational.
 3. Complete Phase 3: User Story 1.
-4. Stop and validate receiver-off visible timing, hardware backlight-off transition, and no stale
-   visible content.
+4. Stop and validate receiver-off visible timing, hardware backlight-off transition, and no stale visible content.
 
 ### Incremental Delivery
 
@@ -226,11 +200,8 @@ Task: "Add safety warnings for GPIO current limits, 3.3V logic, no direct backli
 ### Scope Guard
 
 - Do not switch TFT `VCC`, touch power, ESP32 power, or receiver power.
-- Do not add a separate direct power feed to TFT/touch hardware or the Pololu `VIN` pads;
-  USB power enters through the ESP32 and display/touch plus switch-load power comes from ESP32 power
-  pins.
+- Do not add a separate direct power feed to TFT/touch hardware or the Pololu `VIN` pads; USB power enters through the ESP32 and display/touch plus switch-load power comes from ESP32 power pins.
 - Do not add receiver power-control UI or commands.
 - Do not add Settings toggles, stored preferences, or separate firmware builds for hardware control.
 - Do not use `2N7000FS-ND` as the planned switch; keep it documented as evaluated but rejected.
-- Do not add storage schema, network protocol, dependency, or platform changes unless a validation
-  failure proves they are necessary for the specified behavior.
+- Do not add storage schema, network protocol, dependency, or platform changes unless a validation failure proves they are necessary for the specified behavior.

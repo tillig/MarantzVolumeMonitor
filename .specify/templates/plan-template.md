@@ -13,9 +13,7 @@
 ## Technical Context
 
 <!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
+ACTION REQUIRED: Replace the content in this section with the technical details for the project. The structure here is presented in advisory capacity to guide the iteration process.
 -->
 
 **Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]
@@ -58,10 +56,7 @@ specs/[###-feature]/
 
 ### Source Code (repository root)
 <!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
+ACTION REQUIRED: Replace the placeholder tree below with the concrete layout for this feature. Delete unused options and expand the chosen structure with real paths (e.g., apps/admin, packages/something). The delivered plan must not include Option labels.
 -->
 
 ```text
@@ -100,15 +95,11 @@ ios/ or android/
 └── [platform-specific structure: feature modules, UI flows, platform tests]
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Structure Decision**: [Document the selected structure and reference the real directories captured above]
 
 ## Documentation Alignment
 
-[Record any durable documentation that must change outside this feature folder. Use `README.md` for
-user-facing setup and usage changes, `CONTRIBUTING.md` for build/validation/workflow changes, and
-`docs/` for hardware, UI, and architecture references. Keep feature-specific details in
-`specs/[###-feature]/`.]
+[Record any durable documentation that must change outside this feature folder. Use `README.md` for user-facing setup and usage changes, `CONTRIBUTING.md` for build/validation/workflow changes, and `docs/` for hardware, UI, and architecture references. Keep feature-specific details in `specs/[###-feature]/`.]
 
 ## Complexity Tracking
 

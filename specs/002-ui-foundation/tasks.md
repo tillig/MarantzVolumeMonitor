@@ -73,7 +73,7 @@
 
 ---
 
-## Phase 6: Polish & Cross-Cutting Concerns
+## Phase 6: Polish and Cross-Cutting Concerns
 
 - [x] T015 [P] Remove all temporary hardware spike code from `main.cpp`
 - [x] T016 [P] Update `README.md` with the new architecture status

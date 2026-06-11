@@ -34,22 +34,18 @@ Define the firmware-visible behavior for the optional receiver-off hardware back
 ## Entry Rules
 
 - Entering `receiverOffBlank` turns the backlight signal off after the existing software blank draw.
-- Entering any visible state turns the backlight signal on before the user must read or touch the
-  screen.
-- Returning from Settings to Home follows the current receiver status classification before deciding
-  whether the backlight remains on or later turns off after the receiver-off timeout.
+- Entering any visible state turns the backlight signal on before the user must read or touch the screen.
+- Returning from Settings to Home follows the current receiver status classification before deciding whether the backlight remains on or later turns off after the receiver-off timeout.
 
 ## Exit Rules
 
 - A wake touch while `receiverOffBlank` turns the backlight signal on and consumes the touch.
 - Fresh active receiver status while blanked turns the backlight signal on and returns to live volume.
-- If receiver-off confirmation is lost while blanked, the backlight signal remains off until touch or
-  fresh active receiver status.
+- If receiver-off confirmation is lost while blanked, the backlight signal remains off until touch or fresh active receiver status.
 
 ## Acceptance Rules
 
 - Software-only hardware with GPIO13 unconnected still blanks visually and wakes by touch.
 - Hardware-capable wiring turns the backlight off only in receiver-off blank state.
-- Hardware-capable wiring never turns off TFT logic power, touch power, ESP32 power, or receiver
-  power.
+- Hardware-capable wiring never turns off TFT logic power, touch power, ESP32 power, or receiver power.
 - Backlight transitions must not block the existing 1-second receiver polling cadence.

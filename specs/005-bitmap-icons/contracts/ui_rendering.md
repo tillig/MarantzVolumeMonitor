@@ -32,20 +32,15 @@
 
 - Replace manually drawn caps lock, password-visibility eye, OK, and Cancel glyphs with bitmap icons.
 - Replace the text backspace arrow with a bitmap icon.
-- Use distinct visibility and visibility-off icons so the keyboard indicates whether input is masked
-  or visible.
+- Use distinct visibility and visibility-off icons so the keyboard indicates whether input is masked or visible.
 - Caps lock inactive uses the normal function-key foreground color.
-- Caps lock active uses the selected-state foreground treatment and remains visible against the active
-  key background.
-- OK and Cancel keep their existing semantic button backgrounds unless changed by a later Material
-  screen style feature.
+- Caps lock active uses the selected-state foreground treatment and remains visible against the active key background.
+- OK and Cancel keep their existing semantic button backgrounds unless changed by a later Material screen style feature.
 
 ## Setup And Status Screens
 
-- Searching/discovery, manual entry, retry, success, warning, failure, Wi-Fi, and receiver states
-  should use inventory-backed icon assets where those states appear.
-- Icons supplement concise labels and status messages; they do not remove text needed to complete
-  setup.
+- Searching/discovery, manual entry, retry, success, warning, failure, Wi-Fi, and receiver states should use inventory-backed icon assets where those states appear.
+- Icons supplement concise labels and status messages; they do not remove text needed to complete setup.
 
 ## Rendering Invariants
 

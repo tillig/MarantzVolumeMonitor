@@ -5,13 +5,11 @@
 The firmware uses a small layered architecture:
 
 - **UI layer**: Screens, display rendering, touch handling, and screen navigation.
-- **Network layer**: Wi-Fi connection management, SSDP/UPnP receiver discovery, and Marantz HTTP
-  status access.
+- **Network layer**: Wi-Fi connection management, SSDP/UPnP receiver discovery, and Marantz HTTP status access.
 - **Storage layer**: Persistent device configuration using LittleFS.
 - **Hardware layer**: TFT_eSPI display access and XPT2046 touch input.
 
-Screens should not perform network I/O directly. They should delegate network work to the network
-layer and persistence to `ConfigStore`.
+Screens should not perform network I/O directly. They should delegate network work to the network layer and persistence to `ConfigStore`.
 
 ## Source Layout
 
@@ -34,9 +32,7 @@ src/
         ├── ReceiverStatusScreen.h/.cpp
 ```
 
-Feature work may add classes inside these existing layer folders. New cross-layer behavior should keep
-the ownership boundary clear: UI presents state and handles touch, network classes perform network
-operations, and storage classes read or write persistent configuration.
+Feature work may add classes inside these existing layer folders. New cross-layer behavior should keep the ownership boundary clear: UI presents state and handles touch, network classes perform network operations, and storage classes read or write persistent configuration.
 
 ## Runtime Flow
 

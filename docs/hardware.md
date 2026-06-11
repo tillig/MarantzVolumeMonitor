@@ -10,8 +10,7 @@
 
 ## Power
 
-The monitor uses one 5V 2A USB supply plugged into the ESP32. Display and touch power must remain
-fed from ESP32 power pins; do not add a separate direct power feed to the TFT/touch assembly.
+The monitor uses one 5V 2A USB supply plugged into the ESP32. Display and touch power must remain fed from ESP32 power pins; do not add a separate direct power feed to the TFT/touch assembly.
 
 Current power path:
 
@@ -22,19 +21,14 @@ ESP32 5V/VIN pin ----> TFT VCC
 ESP32 GND -----------> TFT GND
 ```
 
-All components must share ground. The 4" TFT and backlight can draw significant current, so validate
-the ESP32-fed 5V path before accepting the build. With the display connected and active, measure:
+All components must share ground. The 4" TFT and backlight can draw significant current, so validate the ESP32-fed 5V path before accepting the build. With the display connected and active, measure:
 
 - USB supply voltage at the ESP32 USB input: pass if it remains near 5V without ESP32 brownouts.
 - Voltage between TFT `VCC` and `GND`: pass if it remains at least 4.75V while the display is active.
-- Temperature of the ESP32 USB connector, 5V/VIN pin, jumpers, and switch module after 10 minutes:
-  pass only if no part is uncomfortably warm.
-- Total USB supply capacity: pass only if the 5V 2A supply has margin for ESP32, TFT logic, touch,
-  and backlight current together.
+- Temperature of the ESP32 USB connector, 5V/VIN pin, jumpers, and switch module after 10 minutes: pass only if no part is uncomfortably warm.
+- Total USB supply capacity: pass only if the 5V 2A supply has margin for ESP32, TFT logic, touch, and backlight current together.
 
-If the current-budget check fails, do not work around it by adding a second direct supply to the
-display. Keep the software-only receiver-off blanking behavior until the ESP32-fed 5V path can be
-made safe with suitable wiring/connectors and a stable 5V 2A USB supply.
+If the current-budget check fails, do not work around it by adding a second direct supply to the display. Keep the software-only receiver-off blanking behavior until the ESP32-fed 5V path can be made safe with suitable wiring/connectors and a stable 5V 2A USB supply.
 
 ## SPI TFT Display Wiring
 
@@ -54,10 +48,7 @@ The display uses the ESP32 VSPI pins.
 
 ## Receiver-Off Backlight Hardware Control
 
-The firmware drives ESP32 GPIO13 as an active-high backlight-control signal. When the receiver is
-confirmed off, Home shows `Receiver off` for about 3 seconds, clears the display, then drives GPIO13
-low so optional hardware can turn off only the TFT backlight. TFT `VCC`, touch power, ESP32 power,
-receiver polling, and touch wake remain active.
+The firmware drives ESP32 GPIO13 as an active-high backlight-control signal. When the receiver is confirmed off, Home shows `Receiver off` for about 3 seconds, clears the display, then drives GPIO13 low so optional hardware can turn off only the TFT backlight. TFT `VCC`, touch power, ESP32 power, receiver polling, and touch wake remain active.
 
 ### Bill Of Materials
 
@@ -69,9 +60,7 @@ receiver polling, and touch wake remain active.
 | Optional | Inline connector or small terminal block        | Reversible service point                           | Useful for bypassing the switch or removing the display without solder rework.                                                                   |
 | 1        | Multimeter                                      | Continuity, voltage, and current-budget validation | Required before first power-on after rewiring.                                                                                                   |
 
-Equivalent high-side switch modules are acceptable only if they support a 5V load path, the measured
-backlight current with margin, a 3.3V logic-compatible active-high enable input, and shared-ground
-operation. Document the substitute part and repeat the validation steps below.
+Equivalent high-side switch modules are acceptable only if they support a 5V load path, the measured backlight current with margin, a 3.3V logic-compatible active-high enable input, and shared-ground operation. Document the substitute part and repeat the validation steps below.
 
 ### Canonical Wiring
 
@@ -93,10 +82,7 @@ ESP32 GND -------------------+----> TFT GND
                              +----> Pololu 2810 GND
 ```
 
-The two `VIN` pads are the same node, the two `VOUT` pads are the same node, and the four `GND`
-pads are the same node. Use whichever matching pad locations make wiring cleanest. The separate
-switch-contact pads are optional and are not used by this feature's canonical wiring because the ESP32
-drives the `ON` pin directly.
+The two `VIN` pads are the same node, the two `VOUT` pads are the same node, and the four `GND` pads are the same node. Use whichever matching pad locations make wiring cleanest. The separate switch-contact pads are optional and are not used by this feature's canonical wiring because the ESP32 drives the `ON` pin directly.
 
 Connection table:
 
@@ -114,23 +100,15 @@ Connection table:
 
 - Do not drive TFT `LED/BL` directly from GPIO13.
 - Do not connect ESP32 GPIO13 to any 5V output. ESP32 GPIO is 3.3V logic and is not 5V tolerant.
-- Do not substitute GPIO12 for this feature's `ON` connection; GPIO12 is an ESP32 strapping pin and
-  is a less robust choice for this startup-sensitive control signal.
+- Do not substitute GPIO12 for this feature's `ON` connection; GPIO12 is an ESP32 strapping pin and is a less robust choice for this startup-sensitive control signal.
 - Do not switch TFT `VCC`; touch wake and display logic must remain powered.
 - Do not add a separate direct external supply to TFT `VCC`, touch power, or the Pololu `VIN` pads.
 - Disconnect USB power before rewiring or moving jumpers.
 - Do not treat small-signal MOSFETs such as `2N7000FS-ND` / onsemi `2N7000` as drop-in substitutes.
 
-The `2N7000FS-ND` parts are useful bench parts, but they are not the planned switch for this upgrade.
-They are N-channel low-side small-signal MOSFETs, not high-side load-switch modules for the positive
-`LED/BL` feed. They also have limited continuous-current and 3.3V-gate-drive margin for an unknown
-TFT backlight load. Use them only for separate experiments where the display exposes a measured
-low-current logic-enable input or an isolated low-current backlight return.
+The `2N7000FS-ND` parts are useful bench parts, but they are not the planned switch for this upgrade. They are N-channel low-side small-signal MOSFETs, not high-side load-switch modules for the positive `LED/BL` feed. They also have limited continuous-current and 3.3V-gate-drive margin for an unknown TFT backlight load. Use them only for separate experiments where the display exposes a measured low-current logic-enable input or an isolated low-current backlight return.
 
-Adafruit STEMMA MOSFET Driver, item `5648`, is a conditional low-side substitute only when the
-specific display exposes an isolated backlight return that can be switched without breaking TFT
-logic, touch power, or shared ground. Source: <https://www.adafruit.com/product/5648>. It is not the
-canonical path because the current display wiring exposes the positive `LED/BL` path.
+Adafruit STEMMA MOSFET Driver, item `5648`, is a conditional low-side substitute only when the specific display exposes an isolated backlight return that can be switched without breaking TFT logic, touch power, or shared ground. Source: <https://www.adafruit.com/product/5648>. It is not the canonical path because the current display wiring exposes the positive `LED/BL` path.
 
 ### First-Power-On Validation
 
@@ -152,34 +130,25 @@ Then power the ESP32 by USB:
 4. Confirm the backlight turns off after about 3 seconds while the ESP32 remains running.
 5. Tap the dark display and confirm the backlight turns on and the wake tap does not open Settings.
 6. While blanked, turn the receiver active and confirm live volume returns without reboot.
-7. While blanked, make receiver-off confirmation unavailable, then tap and confirm the latest visible
-   state appears rather than assuming the receiver is still off.
-8. Restart the monitor while the receiver is already off and confirm touch wake and Settings remain
-   recoverable.
+7. While blanked, make receiver-off confirmation unavailable, then tap and confirm the latest visible state appears rather than assuming the receiver is still off.
+8. Restart the monitor while the receiver is already off and confirm touch wake and Settings remain recoverable.
 
 ### Software-Only Fallback And Rollback
 
-If GPIO13 is unconnected, the firmware remains safe. Receiver-off handling still clears the screen in
-software, touch wake still works, and the backlight-control pin has no effect.
+If GPIO13 is unconnected, the firmware remains safe. Receiver-off handling still clears the screen in software, touch wake still works, and the backlight-control pin has no effect.
 
-To roll back the hardware upgrade, disconnect USB power and bypass the Pololu module by reconnecting
-ESP32 `5V`/`VIN` directly to TFT `LED/BL`. Disconnect GPIO13 from `ON`, leave the switch-contact pads
-open, and insulate any loose leads. After rollback, repeat software-only validation with GPIO13
-unconnected.
+To roll back the hardware upgrade, disconnect USB power and bypass the Pololu module by reconnecting ESP32 `5V`/`VIN` directly to TFT `LED/BL`. Disconnect GPIO13 from `ON`, leave the switch-contact pads open, and insulate any loose leads. After rollback, repeat software-only validation with GPIO13 unconnected.
 
 ### Last-Resort Display Module Modification
 
-Prefer external inline wiring. Only modify display-module traces, jumpers, solder bridges, or onboard
-resistors if all of these are true:
+Prefer external inline wiring. Only modify display-module traces, jumpers, solder bridges, or onboard resistors if all of these are true:
 
 - The module cannot expose `LED/BL` through normal pins or inline wiring.
-- The backlight path has been identified with a schematic, continuity measurements, or clear module
-  markings.
+- The backlight path has been identified with a schematic, continuity measurements, or clear module markings.
 - The change can be documented with photos and measured before/after continuity checks.
 - You accept that rollback may require solder repair or replacing the display module.
 
-Do not modify the display module just to use a low-side switch. If the backlight path cannot be
-isolated confidently, keep the software-only fallback.
+Do not modify the display module just to use a low-side switch. If the backlight path cannot be isolated confidently, keep the software-only fallback.
 
 ## Touch Controller Wiring
 
@@ -195,12 +164,6 @@ The XPT2046 touch controller shares the SPI bus with the display.
 
 ## Touch Calibration
 
-Touch alignment on this hardware uses a measured 9-point affine transform in `src/ui/TouchManager.*`.
-Simple axis min/max calibration plus manual per-screen offsets was not accurate enough for the
-keyboard and list screens.
+Touch alignment on this hardware uses a measured 9-point affine transform in `src/ui/TouchManager.*`. Simple axis min/max calibration plus manual per-screen offsets was not accurate enough for the keyboard and list screens.
 
-`XPT2046_Touchscreen::setRotation(1)` already rotates controller readings to match the display
-orientation. If alignment drifts, use the `CAL` button on the unconfigured/setup Home Screen to
-capture a new 9-point dataset from the serial console, then update the affine coefficients in
-`TouchManager`. Do not add screen-specific hitbox offsets unless new hardware data proves the affine
-model is wrong.
+`XPT2046_Touchscreen::setRotation(1)` already rotates controller readings to match the display orientation. If alignment drifts, use the `CAL` button on the unconfigured/setup Home Screen to capture a new 9-point dataset from the serial console, then update the affine coefficients in `TouchManager`. Do not add screen-specific hitbox offsets unless new hardware data proves the affine model is wrong.

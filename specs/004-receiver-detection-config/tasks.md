@@ -105,7 +105,7 @@
 
 ---
 
-## Phase 6: Polish & Cross-Cutting Concerns
+## Phase 6: Polish and Cross-Cutting Concerns
 
 **Purpose**: Final validation, documentation alignment, and hardware verification across the complete receiver setup flow.
 
@@ -118,7 +118,7 @@
 
 ---
 
-## Dependencies & Execution Order
+## Dependencies and Execution Order
 
 ### Phase Dependencies
 

@@ -98,7 +98,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 4. **Project Setup Verification**:
    - **REQUIRED**: Create/verify ignore files based on actual project setup:
 
-   **Detection & Creation Logic**:
+   **Detection and Creation Logic**:
    - Check if the following command succeeds to determine if the repository is a git repo (create/verify .gitignore if so):
 
      ```sh
@@ -114,6 +114,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Check if .helmignore needed (helm charts present) → create/verify .helmignore
 
    **If ignore file already exists**: Verify it contains essential patterns, append missing critical patterns only
+
    **If ignore file missing**: Create with full pattern set for detected technology
 
    **Common Patterns by Technology** (from plan.md tech stack):

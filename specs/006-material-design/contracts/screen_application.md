@@ -22,8 +22,7 @@ Implementation must audit and update every current screen:
 
 ## Shared Rendering Expectations
 
-- Screens should call shared UI-layer style helpers for repeated buttons, rows, searching states, and
-  status blocks.
+- Screens should call shared UI-layer style helpers for repeated buttons, rows, searching states, and status blocks.
 - Screens may keep domain-specific content and flow logic, but must not hand-roll shared styling.
 - Screens must not perform network or storage work directly as part of style standardization.
 - Existing `IconRenderer` and icon bitmap assets should be reused for button and state icons.
@@ -33,10 +32,8 @@ Implementation must audit and update every current screen:
 
 - Standard actions use `standard-icon-text`.
 - Keyboard function actions may use `keyboard-icon-only`.
-- OK and Cancel on the keyboard must share the same y-coordinate, height, visual center, and icon
-  alignment.
-- Equivalent actions across screens use the same label and icon unless a catalog exception is
-  documented.
+- OK and Cancel on the keyboard must share the same y-coordinate, height, visual center, and icon alignment.
+- Equivalent actions across screens use the same label and icon unless a catalog exception is documented.
 
 ## Searching Application Rules
 
@@ -54,11 +51,8 @@ Implementation must audit and update every current screen:
 
 ## Acceptance Criteria
 
-- A screen-by-screen review finds no square buttons on one screen and rounded buttons on another
-  unless the exception is documented.
-- Standard OK, Cancel, Retry, Manual, and Save-like actions use the same button variant across
-  equivalent contexts.
+- A screen-by-screen review finds no square buttons on one screen and rounded buttons on another unless the exception is documented.
+- Standard OK, Cancel, Retry, Manual, and Save-like actions use the same button variant across equivalent contexts.
 - Wi-Fi and receiver searching screens match title, message, icon, progress, and action placement.
-- Wi-Fi and receiver selection lists match row height, typography roles, spacing, and selection state
-  treatment.
+- Wi-Fi and receiver selection lists match row height, typography roles, spacing, and selection state treatment.
 - No screen text overlaps neighboring controls or disappears outside its intended bounds.

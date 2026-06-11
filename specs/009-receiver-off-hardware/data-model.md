@@ -16,8 +16,7 @@ Represents the current user-visible receiver condition used by the Home Screen.
 ### Receiver Power Validation Rules
 
 - `receiverOff` requires fresh current receiver status with known powered-off state.
-- Missing volume, failed refresh, unknown power state, missing Wi-Fi, or missing receiver
-  configuration must not produce `receiverOff`.
+- Missing volume, failed refresh, unknown power state, missing Wi-Fi, or missing receiver configuration must not produce `receiverOff`.
 - `live` requires fresh current receiver status with powered-on state and usable volume.
 
 ## HomeDisplayMode
@@ -28,8 +27,7 @@ Represents what the Home Screen is currently presenting for the receiver conditi
 
 - `liveVisible`: Normal live volume display with backlight on.
 - `receiverOffVisible`: Visible `Receiver off` state with Settings entry and backlight on.
-- `receiverOffBlank`: Quiet receiver-off state with screen content blanked and hardware backlight
-  signal off.
+- `receiverOffBlank`: Quiet receiver-off state with screen content blanked and hardware backlight signal off.
 - `receiverUnavailableVisible`: Visible unavailable state with Settings entry and backlight on.
 - `setupVisible`: Wi-Fi, receiver setup, or connecting state remains visible with backlight on.
 - `settingsSession`: Settings or settings-launched setup flow remains visible with backlight on.
@@ -37,17 +35,12 @@ Represents what the Home Screen is currently presenting for the receiver conditi
 ### State Transitions
 
 - `liveVisible -> receiverOffVisible`: Fresh status confirms receiver has powered off.
-- `receiverOffVisible -> receiverOffBlank`: 3 seconds pass with receiver still off and no visible
-  receiver-off interaction requiring the timer to remain visible.
-- `receiverOffBlank -> receiverOffVisible`: User touches the blank display while receiver remains
-  off.
-- `receiverOffBlank -> receiverUnavailableVisible`: User touches the blank display after
-  receiver-off status can no longer be confirmed and receiver status is unavailable.
+- `receiverOffVisible -> receiverOffBlank`: 3 seconds pass with receiver still off and no visible receiver-off interaction requiring the timer to remain visible.
+- `receiverOffBlank -> receiverOffVisible`: User touches the blank display while receiver remains off.
+- `receiverOffBlank -> receiverUnavailableVisible`: User touches the blank display after receiver-off status can no longer be confirmed and receiver status is unavailable.
 - `receiverOffBlank -> liveVisible`: Fresh active receiver status resumes while blanked.
-- `receiverOffVisible -> receiverOffVisible`: User touches the visible receiver-off screen outside
-  Settings before the timeout expires, restarting the 3-second timer.
-- `receiverOffVisible -> settingsSession`: User taps Settings while the visible receiver-off screen is
-  active.
+- `receiverOffVisible -> receiverOffVisible`: User touches the visible receiver-off screen outside Settings before the timeout expires, restarting the 3-second timer.
+- `receiverOffVisible -> settingsSession`: User taps Settings while the visible receiver-off screen is active.
 - `settingsSession -> receiverOffVisible`: User exits Settings and receiver is still confirmed off.
 - `settingsSession -> liveVisible`: User exits Settings and fresh active receiver status is available.
 
@@ -56,8 +49,7 @@ Represents what the Home Screen is currently presenting for the receiver conditi
 - `receiverOffBlank` is reachable only from confirmed receiver-off status.
 - `receiverOffBlank` must not show stale live volume, source, mode, or audio-family details.
 - `receiverOffBlank` must keep receiver polling and touch wake active.
-- `receiverOffBlank` keeps the backlight-control signal off until user wake or fresh active receiver
-  status exits the state.
+- `receiverOffBlank` keeps the backlight-control signal off until user wake or fresh active receiver status exits the state.
 - Setup, unavailable, and Settings states must force the backlight-control signal on.
 
 ## BacklightControlSignal
@@ -85,8 +77,7 @@ Represents whether the physical device has been wired and verified for hardware 
 
 ### Availability Values
 
-- `softwareOnly`: No verified backlight-control circuit is connected; software blanking is the only
-  visible effect.
+- `softwareOnly`: No verified backlight-control circuit is connected; software blanking is the only visible effect.
 - `hardwareCapable`: The canonical or equivalent backlight-control circuit is wired and verified.
 - `unknown`: Maintainer has not inspected or validated wiring.
 
@@ -94,8 +85,7 @@ Represents whether the physical device has been wired and verified for hardware 
 
 - Availability is determined by hardware inspection and validation steps in `docs/hardware.md`.
 - Firmware does not store or infer availability.
-- `softwareOnly` and `unknown` installations must remain safe because the control signal may be
-  unconnected.
+- `softwareOnly` and `unknown` installations must remain safe because the control signal may be unconnected.
 
 ## HardwareUpgradeGuide
 
@@ -106,8 +96,7 @@ Represents the durable documentation deliverable for the hardware change.
 - Bill of materials with quantities, part identifiers, source links, and minimum ratings.
 - Canonical high-side backlight-control circuit.
 - Equivalent substitution rules.
-- Connection table for USB input, ESP32 power pins, TFT `VCC`, TFT `LED/BL`, ESP32 GPIO13, shared
-  ground, and switch module pins.
+- Connection table for USB input, ESP32 power pins, TFT `VCC`, TFT `LED/BL`, ESP32 GPIO13, shared ground, and switch module pins.
 - Current-budget worksheet for the ESP32-fed display/touch and backlight-switch load path.
 - Safety warnings, including no direct backlight drive from ESP32 GPIO.
 - Inspection and first-power-on validation.
@@ -119,8 +108,7 @@ Represents the durable documentation deliverable for the hardware change.
 
 - Every connection has a matching inspection or functional validation step.
 - The canonical path is non-destructive inline wiring.
-- TFT/touch and switch-load power must originate from ESP32 power pins after USB power enters the
-  ESP32, not from a separate direct external supply.
+- TFT/touch and switch-load power must originate from ESP32 power pins after USB power enters the ESP32, not from a separate direct external supply.
 - The guide must include a pass/fail current-budget check before accepting the ESP32-fed power path.
 - Destructive module modification is documented only as last resort.
 - The guide must be usable before implementation is accepted.
@@ -137,18 +125,13 @@ Represents the planned physical connection used by the hardware guide.
 - `onPin`: Pololu `ON` pin driven by ESP32 GPIO13.
 - `groundReference`: Shared ground from ESP32 `GND` to TFT `GND` and Pololu `GND`.
 - `switchPads`: Optional Pololu switch-contact pads left open in the canonical wiring.
-- `unchangedPower`: USB remains plugged into the ESP32; TFT `VCC`, TFT logic ground, touch wiring,
-  and ESP32 power remain on the ESP32-fed power path.
+- `unchangedPower`: USB remains plugged into the ESP32; TFT `VCC`, TFT logic ground, touch wiring, and ESP32 power remain on the ESP32-fed power path.
 
 ### Circuit Validation Rules
 
 - The circuit switches only `LED/BL`, not TFT `VCC`.
 - GPIO13 must drive only the Pololu `ON` pin, not the backlight load current.
-- The switch module and substitutes must be rated for the measured backlight current and ESP32-fed 5V
-  supply path.
-- The TFT/touch assembly and Pololu `VIN` pads must not be wired directly to a separate external
-  supply.
-- The installed wiring must pass the documented current-budget check for the ESP32 power pin and USB
-  input path.
-- The installed circuit must be inspectable and reversible without display-module modification where
-  possible.
+- The switch module and substitutes must be rated for the measured backlight current and ESP32-fed 5V supply path.
+- The TFT/touch assembly and Pololu `VIN` pads must not be wired directly to a separate external supply.
+- The installed wiring must pass the documented current-budget check for the ESP32 power pin and USB input path.
+- The installed circuit must be inspectable and reversible without display-module modification where possible.

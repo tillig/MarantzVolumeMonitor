@@ -35,15 +35,13 @@ platformio run
 pre-commit run --all-files
 ```
 
-If you change icon source artwork in `assets/icons/source/`, regenerate firmware icon masks before
-building:
+If you change icon source artwork in `assets/icons/source/`, regenerate firmware icon masks before building:
 
 ```bash
 python3 scripts/icons/generate-icons.py
 ```
 
-Run the generator twice when reviewing icon changes; the second run should produce no additional
-diff.
+Run the generator twice when reviewing icon changes; the second run should produce no additional diff.
 
 To flash a connected ESP32, use PlatformIO's upload action or:
 
@@ -56,8 +54,7 @@ platformio run --target upload
 1. **Report Issues:** Use the GitHub issue tracker for bugs or feature requests.
 2. **Submit PRs:**
    - Follow the existing code style (CamelCase for classes, camelCase for methods/variables).
-   - Use the Spec Kit branch convention in `.specify/branch-convention.yml`. In this repository,
-     `/speckit.specify` should create branches in the `feature/NNN-short-name` form.
+   - Use the Spec Kit branch convention in `.specify/branch-convention.yml`. In this repository, `/speckit.specify` should create branches in the `feature/NNN-short-name` form.
    - Ensure the code compiles and follows the `platformio.ini` configuration.
    - Update tests or documentation if applicable.
 
@@ -77,8 +74,7 @@ If you are an AI assistant (like Gemini CLI) working on this codebase:
 
 - **Context Awareness:** Always read `AGENTS.md`, the active Spec Kit feature under `specs/`, and relevant durable references in `docs/` before making changes.
 - **Spec Kit:** Use Spec Kit commands for planning and task management.
-- **Branching:** Prefer `/speckit.specify` so the git hook can generate a compliant feature branch
-  from `.specify/branch-convention.yml`.
+- **Branching:** Prefer `/speckit.specify` so the git hook can generate a compliant feature branch from `.specify/branch-convention.yml`.
 - **Safety:** Do not hardcode credentials. Use the `ConfigStore` for secrets.
 - **Verification:** Always run `pre-commit run --all-files` before finishing a task. Describe how to verify your changes in a real or simulated environment.
 

@@ -1,9 +1,6 @@
 # Icon Inventory
 
-This inventory records every icon source and generated firmware target used by the on-device UI.
-Material-compatible custom artwork is kept in `assets/icons/source/`; generated previews are in
-`assets/icons/generated/`; firmware masks are in `src/ui/assets/IconBitmaps.h` and
-`src/ui/assets/IconBitmaps.cpp`.
+This inventory records every icon source and generated firmware target used by the on-device UI. Material-compatible custom artwork is kept in `assets/icons/source/`; generated previews are in `assets/icons/generated/`; firmware masks are in `src/ui/assets/IconBitmaps.h` and `src/ui/assets/IconBitmaps.cpp`.
 
 | Asset ID | Meaning | Category | Source Type | Source | License / Usage Note | Target Size | Minimum Display Size | Generated Symbol | Screen Usage | Runtime Colors |
 | -------- | ------- | -------- | ----------- | ------ | -------------------- | ----------- | -------------------- | ---------------- | ------------ | -------------- |

@@ -20,8 +20,7 @@
 ## Implementation Outline
 
 1. Add shared UI style primitives under `src/ui/MaterialStyle.h` and `src/ui/MaterialStyle.cpp`.
-2. Define button variants, typography roles, spacing rules, state treatments, list rows, and searching
-   screen helpers.
+2. Define button variants, typography roles, spacing rules, state treatments, list rows, and searching screen helpers.
 3. Update `docs/ui-reference.md` with the shared component/style catalog before migrating screens.
 4. Migrate standard action buttons to icon-with-text rendering.
 5. Migrate keyboard compact controls to the documented icon-only variant and align OK/Cancel.
@@ -41,20 +40,16 @@ platformio run
 git diff --check
 ```
 
-If `platformio` is not available in the local environment, record that limitation and run the
-remaining checks.
+If `platformio` is not available in the local environment, record that limitation and run the remaining checks.
 
 Hardware visual verification:
 
 1. Confirm the home screen preserves the volume-first hierarchy from a 15-foot viewing distance.
 2. Compare standard buttons across setup, status, receiver, and settings screens.
 3. Confirm keyboard OK and Cancel are aligned and use the compact icon-only variant.
-4. Compare Wi-Fi and receiver searching screens for matching title, message, icon, progress, and
-   action placement.
-5. Confirm searching progress moves immediately after search starts and does not block touch or screen
-   updates.
-6. Compare Wi-Fi and receiver list rows for matching height, font roles, spacing, metadata placement,
-   and state treatment.
+4. Compare Wi-Fi and receiver searching screens for matching title, message, icon, progress, and action placement.
+5. Confirm searching progress moves immediately after search starts and does not block touch or screen updates.
+6. Compare Wi-Fi and receiver list rows for matching height, font roles, spacing, metadata placement, and state treatment.
 7. Walk through success, warning, failure, empty, unavailable, and retry states.
 8. Confirm every current screen is covered and any exception is documented.
 

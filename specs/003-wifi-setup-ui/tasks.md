@@ -26,7 +26,7 @@
 
 ---
 
-## Phase 3: User Story 1 - Network Scanning & Selection (Priority: P1) 🎯 MVP
+## Phase 3: User Story 1 - Network Scanning and Selection (Priority: P1) 🎯 MVP
 
 **Goal**: Discover and select nearby SSIDs
 
@@ -77,7 +77,7 @@
 
 ---
 
-## Phase 6: Polish & Cross-Cutting Concerns
+## Phase 6: Polish and Cross-Cutting Concerns
 
 - [x] T021 [P] Implement scroll scrolling/paging for long network lists in `src/ui/Screens/NetworkListScreen.cpp`
 - [x] T022 [P] Add signal strength (RSSI) icons to the network list in `src/ui/Screens/NetworkListScreen.cpp`

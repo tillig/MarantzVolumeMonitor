@@ -66,10 +66,7 @@ auto_commit:
     message: "[Spec Kit] Add specification"
 ```
 
-If `.specify/branch-convention.yml` exists, `speckit.git.feature` uses its `branch_pattern`,
-`type_prefix`, `seq_padding`, `date_format`, `separator`, and `ticket_pattern` values when
-constructing the branch name. This keeps `/speckit.specify` aligned with the configured project
-branch convention instead of the git extension's built-in default numbering format.
+If `.specify/branch-convention.yml` exists, `speckit.git.feature` uses its `branch_pattern`, `type_prefix`, `seq_padding`, `date_format`, `separator`, and `ticket_pattern` values when constructing the branch name. This keeps `/speckit.specify` aligned with the configured project branch convention instead of the git extension's built-in default numbering format.
 
 ## Installation
 

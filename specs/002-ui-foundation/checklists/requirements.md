@@ -1,8 +1,6 @@
 # Specification Quality Checklist: UI Foundation Integration
 
-**Purpose**: Validate specification completeness and quality before proceeding to planning
-**Created**: 2026-05-31
-**Feature**: [spec.md](../spec.md)
+**Purpose**: Validate specification completeness and quality before proceeding to planning **Created**: 2026-05-31 **Feature**: [spec.md](../spec.md)
 
 ## Content Quality
 

@@ -19,16 +19,13 @@
 
 ## Implementation Outline
 
-1. Audit current `HomeScreen` rendering paths for full-screen redraw triggers versus live-update-only
-   changes.
-2. Add explicit home-state classification for live, powered-off, unavailable, and setup-required
-   conditions.
+1. Audit current `HomeScreen` rendering paths for full-screen redraw triggers versus live-update-only changes.
+2. Add explicit home-state classification for live, powered-off, unavailable, and setup-required conditions.
 3. Preserve Settings access from both powered-off and unavailable receiver states.
 4. Add one-decimal home-screen formatting for live volume presentation.
 5. Introduce home-screen animation state that tracks displayed versus target volume.
 6. Animate the gauge and numeric value with one shared calm motion treatment and smooth retargeting.
-7. Split home-screen redraw behavior so animation updates repaint only dirty regions while major state
-   changes still redraw the full layout.
+7. Split home-screen redraw behavior so animation updates repaint only dirty regions while major state changes still redraw the full layout.
 8. Update durable docs for home-screen motion and non-live receiver-state behavior.
 9. Complete static validation and hardware visual verification.
 
@@ -42,8 +39,7 @@ pre-commit run --all-files
 git diff --check
 ```
 
-If the PlatformIO environment is unavailable locally, record that limitation and run the remaining
-checks.
+If the PlatformIO environment is unavailable locally, record that limitation and run the remaining checks.
 
 Hardware visual verification:
 
@@ -52,12 +48,9 @@ Hardware visual verification:
 3. Confirm animation slows into the final value rather than stopping abruptly.
 4. Trigger multiple quick volume changes and confirm motion retargets smoothly to the newest value.
 5. Watch the display during animation and confirm unaffected areas do not flash or visibly repaint.
-6. Verify a powered-off receiver shows `Receiver off`, does not show stale live volume, and still
-   keeps Settings accessible.
-7. Verify an unavailable receiver shows a distinct unavailable state and still keeps Settings
-   accessible.
-8. Verify the home screen returns to live volume presentation automatically when active receiver
-   status resumes.
+6. Verify a powered-off receiver shows `Receiver off`, does not show stale live volume, and still keeps Settings accessible.
+7. Verify an unavailable receiver shows a distinct unavailable state and still keeps Settings accessible.
+8. Verify the home screen returns to live volume presentation automatically when active receiver status resumes.
 
 ## Expected Artifacts
 

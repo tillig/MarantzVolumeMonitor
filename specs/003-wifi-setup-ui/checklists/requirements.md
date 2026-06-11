@@ -1,8 +1,6 @@
 # Specification Quality Checklist: WiFi Setup UI
 
-**Purpose**: Validate specification completeness and quality before proceeding to planning
-**Created**: 2026-06-02
-**Feature**: [spec.md](../spec.md)
+**Purpose**: Validate specification completeness and quality before proceeding to planning **Created**: 2026-06-02 **Feature**: [spec.md](../spec.md)
 
 ## Content Quality
 

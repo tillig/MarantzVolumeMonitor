@@ -1,8 +1,6 @@
 # Specification Quality Checklist: Receiver Off Screen Sleep
 
-**Purpose**: Validate specification completeness and quality before proceeding to planning
-**Created**: 2026-06-05
-**Feature**: [spec.md](../spec.md)
+**Purpose**: Validate specification completeness and quality before proceeding to planning **Created**: 2026-06-05 **Feature**: [spec.md](../spec.md)
 
 ## Content Quality
 
@@ -31,5 +29,4 @@
 
 ## Notes
 
-- Validation pass 3 completed on 2026-06-05 after separating hardware backlight control from the
-  receiver-off screen sleep behavior. No unresolved clarification markers or quality issues remain.
+- Validation pass 3 completed on 2026-06-05 after separating hardware backlight control from the receiver-off screen sleep behavior. No unresolved clarification markers or quality issues remain.

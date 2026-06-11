@@ -99,8 +99,7 @@ Given that feature description, do this:
        "feature_directory": "<resolved feature dir>"
      }
      ```
-     Write the actual resolved directory path value (for example, `specs/003-user-auth`), not the literal string `SPECIFY_FEATURE_DIRECTORY`.
-     This allows downstream commands (`/speckit-plan`, `/speckit-tasks`, etc.) to locate the feature directory without relying on git branch name conventions.
+     Write the actual resolved directory path value (for example, `specs/003-user-auth`), not the literal string `SPECIFY_FEATURE_DIRECTORY`. This allows downstream commands (`/speckit-plan`, `/speckit-tasks`, etc.) to locate the feature directory without relying on git branch name conventions.
 
    **IMPORTANT**:
    - You must only create one feature per `/speckit-specify` invocation
@@ -112,10 +111,8 @@ Given that feature description, do this:
 5. **IF EXISTS**: Load `.specify/memory/constitution.md` for project principles and governance constraints.
 
 6. Follow this execution flow:
-    1. Parse user description from arguments
-       If empty: ERROR "No feature description provided"
-    2. Extract key concepts from description
-       Identify: actors, actions, data, constraints
+    1. Parse user description from arguments. If empty: ERROR "No feature description provided"
+    2. Extract key concepts from description. Identify: actors, actions, data, constraints
     3. For unclear aspects:
        - Make informed guesses based on context and industry standards
        - Only mark with [NEEDS CLARIFICATION: specific question] if:
@@ -124,15 +121,9 @@ Given that feature description, do this:
          - No reasonable default exists
        - **LIMIT: Maximum 3 [NEEDS CLARIFICATION] markers total**
        - Prioritize clarifications by impact: scope > security/privacy > user experience > technical details
-    4. Fill User Scenarios & Testing section
-       If no clear user flow: ERROR "Cannot determine user scenarios"
-    5. Generate Functional Requirements
-       Each requirement must be testable
-       Use reasonable defaults for unspecified details (document assumptions in Assumptions section)
-    6. Define Success Criteria
-       Create measurable, technology-agnostic outcomes
-       Include both quantitative metrics (time, performance, volume) and qualitative measures (user satisfaction, task completion)
-       Each criterion must be verifiable without implementation details
+    4. Fill User Scenarios and Testing section. If no clear user flow: ERROR "Cannot determine user scenarios"
+    5. Generate Functional Requirements. Each requirement must be testable. Use reasonable defaults for unspecified details (document assumptions in Assumptions section)
+    6. Define Success Criteria. Create measurable, technology-agnostic outcomes. Include both quantitative metrics (time, performance, volume) and qualitative measures (user satisfaction, task completion). Each criterion must be verifiable without implementation details
     7. Identify Key Entities (if data involved)
     8. Return: SUCCESS (spec ready for planning)
 

@@ -1,7 +1,9 @@
 # Specification Quality Checklist: Receiver Off Hardware Handling
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
+
 **Created**: 2026-06-05
+
 **Feature**: [spec.md](../spec.md)
 
 ## Content Quality
@@ -31,7 +33,5 @@
 
 ## Notes
 
-- Validation pass 1: All checklist items pass. The specification has no clarification markers and is
-  ready for `/speckit-plan`.
-- Validation pass 2: Added explicit hardware documentation deliverables; all checklist items still
-  pass with no clarification markers.
+- Validation pass 1: All checklist items pass. The specification has no clarification markers and is ready for `/speckit-plan`.
+- Validation pass 2: Added explicit hardware documentation deliverables; all checklist items still pass with no clarification markers.

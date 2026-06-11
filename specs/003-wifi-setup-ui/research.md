@@ -6,7 +6,7 @@
 - **Rationale**: While libraries like `TFT_eSPI_Widgets` exist, they add heavy dependencies and might not align with our Dark Mode #101010 theme. A custom implementation gives us full control over the 40x40px touch targets required by SC-002.
 - **Alternatives considered**: `lvgl` (Too complex for this stage), standard Arduino `Serial` input (Violates Constitution V - Intuitive On-Device Setup).
 
-## WiFi Scanning & Signal Strength
+## WiFi Scanning and Signal Strength
 
 - **Decision**: Use `WiFi.scanNetworks()` in non-blocking mode.
 - **Rationale**: `WiFi.scanNetworks(true)` allows the UI to remain responsive (animating a "Scanning..." spinner) while the radio works. RSSI will be mapped:

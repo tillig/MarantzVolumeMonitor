@@ -10,16 +10,14 @@ Represents one current on-device screen or major screen region that participates
 - `titleRole`: Typography role used for the screen title, if present.
 - `primaryContentRole`: The dominant content role for the screen.
 - `componentPatterns`: Ordered list of component patterns used on the surface.
-- `stateTreatments`: States the surface can present, such as loading, empty, success, warning, error,
-  inactive, or unavailable.
+- `stateTreatments`: States the surface can present, such as loading, empty, success, warning, error, inactive, or unavailable.
 - `documentedExceptions`: Any design exceptions approved for the surface.
 
 ### UISurface Validation Rules
 
 - Every current screen in `src/ui/Screens` must have an entry in the implementation audit.
 - A screen may diverge from the shared catalog only through a documented design exception.
-- The home screen must preserve volume, source, listening mode, and audio family as the dominant
-  visual hierarchy.
+- The home screen must preserve volume, source, listening mode, and audio family as the dominant visual hierarchy.
 
 ## ComponentPattern
 
@@ -27,8 +25,7 @@ Represents one reusable Material-compatible control or content treatment.
 
 ### ComponentPattern Fields
 
-- `id`: Stable identifier, such as `standard-action-button`, `keyboard-icon-button`,
-  `selection-list-row`, or `searching-screen`.
+- `id`: Stable identifier, such as `standard-action-button`, `keyboard-icon-button`, `selection-list-row`, or `searching-screen`.
 - `purpose`: User-facing reason the pattern exists.
 - `geometry`: Shape, corner radius, minimum size, and alignment rules.
 - `typography`: Text roles and font usage.
@@ -40,8 +37,7 @@ Represents one reusable Material-compatible control or content treatment.
 
 - Equivalent actions must reference the same component pattern across equivalent contexts.
 - Component text and icons must fit without overlapping neighboring content.
-- Component patterns must use existing UI-layer colors unless implementation explicitly documents a
-  new color role in `docs/ui-reference.md`.
+- Component patterns must use existing UI-layer colors unless implementation explicitly documents a new color role in `docs/ui-reference.md`.
 
 ## ButtonVariant
 
@@ -59,10 +55,8 @@ Represents a specific button treatment.
 
 ### ButtonVariant Validation Rules
 
-- OK, Cancel, Save, Retry, Back, Confirm, Manual, Rescan, and Discover use
-  `standard-icon-text` outside documented compact contexts.
-- Keyboard OK and Cancel may use `keyboard-icon-only`, but must share shape, size, baseline, center,
-  spacing, and icon style.
+- OK, Cancel, Save, Retry, Back, Confirm, Manual, Rescan, and Discover use `standard-icon-text` outside documented compact contexts.
+- Keyboard OK and Cancel may use `keyboard-icon-only`, but must share shape, size, baseline, center, spacing, and icon style.
 - Text-only buttons require a documented exception.
 
 ## SelectionListPattern
@@ -111,8 +105,7 @@ Represents a reusable visual treatment for a UI state.
 
 ### StateTreatment Fields
 
-- `id`: State identifier such as `normal`, `pressed`, `selected`, `disabled`, `loading`, `success`,
-  `warning`, `error`, `inactive`, or `unavailable`.
+- `id`: State identifier such as `normal`, `pressed`, `selected`, `disabled`, `loading`, `success`, `warning`, `error`, `inactive`, or `unavailable`.
 - `colorRole`: Approved foreground/background color role.
 - `iconRule`: Required or optional icon treatment.
 - `textRule`: Required or optional text treatment.
@@ -138,7 +131,6 @@ Represents the durable style catalog added to `docs/ui-reference.md`.
 
 ### DocumentationCatalog Validation Rules
 
-- The catalog must cover buttons, lists, searching screens, typography, spacing, icons, state
-  treatments, and exceptions.
+- The catalog must cover buttons, lists, searching screens, typography, spacing, icons, state treatments, and exceptions.
 - The catalog must identify icon-only keyboard controls as compact-context exceptions.
 - The catalog must remain durable guidance outside the feature-specific artifacts.

@@ -8,7 +8,7 @@
 
 **Input**: User request for a "Hello World" to verify ESP32 + TFT/SPI + PlatformIO.
 
-## User Scenarios & Testing
+## User Scenarios and Testing
 
 ### User Story 1 - Verify TFT Display (Priority: P1)
 

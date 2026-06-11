@@ -16,16 +16,14 @@ Review `docs/hardware.md` and confirm it includes:
 
 1. Canonical circuit with Pololu item `2810`.
 2. BOM with quantities, part identifiers, links, and equivalent minimum ratings.
-3. Connection table for USB input, ESP32 `5V`/`VIN`, ground, TFT `VCC`, TFT `LED/BL`, ESP32 GPIO13,
-   and Pololu `VIN`/`VOUT`/`ON`/`GND` pins.
+3. Connection table for USB input, ESP32 `5V`/`VIN`, ground, TFT `VCC`, TFT `LED/BL`, ESP32 GPIO13, and Pololu `VIN`/`VOUT`/`ON`/`GND` pins.
 4. Warning not to drive backlight current directly from ESP32 GPIO.
 5. Warning not to switch TFT `VCC`.
 6. Software-only fallback description for unmodified hardware.
 7. Last-resort display-module modification limits.
 8. 2N7000FS-ND / onsemi 2N7000 documented as evaluated but rejected for the planned switch.
 9. Validation steps matching every documented connection.
-10. Explicit instruction that USB power enters the ESP32 and TFT/touch plus switch-load power comes
-    from ESP32 power pins, not a separate direct external supply.
+10. Explicit instruction that USB power enters the ESP32 and TFT/touch plus switch-load power comes from ESP32 power pins, not a separate direct external supply.
 11. Pass/fail current-budget check for the ESP32-fed display/touch and switch-load power path.
 
 ## Hardware Verification Matrix
@@ -41,14 +39,12 @@ Verify on the 480x320 touchscreen with a saved receiver target.
 5. Confirm receiver-off flow still shows `Receiver off`, then software-blanks after 3 seconds.
 6. Confirm touch wakes the blank state.
 7. Confirm active receiver status restores live display.
-8. Restart the monitor while the receiver is already off and confirm software blanking, touch wake,
-   and Settings access remain recoverable.
+8. Restart the monitor while the receiver is already off and confirm software blanking, touch wake, and Settings access remain recoverable.
 
 ### Hardware-Capable Wiring
 
 1. Inspect wiring with power disconnected.
-2. Confirm USB power enters through the ESP32 and there is no separate direct external supply wired
-   to TFT/touch hardware or the Pololu `VIN` pads.
+2. Confirm USB power enters through the ESP32 and there is no separate direct external supply wired to TFT/touch hardware or the Pololu `VIN` pads.
 3. Confirm TFT `VCC` is still connected to ESP32 `5V`/`VIN` and not routed through the switch.
 4. Confirm a Pololu `VIN` pad is connected to ESP32 `5V`/`VIN`.
 5. Confirm TFT `LED/BL` is routed through a Pololu `VOUT` pad.
@@ -62,10 +58,8 @@ Verify on the 480x320 touchscreen with a saved receiver target.
 13. Tap the dark display and confirm the backlight turns on and wakes to the current visible state.
 14. Confirm the wake tap does not also open Settings.
 15. While blanked, turn the receiver active and confirm live volume returns without reboot.
-16. While blanked, make receiver-off confirmation unavailable, then tap the dark display and confirm
-    the monitor shows the latest current visible state rather than assuming the receiver is still off.
-17. Restart the monitor after receiver-off hardware display-off and confirm it remains recoverable
-    without a forced power disconnect.
+16. While blanked, make receiver-off confirmation unavailable, then tap the dark display and confirm the monitor shows the latest current visible state rather than assuming the receiver is still off.
+17. Restart the monitor after receiver-off hardware display-off and confirm it remains recoverable without a forced power disconnect.
 18. Open Settings while receiver is off and confirm Settings remains visible for at least 60 seconds.
 
 ## Pass Criteria
@@ -75,7 +69,5 @@ Verify on the 480x320 touchscreen with a saved receiver target.
 - Backlight on/off transitions occur within 0.5 seconds of receiver-off display state transitions.
 - Touch wake and receiver polling continue while the backlight is off.
 - Settings and settings-launched setup screens remain visible while active.
-- Hardware-capable and software-only installations both remain recoverable without forced power
-  disconnect.
-- Hardware-capable validation preserves the single USB-to-ESP32 power entry and ESP32-fed display,
-  touch, and switch-load power path.
+- Hardware-capable and software-only installations both remain recoverable without forced power disconnect.
+- Hardware-capable validation preserves the single USB-to-ESP32 power entry and ESP32-fed display, touch, and switch-load power path.

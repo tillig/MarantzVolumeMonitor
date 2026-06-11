@@ -4,17 +4,13 @@
 
 **Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/, quickstart.md
 
-**Tests**: Automated test tasks are not included because the specification does not request TDD or
-automated tests for this embedded UI feature. Static validation and hardware visual verification tasks
-are included in the final phase.
+**Tests**: Automated test tasks are not included because the specification does not request TDD or automated tests for this embedded UI feature. Static validation and hardware visual verification tasks are included in the final phase.
 
-**Organization**: Tasks are grouped by user story to enable independent implementation and testing of
-each story.
+**Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
 ## Format: `[ID] [P?] [Story] Description`
 
-- **[P]**: Can run in parallel with other marked tasks in the same phase when assigned to different
-  files.
+- **[P]**: Can run in parallel with other marked tasks in the same phase when assigned to different files.
 - **[Story]**: Maps task to a user story from `spec.md`.
 - Every task includes an exact file path.
 
@@ -32,8 +28,7 @@ each story.
 
 ## Phase 2: Foundational (Blocking Prerequisites)
 
-**Purpose**: Define shared roles, geometry, state primitives, and drawing helpers before screen work
-begins.
+**Purpose**: Define shared roles, geometry, state primitives, and drawing helpers before screen work begins.
 
 **Critical**: No user story work should begin until this phase is complete.
 
@@ -49,19 +44,15 @@ begins.
 - [X] T015 [P] Document typography roles, spacing, geometry, and color roles in `docs/ui-reference.md`
 - [X] T016 [P] Document standard button, keyboard button, list row, searching screen, and state treatment patterns in `docs/ui-reference.md`
 
-**Checkpoint**: Foundation ready. User story work can now call shared style primitives instead of
-hand-rolling repeated styling.
+**Checkpoint**: Foundation ready. User story work can now call shared style primitives instead of hand-rolling repeated styling.
 
 ---
 
 ## Phase 3: User Story 1 - Recognize the Interface as a Coherent Appliance (Priority: P1) MVP
 
-**Goal**: Every current on-device screen shares coherent spacing, typography hierarchy, icon treatment,
-component states, and touch affordances while preserving home-screen readability from 15 feet.
+**Goal**: Every current on-device screen shares coherent spacing, typography hierarchy, icon treatment, component states, and touch affordances while preserving home-screen readability from 15 feet.
 
-**Independent Test**: Review every current on-device screen as a complete UI set. Confirm screens
-share consistent visual hierarchy, the home screen remains volume-first, and project appliance
-constraints override generic Material conventions where needed.
+**Independent Test**: Review every current on-device screen as a complete UI set. Confirm screens share consistent visual hierarchy, the home screen remains volume-first, and project appliance constraints override generic Material conventions where needed.
 
 ### Implementation for User Story 1
 
@@ -76,19 +67,15 @@ constraints override generic Material conventions where needed.
 - [X] T025 [US1] Apply shared keyboard title and input field styling in `src/ui/Screens/KeyboardScreen.cpp`
 - [X] T026 [US1] Record screen-by-screen pattern coverage and any justified exceptions in `docs/ui-reference.md`
 
-**Checkpoint**: User Story 1 is independently testable by reviewing all screens for coherent style
-and confirming the home screen remains readable from 15 feet.
+**Checkpoint**: User Story 1 is independently testable by reviewing all screens for coherent style and confirming the home screen remains readable from 15 feet.
 
 ---
 
 ## Phase 4: User Story 2 - Complete Touch Setup with Material Controls (Priority: P1)
 
-**Goal**: Wi-Fi and receiver setup controls, lists, dialogs/statuses, and keyboard controls use
-consistent Material-compatible behavior and presentation.
+**Goal**: Wi-Fi and receiver setup controls, lists, dialogs/statuses, and keyboard controls use consistent Material-compatible behavior and presentation.
 
-**Independent Test**: Walk through Wi-Fi setup and receiver setup from Settings using only the
-touchscreen. Confirm all required actions use documented controls, equivalent actions match across
-screens, and keyboard OK/Cancel are aligned.
+**Independent Test**: Walk through Wi-Fi setup and receiver setup from Settings using only the touchscreen. Confirm all required actions use documented controls, equivalent actions match across screens, and keyboard OK/Cancel are aligned.
 
 ### Implementation for User Story 2
 
@@ -104,19 +91,15 @@ screens, and keyboard OK/Cancel are aligned.
 - [X] T036 [US2] Update keyboard key layout constants to use shared spacing and touch target values in `src/ui/Screens/KeyboardScreen.cpp`
 - [X] T037 [US2] Document setup button variants, list rows, keyboard compact exceptions, and long-name behavior in `docs/ui-reference.md`
 
-**Checkpoint**: User Story 2 is independently testable by completing Wi-Fi and receiver setup on the
-touchscreen and comparing equivalent buttons, list rows, and keyboard controls.
+**Checkpoint**: User Story 2 is independently testable by completing Wi-Fi and receiver setup on the touchscreen and comparing equivalent buttons, list rows, and keyboard controls.
 
 ---
 
 ## Phase 5: User Story 3 - Understand State, Feedback, and Errors (Priority: P2)
 
-**Goal**: Loading, searching, empty, success, warning, failure, and unavailable states use consistent
-feedback and recovery patterns without distracting from passive appliance behavior.
+**Goal**: Loading, searching, empty, success, warning, failure, and unavailable states use consistent feedback and recovery patterns without distracting from passive appliance behavior.
 
-**Independent Test**: Exercise normal, loading, empty, success, warning, and failure states for Wi-Fi
-and receiver setup. Confirm every state has matching visual treatment, clear text, and an appropriate
-next action where recovery is possible.
+**Independent Test**: Exercise normal, loading, empty, success, warning, and failure states for Wi-Fi and receiver setup. Confirm every state has matching visual treatment, clear text, and an appropriate next action where recovery is possible.
 
 ### Implementation for User Story 3
 
@@ -132,18 +115,15 @@ next action where recovery is possible.
 - [X] T047 [US3] Apply shared empty and unavailable state treatments to receiver discovery results in `src/ui/Screens/ReceiverListScreen.cpp`
 - [X] T048 [US3] Document searching, loading, success, warning, failure, unavailable, and recovery state rules in `docs/ui-reference.md`
 
-**Checkpoint**: User Story 3 is independently testable by forcing searching, loading, empty,
-success, warning, failure, and unavailable states in setup flows.
+**Checkpoint**: User Story 3 is independently testable by forcing searching, loading, empty, success, warning, failure, and unavailable states in setup flows.
 
 ---
 
 ## Phase 6: User Story 4 - Preserve Contributor Design Consistency (Priority: P3)
 
-**Goal**: Contributors can use durable Material-compatible guidance to extend the UI without
-reintroducing one-off screen styles.
+**Goal**: Contributors can use durable Material-compatible guidance to extend the UI without reintroducing one-off screen styles.
 
-**Independent Test**: Review `docs/ui-reference.md` and confirm a contributor can identify approved
-component styles, state treatments, screen patterns, and exceptions for future work.
+**Independent Test**: Review `docs/ui-reference.md` and confirm a contributor can identify approved component styles, state treatments, screen patterns, and exceptions for future work.
 
 ### Implementation for User Story 4
 
@@ -155,12 +135,11 @@ component styles, state treatments, screen patterns, and exceptions for future w
 - [X] T054 [US4] Cross-check `docs/ui-reference.md` against `specs/006-material-design/contracts/screen_application.md`
 - [X] T055 [US4] Update `CONTRIBUTING.md` only if implementation adds validation commands beyond current pre-commit, PlatformIO, and diff checks in `CONTRIBUTING.md`
 
-**Checkpoint**: User Story 4 is independently testable by using `docs/ui-reference.md` to choose the
-correct pattern for common future controls within 2 minutes.
+**Checkpoint**: User Story 4 is independently testable by using `docs/ui-reference.md` to choose the correct pattern for common future controls within 2 minutes.
 
 ---
 
-## Phase 7: Polish & Cross-Cutting Concerns
+## Phase 7: Polish and Cross-Cutting Concerns
 
 **Purpose**: Validate the full feature and clean up cross-story issues.
 
@@ -176,7 +155,7 @@ correct pattern for common future controls within 2 minutes.
 
 ---
 
-## Dependencies & Execution Order
+## Dependencies and Execution Order
 
 ### Phase Dependencies
 
@@ -190,8 +169,7 @@ correct pattern for common future controls within 2 minutes.
 - **User Story 1 (P1)**: Can start after Foundation; no dependency on other stories.
 - **User Story 2 (P1)**: Can start after Foundation; no dependency on other stories.
 - **User Story 3 (P2)**: Can start after Foundation; depends on shared helpers but not on US1/US2.
-- **User Story 4 (P3)**: Can start after Foundation but should finish after screen behavior and
-  exceptions are known.
+- **User Story 4 (P3)**: Can start after Foundation but should finish after screen behavior and exceptions are known.
 
 ### Within Each User Story
 
@@ -204,8 +182,7 @@ correct pattern for common future controls within 2 minutes.
 
 - T004 and T005 can run in parallel with style file setup after T001-T002.
 - T015 and T016 can run in parallel after shared helper decisions are encoded.
-- US1 screen migration tasks T017-T025 touch separate screen files and can run in parallel if helper
-  contracts are stable.
+- US1 screen migration tasks T017-T025 touch separate screen files and can run in parallel if helper contracts are stable.
 - US2 button/list/keyboard tasks can run in parallel by screen file after T010-T012 complete.
 - US3 Wi-Fi and receiver searching tasks can run in parallel by screen pair after T013 is complete.
 - Final validation tasks T056-T058 can run in parallel.
@@ -263,8 +240,7 @@ Task: "Cross-check docs/ui-reference.md against specs/006-material-design/contra
 1. Complete Phase 1: Setup.
 2. Complete Phase 2: Foundational.
 3. Complete Phase 3: User Story 1.
-4. Stop and validate all screens for coherent Material-compatible styling and home-screen
-   readability.
+4. Stop and validate all screens for coherent Material-compatible styling and home-screen readability.
 
 ### Incremental Delivery
 
