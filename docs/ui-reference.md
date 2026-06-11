@@ -28,9 +28,9 @@ The main UI is optimized for a 15-foot viewing distance. It uses a high-contrast
 ### Volume Number And Gauge
 
 - Center point: `(240, 140)`
-- Volume number: white, Font 8, centered near `Y=125`
-- Live volume always shows one decimal place.
-- Volume caption: dimmed gray, Font 2, centered near `Y=185`
+- Volume number: white, Font 8 with Font 7 fallback for wider values, centered near `Y=139`
+- Live volume always shows one decimal place on the normalized home scale of `0.0` to `100.0` (`receiver dB + 80`).
+- Volume caption: dimmed gray, Font 2, centered near `Y=72`
 - Gauge arc: outer radius 125 px, inner radius 109 px, 240-degree span
 - Gauge colors: green/yellow/red fill over `#303030` background
 - These home fonts are intentionally larger than setup-screen roles so the main status remains readable from 15 feet.
@@ -40,11 +40,11 @@ The main UI is optimized for a 15-foot viewing distance. It uses a high-contrast
 
 - A small bitmap settings icon in the top-right corner opens Settings from the normal Home Screen.
 - The same settings icon remains available from powered-off and receiver-unavailable home states so receiver setup can be changed without rebooting.
-- Confirmed powered-off receiver state first shows `Receiver off`, then the Home Screen software- blanks after 3 seconds so no idle status remains visible in the room.
+- Confirmed powered-off receiver state first shows `Receiver off`, then the Home Screen blanks after 3 seconds so no idle status remains visible in the room.
 - With the receiver-off backlight circuit documented in `docs/hardware.md` wired and validated, the same 3-second transition also turns off the TFT `LED/BL` backlight. TFT logic, touch, receiver polling, and Settings recovery remain active.
 - While the Home Screen is blank because receiver-off was confirmed, touch wake remains active and the first tap wakes only. A separate visible tap on the settings icon is still required to open Settings.
 - A non-Settings tap on visible `Receiver off` restarts the 3-second timer and keeps the message visible briefly.
-- Settings exposes touch calibration, Wi-Fi setup, and receiver setup.
+- Settings exposes `Current Settings`, Wi-Fi setup, receiver setup, and touch calibration.
 - Flows launched from Settings should return to Settings when complete; the Settings OK button returns to the Home Screen.
 - Returning Home while the receiver is still confirmed off shows `Receiver off` again and restarts the 3-second blanking timer. Settings and settings-launched setup flows stay visible while active.
 - Setup/boot states expose a bottom-right `Calibrate` maintenance action using the shared bottom action button size, position, and icon-with-text treatment.
@@ -53,8 +53,8 @@ The main UI is optimized for a 15-foot viewing distance. It uses a high-contrast
 
 - Typography: white, Font 4
 - Vertical position: centered near `Y=255`
-- Source: left-aligned near `X=40`
-- Mode: right-aligned near `X=440`
+- Source: left-aligned near `X=28`
+- Mode: right-aligned with the text edge near `X=452`
 - Show raw receiver values without labels such as `SRC:`
 
 ### Audio Family Icons
@@ -100,7 +100,7 @@ The firmware build uses checked-in generated masks and does not decode SVG or PN
 - The screen shows each section as a compact one-line or two-line summary instead of stacked label/value rows so saved and live status remain readable on the 480x320 display.
 - The screen shows saved Wi-Fi SSID, current monitor IP address, Wi-Fi signal strength, saved receiver IP address, receiver power state, and receiver name or type when the network layer can resolve it.
 - Wi-Fi signal uses the same 1-to-3 bar graphic language as the Wi-Fi selection screen and shows numeric RSSI when available.
-- Missing saved values show `setup required`. Live values that cannot be read show `unavailable`. Powered-off receiver state remains distinct from general receiver unavailability.
+- Missing saved values show `Unconfigured`. Saved Wi-Fi without a live link shows `Disconnected`. A saved receiver without resolved UPnP identity falls back to `Configured receiver`. Live values that cannot be read show `Unavailable`. Powered-off receiver state remains distinct from general receiver unavailability by showing `Off` instead of `Unavailable`.
 - The screen refreshes current Wi-Fi and receiver status while it remains visible, using the same restrained polling rhythm as the rest of the appliance UI.
 - Live refreshes redraw only the card body content so the screen does not visibly flash during normal status updates.
 
