@@ -1,5 +1,6 @@
 #include "SettingsScreen.h"
 #include "CalibrationScreen.h"
+#include "CurrentSettingsScreen.h"
 #include "HomeScreen.h"
 #include "NetworkListScreen.h"
 #include "ReceiverListScreen.h"
@@ -7,39 +8,33 @@
 #include "../MaterialStyle.h"
 #include "../assets/IconBitmaps.h"
 
+namespace {
+
+constexpr int SettingsListTopY = 68;
+
+int entryY(int indexOnPage) {
+    return SettingsListTopY + (indexOnPage * (MaterialStyle::ListRowHeight + MaterialStyle::RowGap));
+}
+
+} // namespace
+
 void SettingsScreen::draw() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
     tft.fillScreen(DisplayManager::COLOR_BACKGROUND);
 
     MaterialStyle::drawText(tft, "Settings", 20, 20, MaterialStyle::TextRole::ScreenTitle, TL_DATUM);
 
-    MaterialStyle::drawListRow(tft, {
-        20, 68, 440, MaterialStyle::ListRowHeight,
-        &Icons::WIFI,
-        0,
-        "Wi-Fi Setup",
-        "Choose network and password",
-        ">",
-        MaterialStyle::ComponentState::Normal
-    });
-    MaterialStyle::drawListRow(tft, {
-        20, 128, 440, MaterialStyle::ListRowHeight,
-        &Icons::RECEIVER,
-        0,
-        "Receiver Setup",
-        "Discover or enter receiver",
-        ">",
-        MaterialStyle::ComponentState::Normal
-    });
-    MaterialStyle::drawListRow(tft, {
-        20, 188, 440, MaterialStyle::ListRowHeight,
-        &Icons::TOUCH_CALIBRATION,
-        0,
-        "Touch Calibration",
-        "Capture raw touch samples",
-        ">",
-        MaterialStyle::ComponentState::Normal
-    });
+    int startIndex = pageStartIndex();
+    for (int i = 0; i < ItemsPerPage; ++i) {
+        int entryIndex = startIndex + i;
+        if (entryIndex >= EntryCount) {
+            break;
+        }
+        drawEntry(tft, entryIndex, entryY(i));
+    }
+
+    MaterialStyle::drawPagination(tft, _pageIndex, totalPages(), _pageIndex > 0,
+                                  _pageIndex < totalPages() - 1);
 
     MaterialStyle::drawStandardButton(tft, 340, MaterialStyle::BottomActionY, 116, MaterialStyle::ButtonHeight,
                                       Icons::KEYBOARD_OK, "OK",
@@ -51,14 +46,123 @@ void SettingsScreen::update() {
 }
 
 void SettingsScreen::handleTouch(TS_Point p) {
-    if (p.x >= 340 && p.x <= 456 && p.y >= MaterialStyle::BottomActionY &&
-        p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight) {
+    if (isOkPressed(p)) {
         ScreenManager::getInstance().setScreen(new HomeScreen());
-    } else if (p.y >= 68 && p.y <= 114) {
-        ScreenManager::getInstance().setScreen(new NetworkListScreen(ScreenReturnTarget::Settings));
-    } else if (p.y >= 128 && p.y <= 174) {
-        ScreenManager::getInstance().setScreen(new ReceiverListScreen(ScreenReturnTarget::Settings));
-    } else if (p.y >= 188 && p.y <= 234) {
-        ScreenManager::getInstance().setScreen(new CalibrationScreen(ScreenReturnTarget::Settings));
+        return;
     }
+
+    bool goPrev = false;
+    bool goNext = false;
+    if (isPaginationPressed(p, goPrev, goNext)) {
+        if (goPrev) {
+            _pageIndex--;
+            draw();
+        } else if (goNext) {
+            _pageIndex++;
+            draw();
+        }
+        return;
+    }
+
+    int entryIndex = touchedEntryIndex(p);
+    if (entryIndex >= 0) {
+        openEntry(entryIndex);
+    }
+}
+
+void SettingsScreen::drawEntry(TFT_eSPI& tft, int entryIndex, int y) {
+    const Icons::IconBitmap* icon = &Icons::SETTINGS;
+    const char* primary = "Current Settings";
+    const char* secondary = "View Wi-Fi and receiver state";
+
+    if (entryIndex == 1) {
+        icon = &Icons::WIFI;
+        primary = "Wi-Fi Setup";
+        secondary = "Choose network and password";
+    } else if (entryIndex == 2) {
+        icon = &Icons::RECEIVER;
+        primary = "Receiver Setup";
+        secondary = "Discover or enter receiver";
+    } else if (entryIndex == 3) {
+        icon = &Icons::TOUCH_CALIBRATION;
+        primary = "Touch Calibration";
+        secondary = "Capture raw touch samples";
+    }
+
+    MaterialStyle::drawListRow(tft, {
+        20, y, 440, MaterialStyle::ListRowHeight,
+        icon,
+        0,
+        primary,
+        secondary,
+        ">",
+        MaterialStyle::ComponentState::Normal
+    });
+}
+
+void SettingsScreen::openEntry(int entryIndex) {
+    switch (entryIndex) {
+        case 0:
+            ScreenManager::getInstance().setScreen(new CurrentSettingsScreen());
+            return;
+        case 1:
+            ScreenManager::getInstance().setScreen(new NetworkListScreen(ScreenReturnTarget::Settings));
+            return;
+        case 2:
+            ScreenManager::getInstance().setScreen(new ReceiverListScreen(ScreenReturnTarget::Settings));
+            return;
+        case 3:
+            ScreenManager::getInstance().setScreen(new CalibrationScreen(ScreenReturnTarget::Settings));
+            return;
+        default:
+            return;
+    }
+}
+
+int SettingsScreen::totalPages() const {
+    return (EntryCount + ItemsPerPage - 1) / ItemsPerPage;
+}
+
+int SettingsScreen::pageStartIndex() const {
+    return _pageIndex * ItemsPerPage;
+}
+
+bool SettingsScreen::isOkPressed(TS_Point p) const {
+    return p.x >= 340 && p.x <= 456 && p.y >= MaterialStyle::BottomActionY &&
+           p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight;
+}
+
+bool SettingsScreen::isPaginationPressed(TS_Point p, bool& goPrev, bool& goNext) const {
+    goPrev = false;
+    goNext = false;
+    if (totalPages() <= 1 || p.y < 230 || p.y > 262) {
+        return false;
+    }
+
+    if (p.x >= 20 && p.x <= 116 && _pageIndex > 0) {
+        goPrev = true;
+        return true;
+    }
+    if (p.x >= 364 && p.x <= 460 && _pageIndex < totalPages() - 1) {
+        goNext = true;
+        return true;
+    }
+    return false;
+}
+
+int SettingsScreen::touchedEntryIndex(TS_Point p) const {
+    int startIndex = pageStartIndex();
+    for (int i = 0; i < ItemsPerPage; ++i) {
+        int entryIndex = startIndex + i;
+        if (entryIndex >= EntryCount) {
+            break;
+        }
+
+        int y = entryY(i);
+        if (p.x >= 20 && p.x <= 460 && p.y >= y && p.y <= y + MaterialStyle::ListRowHeight) {
+            return entryIndex;
+        }
+    }
+
+    return -1;
 }

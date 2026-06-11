@@ -60,6 +60,26 @@ bool ReceiverDiscovery::isSearching() const {
     return _state == ReceiverDiscoveryState::Searching;
 }
 
+String ReceiverDiscovery::resolveReceiverIdentity(const String& ipAddress) {
+    if (!isValidIpv4(ipAddress)) {
+        return "";
+    }
+
+    const String locations[] = {
+        "http://" + ipAddress + ":8080/description.xml",
+        "http://" + ipAddress + "/description.xml",
+    };
+
+    for (const String& location : locations) {
+        String name = resolveDescriptionName(location);
+        if (name.length() > 0) {
+            return name;
+        }
+    }
+
+    return "";
+}
+
 bool ReceiverDiscovery::isValidIpv4(const String& value) {
     if (value.length() < 7 || value.length() > 15) {
         return false;

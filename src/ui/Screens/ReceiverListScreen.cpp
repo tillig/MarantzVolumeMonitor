@@ -31,7 +31,8 @@ void ReceiverListScreen::draw() {
         drawHeader(tft);
         for (size_t i = 0; i < candidates.size() && i < 3; ++i) {
             drawCandidateRow(tft, candidates[i], i,
-                             MaterialStyle::SetupListTopY + (int)i * 56);
+                             MaterialStyle::SetupListTopY +
+                                 (int)i * (MaterialStyle::ListRowHeight + MaterialStyle::RowGap));
         }
     }
 
@@ -135,8 +136,9 @@ int ReceiverListScreen::touchedCandidateIndex(TS_Point p) const {
     }
 
     for (int i = 0; i < 3; ++i) {
-        int y = MaterialStyle::SetupListTopY + i * 56;
-        if (p.y >= y && p.y <= y + 46) {
+        int y = MaterialStyle::SetupListTopY +
+                i * (MaterialStyle::ListRowHeight + MaterialStyle::RowGap);
+        if (p.y >= y && p.y <= y + MaterialStyle::ListRowHeight) {
             return i;
         }
     }

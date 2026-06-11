@@ -37,6 +37,20 @@ String WiFiManager::getIPAddress() {
     return WiFi.localIP().toString();
 }
 
+int32_t WiFiManager::getSignalStrength() {
+    return WiFi.RSSI();
+}
+
+uint8_t WiFiManager::signalLevelForRssi(int32_t rssi) {
+    if (rssi < -80) {
+        return 1;
+    }
+    if (rssi < -70) {
+        return 2;
+    }
+    return 3;
+}
+
 #include <map>
 
 std::vector<WiFiManager::NetworkInfo> WiFiManager::getScanResults() {

@@ -89,8 +89,20 @@ The firmware build uses checked-in generated masks and does not decode SVG or PN
 
 - Settings navigation rows use the same rounded selection-row treatment as setup selection lists.
 - Row labels remain visible, supporting text clarifies the destination, and touch targets remain at least 40 px high.
-- Settings order is Wi-Fi Setup, Receiver Setup, then Touch Calibration. Calibration is intentionally last because it is a maintenance/debug flow rather than a normal setup path.
+- Settings order is `Current Settings`, `Wi-Fi Setup`, `Receiver Setup`, then `Touch Calibration`. Calibration is intentionally last because it is a maintenance/debug flow rather than a normal setup path.
+- `Current Settings` opens a read-only overview screen for saved and live monitor state; it does not launch setup or editing directly.
+- If all settings destinations do not fit cleanly on one screen with the standard row treatment, Settings uses labeled `PREV` and `NEXT` pagination controls above the bottom `OK` action rather than switching to icon-only navigation.
 - Touch Calibration uses the shared `touch-calibration` crosshair icon in both the Settings row and the boot/setup action button.
+
+## Current Settings Screen
+
+- `Current Settings` is a read-only screen with separate `Wi-Fi` and `Receiver` sections plus one bottom `OK` action that returns to `Settings`.
+- The screen shows each section as a compact one-line or two-line summary instead of stacked label/value rows so saved and live status remain readable on the 480x320 display.
+- The screen shows saved Wi-Fi SSID, current monitor IP address, Wi-Fi signal strength, saved receiver IP address, receiver power state, and receiver name or type when the network layer can resolve it.
+- Wi-Fi signal uses the same 1-to-3 bar graphic language as the Wi-Fi selection screen and shows numeric RSSI when available.
+- Missing saved values show `setup required`. Live values that cannot be read show `unavailable`. Powered-off receiver state remains distinct from general receiver unavailability.
+- The screen refreshes current Wi-Fi and receiver status while it remains visible, using the same restrained polling rhythm as the rest of the appliance UI.
+- Live refreshes redraw only the card body content so the screen does not visibly flash during normal status updates.
 
 ## Keyboard Icons
 
@@ -167,7 +179,7 @@ Long primary values must be truncated to the available width with an ellipsis ra
 | Keyboard button radius | 6 px   | Compact keyboard and keypad controls.                          |
 | Selection row height   | 46 px  | Wi-Fi networks, receiver candidates, and future setup choices. |
 | Selection row radius   | 8 px   | Selection list rows.                                           |
-| Row gap                | 10 px  | Vertical space between repeated rows.                          |
+| Row gap                | 9 px   | Vertical space between repeated rows.                          |
 | Button gap             | 12 px  | Horizontal space between standard actions.                     |
 | Keyboard key gap       | 6 px   | Keyboard and keypad grid spacing.                              |
 | Icon-to-label gap      | 8 px   | Standard button icon and label spacing.                        |

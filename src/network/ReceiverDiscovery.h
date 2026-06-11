@@ -63,6 +63,7 @@ public:
     ReceiverDiscoveryState getState() const;
     const std::vector<ReceiverCandidate>& getCandidates() const;
     bool isSearching() const;
+    String resolveReceiverIdentity(const String& ipAddress);
     static bool isValidIpv4(const String& value);
 
 private:

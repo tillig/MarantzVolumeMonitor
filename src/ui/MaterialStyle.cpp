@@ -341,6 +341,60 @@ void drawStatusBlock(TFT_eSPI& tft, StatusKind kind, const String& title,
     }
 }
 
+void drawInfoCard(TFT_eSPI& tft, int x, int y, int w, int h,
+                  const Icons::IconBitmap& icon, const String& title) {
+    tft.fillRoundRect(x, y, w, h, ListRowRadius, DisplayManager::COLOR_PANEL);
+    tft.drawRoundRect(x, y, w, h, ListRowRadius, DisplayManager::COLOR_BAR_BG);
+    IconRenderer::drawCentered(tft, icon, x + 18, y + 16, DisplayManager::COLOR_TEXT_SECONDARY);
+    drawText(tft, title, x + 36, y + 6, TextRole::SectionLabel, TL_DATUM);
+}
+
+void drawStatusRow(TFT_eSPI& tft, const StatusRowSpec& spec) {
+    if (spec.wifiSignalLevel > 0) {
+        drawText(tft, spec.label, spec.x + 12, spec.y + 2, TextRole::CompactMetadata, TL_DATUM);
+        int metadataWidth = spec.metadata.length() > 0
+                                ? tft.textWidth(spec.metadata, fontFor(TextRole::Body))
+                                : 0;
+        int metadataRight = spec.x + spec.w - 12;
+        if (spec.metadata.length() > 0) {
+            tft.setTextDatum(MR_DATUM);
+            tft.setTextColor(textColorFor(TextRole::Body, spec.state), DisplayManager::COLOR_PANEL);
+            tft.drawString(spec.metadata, metadataRight, spec.y + spec.h / 2 + 2,
+                           fontFor(TextRole::Body));
+        }
+        int wifiCenterX = metadataRight - metadataWidth - 18;
+        drawWifiSignal(tft, wifiCenterX, spec.y + spec.h / 2 + 1, spec.wifiSignalLevel);
+    } else {
+        drawText(tft, spec.label, spec.x + 12, spec.y + 2, TextRole::CompactMetadata, TL_DATUM);
+        int labelWidth = tft.textWidth(spec.label, fontFor(TextRole::CompactMetadata));
+        int valueMaxWidth = spec.w - labelWidth - 36;
+        String value = truncateToWidth(tft, spec.value, valueMaxWidth, fontFor(TextRole::Body));
+        tft.setTextDatum(MR_DATUM);
+        tft.setTextColor(textColorFor(TextRole::Body, spec.state), DisplayManager::COLOR_PANEL);
+        tft.drawString(value, spec.x + spec.w - 12, spec.y + spec.h / 2 + 2,
+                       fontFor(TextRole::Body));
+    }
+
+    tft.drawFastHLine(spec.x + 12, spec.y + spec.h - 1, spec.w - 24, DisplayManager::COLOR_BAR_BG);
+}
+
+void drawPagination(TFT_eSPI& tft, int currentPage, int totalPages,
+                    bool showPrev, bool showNext, int y) {
+    if (totalPages <= 1) {
+        return;
+    }
+
+    String pageInfo = "Page " + String(currentPage + 1) + " of " + String(totalPages);
+    drawText(tft, pageInfo, ScreenWidth / 2, y + 16, TextRole::CompactMetadata, MC_DATUM);
+
+    if (showPrev) {
+        drawTextButton(tft, 20, y, 96, 32, "PREV");
+    }
+    if (showNext) {
+        drawTextButton(tft, 364, y, 96, 32, "NEXT");
+    }
+}
+
 void clearProgressBar(TFT_eSPI& tft, int x, int y, int w) {
     tft.fillRect(x - 2, y - 2, w + 4, 12, DisplayManager::COLOR_BACKGROUND);
 }

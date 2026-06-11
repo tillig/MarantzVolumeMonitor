@@ -36,7 +36,9 @@ Upon first boot, use the on-screen menus to:
 1. Connect to your Wi-Fi network.
 2. Select your Marantz receiver with auto-discovery or enter its IPv4 address manually.
 
-After setup, tap the small gear icon in the top-right corner of the Home Screen to reopen Settings. Settings provides touch calibration, Wi-Fi setup, and receiver setup. Use the Settings OK button to return to the Home Screen.
+After setup, tap the small gear icon in the top-right corner of the Home Screen to reopen Settings. Settings provides a read-only `Current Settings` overview, touch calibration, Wi-Fi setup, and receiver setup. Use the Settings OK button to return to the Home Screen.
+
+`Current Settings` shows the saved Wi-Fi SSID, current monitor IP address, current Wi-Fi signal strength, saved receiver IP address, current receiver power state, and receiver name or type when it can be resolved from the configured receiver. The screen uses compact read-only summaries inside `Wi-Fi` and `Receiver` cards and refreshes those summaries without repainting the whole screen.
 
 Successful Wi-Fi setup stores credentials in `config.json` on LittleFS. On later boots, the device attempts to reconnect automatically using the saved SSID and password.
 

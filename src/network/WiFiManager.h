@@ -16,6 +16,8 @@ public:
     bool connect(const String& ssid, const String& password);
     bool isConnected();
     String getIPAddress();
+    int32_t getSignalStrength();
+    static uint8_t signalLevelForRssi(int32_t rssi);
 
     struct NetworkInfo {
         String ssid;

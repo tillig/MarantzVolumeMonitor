@@ -126,12 +126,10 @@ void NetworkListScreen::drawList() {
         int y = MaterialStyle::SetupListTopY + (i * (MaterialStyle::ListRowHeight + MaterialStyle::RowGap));
 
         if (index < _networks.size()) {
-            int32_t rssi = _networks[index].rssi;
-            int signalLevel = rssi < -80 ? 1 : rssi < -70 ? 2 : 3;
             MaterialStyle::drawListRow(tft, {
                 20, y, 440, MaterialStyle::ListRowHeight,
                 nullptr,
-                signalLevel,
+                WiFiManager::signalLevelForRssi(_networks[index].rssi),
                 _networks[index].ssid,
                 "",
                 String(index + 1),

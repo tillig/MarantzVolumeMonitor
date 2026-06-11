@@ -26,7 +26,7 @@ constexpr int KeyboardButtonRadius = 6;
 constexpr int ListRowHeight = 46;
 constexpr int ListRowRadius = 8;
 constexpr int IconLabelGap = 8;
-constexpr int RowGap = 10;
+constexpr int RowGap = 9;
 constexpr int ButtonGap = 12;
 constexpr int KeyboardKeyGap = 6;
 constexpr int KeyboardKeyHeight = 40;
@@ -98,6 +98,18 @@ struct ListRowSpec {
     ComponentState state;
 };
 
+struct StatusRowSpec {
+    int x;
+    int y;
+    int w;
+    int h;
+    String label;
+    String value;
+    ComponentState state;
+    int wifiSignalLevel;
+    String metadata;
+};
+
 uint8_t fontFor(TextRole role);
 uint16_t textColorFor(TextRole role, ComponentState state = ComponentState::Normal);
 uint16_t surfaceColorFor(ComponentState state = ComponentState::Normal);
@@ -129,6 +141,11 @@ void drawSearchingState(TFT_eSPI& tft, const String& title, const String& messag
 void drawStatusBlock(TFT_eSPI& tft, StatusKind kind, const String& title,
                      const String& message, const Icons::IconBitmap& icon,
                      uint8_t progressFrame = 0);
+void drawInfoCard(TFT_eSPI& tft, int x, int y, int w, int h,
+                  const Icons::IconBitmap& icon, const String& title);
+void drawStatusRow(TFT_eSPI& tft, const StatusRowSpec& spec);
+void drawPagination(TFT_eSPI& tft, int currentPage, int totalPages,
+                    bool showPrev, bool showNext, int y = 230);
 void clearProgressBar(TFT_eSPI& tft, int x, int y, int w);
 void drawInputField(TFT_eSPI& tft, int x, int y, int w, int h, const String& value,
                     TextRole role = TextRole::Body);
