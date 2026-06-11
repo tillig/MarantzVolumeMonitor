@@ -12,6 +12,8 @@ public:
 
     void begin();
     void setBrightness(uint8_t brightness);
+    void setBacklightEnabled(bool enabled);
+    bool isBacklightEnabled() const { return _backlightEnabled; }
     TFT_eSPI& getTft() { return _tft; }
 
     // Constants for colors from UIPlan.md
@@ -31,6 +33,7 @@ public:
 private:
     DisplayManager() : _tft(TFT_eSPI()) {}
     TFT_eSPI _tft;
+    bool _backlightEnabled = true;
 };
 
 #endif

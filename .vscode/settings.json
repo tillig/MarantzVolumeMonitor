@@ -5,6 +5,7 @@
     "marantz",
     "microcontroller",
     "oled",
+    "pololu",
     "ssdp"
   ],
   "markdown.extension.toc.levels": "2..6"

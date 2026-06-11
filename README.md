@@ -57,7 +57,13 @@ available so Wi-Fi or receiver setup can be reopened without restarting the devi
 When powered-off status remains confirmed, `Receiver off` stays visible for about 3 seconds and then
 the Home Screen blanks to a quiet black screen until the receiver becomes active again or the screen
 is tapped. A wake tap only restores the Home Screen; opening Settings still requires a separate tap
-on the visible gear icon.
+on the visible gear icon. Touch input is filtered through a short stable-contact confirmation window
+so single-sample controller noise does not wake the blanked screen.
+
+If the optional receiver-off backlight circuit in `docs/hardware.md` is wired and validated, the same
+receiver-off blanking transition also turns off the TFT backlight through GPIO13. The display/touch
+power path still comes from the ESP32 power pins after USB power enters the ESP32; no separate direct
+display supply is used.
 
 If touch alignment is off, open Settings and choose touch calibration. The calibration screen records
 a 9-point touch dataset to the serial console so the touch transform can be recalculated from

@@ -26,6 +26,9 @@ private:
     TouchManager() : _ts(TOUCH_CS) {}
     XPT2046_Touchscreen _ts;
     TS_Point _lastPoint;
+    TS_Point _candidatePoint;
+    uint32_t _touchCandidateStartedMs = 0;
+    bool _touchCandidateActive = false;
 
     // 9-point affine fit based on measured hardware data captured on 2026-06-03.
     // Important: XPT2046_Touchscreen::setRotation(1) already rotates the raw
@@ -42,6 +45,7 @@ private:
 
     static constexpr uint16_t SCREEN_WIDTH = 480;
     static constexpr uint16_t SCREEN_HEIGHT = 320;
+    static constexpr uint32_t TOUCH_CONFIRM_MS = 25;
 };
 
 #endif

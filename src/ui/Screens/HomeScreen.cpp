@@ -55,7 +55,13 @@ HomeScreen::HomeScreen() {
 }
 
 void HomeScreen::draw() {
-    TFT_eSPI& tft = DisplayManager::getInstance().getTft();
+    DisplayManager& display = DisplayManager::getInstance();
+    TFT_eSPI& tft = display.getTft();
+
+    if (_displayState != DisplayState::ReceiverOffBlank) {
+        display.setBacklightEnabled(true);
+    }
+
     tft.fillScreen(DisplayManager::COLOR_BACKGROUND);
 
     switch (_displayState) {
@@ -78,6 +84,7 @@ void HomeScreen::draw() {
             drawSettingsButton();
             break;
         case DisplayState::ReceiverOffBlank:
+            display.setBacklightEnabled(false);
             break;
         case DisplayState::ReceiverUnavailable:
             drawReceiverStatusState("Receiver unavailable",

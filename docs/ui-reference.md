@@ -46,6 +46,9 @@ status text, and restrained animation so the device behaves like a passive appli
   receiver setup can be changed without rebooting.
 - Confirmed powered-off receiver state first shows `Receiver off`, then the Home Screen software-
   blanks after 3 seconds so no idle status remains visible in the room.
+- If the optional receiver-off backlight circuit in `docs/hardware.md` is wired and validated, the
+  same 3-second transition also turns off the TFT `LED/BL` backlight. TFT logic, touch, receiver
+  polling, and Settings recovery remain active.
 - While the Home Screen is blank because receiver-off was confirmed, touch wake remains active and
   the first tap wakes only. A separate visible tap on the settings icon is still required to open
   Settings.

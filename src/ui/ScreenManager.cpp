@@ -1,4 +1,5 @@
 #include "ScreenManager.h"
+#include "DisplayManager.h"
 
 void ScreenManager::setScreen(Screen* screen) {
     if (_currentScreen != nullptr) {
@@ -6,6 +7,7 @@ void ScreenManager::setScreen(Screen* screen) {
     }
     _currentScreen = screen;
     if (_currentScreen != nullptr) {
+        DisplayManager::getInstance().setBacklightEnabled(true);
         _currentScreen->draw();
     }
 }

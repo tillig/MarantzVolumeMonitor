@@ -5,14 +5,32 @@
 void TouchManager::begin() {
     _ts.begin();
     _ts.setRotation(1);
+    _touchCandidateActive = false;
 }
 
 bool TouchManager::isTouched() {
-    if (_ts.touched()) {
-        _lastPoint = _ts.getPoint();
-        return true;
+    if (!_ts.touched()) {
+        _touchCandidateActive = false;
+        return false;
     }
-    return false;
+
+    TS_Point point = _ts.getPoint();
+    uint32_t now = millis();
+
+    if (!_touchCandidateActive) {
+        _touchCandidateActive = true;
+        _touchCandidateStartedMs = now;
+        _candidatePoint = point;
+        return false;
+    }
+
+    _candidatePoint = point;
+    if (now - _touchCandidateStartedMs < TOUCH_CONFIRM_MS) {
+        return false;
+    }
+
+    _lastPoint = _candidatePoint;
+    return true;
 }
 
 TS_Point TouchManager::getRawPoint() {

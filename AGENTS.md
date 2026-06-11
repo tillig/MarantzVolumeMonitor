@@ -18,5 +18,5 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan:
-[specs/008-receiver-off-status/plan.md](specs/008-receiver-off-status/plan.md)
+[specs/009-receiver-off-hardware/plan.md](specs/009-receiver-off-hardware/plan.md)
 <!-- SPECKIT END -->
