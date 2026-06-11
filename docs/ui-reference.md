@@ -41,7 +41,7 @@ The main UI is optimized for a 15-foot viewing distance. It uses a high-contrast
 - A small bitmap settings icon in the top-right corner opens Settings from the normal Home Screen.
 - The same settings icon remains available from powered-off and receiver-unavailable home states so receiver setup can be changed without rebooting.
 - Confirmed powered-off receiver state first shows `Receiver off`, then the Home Screen software- blanks after 3 seconds so no idle status remains visible in the room.
-- If the optional receiver-off backlight circuit in `docs/hardware.md` is wired and validated, the same 3-second transition also turns off the TFT `LED/BL` backlight. TFT logic, touch, receiver polling, and Settings recovery remain active.
+- With the receiver-off backlight circuit documented in `docs/hardware.md` wired and validated, the same 3-second transition also turns off the TFT `LED/BL` backlight. TFT logic, touch, receiver polling, and Settings recovery remain active.
 - While the Home Screen is blank because receiver-off was confirmed, touch wake remains active and the first tap wakes only. A separate visible tap on the settings icon is still required to open Settings.
 - A non-Settings tap on visible `Receiver off` restarts the 3-second timer and keeps the message visible briefly.
 - Settings exposes touch calibration, Wi-Fi setup, and receiver setup.
@@ -71,7 +71,7 @@ The main UI is optimized for a 15-foot viewing distance. It uses a high-contrast
 
 ## Icon Assets
 
-The durable icon inventory is `assets/icons/inventory.md`. It records each icon's source, usage note, target size, generated firmware symbol, screen usage, and runtime colors.
+The durable icon inventory is [`assets/icons/inventory.md`](../assets/icons/inventory.md). It records each icon's source, usage note, target size, generated firmware symbol, screen usage, and runtime colors.
 
 Source artwork is stored in `assets/icons/source/`. Generated previews are stored in `assets/icons/generated/`. Firmware bitmap masks are generated into `src/ui/assets/`.
 
@@ -114,7 +114,7 @@ The firmware build uses checked-in generated masks and does not decode SVG or PN
 
 ## Touch Targets
 
-Touch hitboxes should be sized for direct finger input, with setup keyboards and keypads using large targets appropriate for the 480x320 display. Do not compensate for alignment problems with screen-specific hitbox offsets. Touch coordinates are globally calibrated in `TouchManager` with the 9-point affine transform described in `docs/hardware.md`.
+Touch hitboxes should be sized for direct finger input, with setup keyboards and keypads using large targets appropriate for the 480x320 display. Do not compensate for alignment problems with screen-specific hitbox offsets. Touch coordinates are globally calibrated in `TouchManager` with the 9-point affine transform described in [`docs/hardware.md`](./hardware.md).
 
 ## Animation
 
@@ -133,7 +133,7 @@ This catalog covers the on-device 480x320 touchscreen UI in `src/ui/Screens`. It
 
 1. Preserve passive appliance readability and the home screen's volume-first hierarchy.
 2. Keep setup flows touch-first with direct, visible recovery actions.
-3. Use shared Material-compatible controls and states from `src/ui/MaterialStyle.h`.
+3. Use shared Material-compatible controls and states from [`src/ui/MaterialStyle.h`](../src/ui/MaterialStyle.h).
 4. Reuse existing bitmap icons before adding new firmware assets.
 5. Document any remaining screen-specific exception here before relying on it.
 
@@ -141,46 +141,46 @@ This catalog covers the on-device 480x320 touchscreen UI in `src/ui/Screens`. It
 
 The firmware uses TFT_eSPI built-in bitmap fonts by number rather than desktop or mobile font families such as Roboto, Arial, Verdana, or Times New Roman. This is intentional: built-in TFT fonts are deterministic, fast, memory-light, and already readable on the 480x320 embedded display. Material Design's typography guidance is applied through consistent roles, hierarchy, spacing, and state treatment rather than exact Roboto typeface matching. Do not add generated smooth-font assets unless the memory, build, and readability tradeoffs are evaluated as a separate feature.
 
-| Role | Font | Color | Usage And Alignment |
-| --- | --- | --- | --- |
-| Home primary value | 8 | Text primary | Large centered volume value only. |
-| Screen title | 4 | Text primary | Top title, centered for setup/search/status screens unless a documented exception applies. |
-| Section label | 4 | Text primary or secondary | Prominent setup labels, IP values, and major grouped information. |
-| Body text | 2 | Text secondary | Instructions, explanatory text, and supporting copy, including centered setup subtitles. |
-| Button label | 2 | Text primary | Standard action and compact key labels. |
-| List primary text | 2 | Text primary | Wi-Fi SSID, receiver name, and navigable row label. |
-| List secondary text | 2 | Text dimmed | Signal strength, IP address, and metadata. |
-| Status message | 4 | State color | Success, warning, failure, empty, and loading headline text. |
-| Compact metadata | 1 | Text dimmed | Page counts, row numbers, and small validation messages. |
+| Role                | Font | Color                     | Usage And Alignment                                                                        |
+| ------------------- | ---- | ------------------------- | ------------------------------------------------------------------------------------------ |
+| Home primary value  | 8    | Text primary              | Large centered volume value only.                                                          |
+| Screen title        | 4    | Text primary              | Top title, centered for setup/search/status screens unless a documented exception applies. |
+| Section label       | 4    | Text primary or secondary | Prominent setup labels, IP values, and major grouped information.                          |
+| Body text           | 2    | Text secondary            | Instructions, explanatory text, and supporting copy, including centered setup subtitles.   |
+| Button label        | 2    | Text primary              | Standard action and compact key labels.                                                    |
+| List primary text   | 2    | Text primary              | Wi-Fi SSID, receiver name, and navigable row label.                                        |
+| List secondary text | 2    | Text dimmed               | Signal strength, IP address, and metadata.                                                 |
+| Status message      | 4    | State color               | Success, warning, failure, empty, and loading headline text.                               |
+| Compact metadata    | 1    | Text dimmed               | Page counts, row numbers, and small validation messages.                                   |
 
 Long primary values must be truncated to the available width with an ellipsis rather than resizing neighboring controls.
 
 ### Spacing And Geometry
 
-| Token | Value | Usage |
-| --- | --- | --- |
-| Screen margin | 20 px | Normal left/right content inset. |
-| Standard button height | 40 px | Standard icon-with-text actions. |
-| Standard button Y | 270 px | Bottom action row on non-keyboard setup/settings screens. |
-| Standard button radius | 20 px | Rounded icon-with-text action buttons. |
-| Input radius | 12 px | Rounded outlined text-entry fields. |
-| Keyboard button radius | 6 px | Compact keyboard and keypad controls. |
-| Selection row height | 46 px | Wi-Fi networks, receiver candidates, and future setup choices. |
-| Selection row radius | 8 px | Selection list rows. |
-| Row gap | 10 px | Vertical space between repeated rows. |
-| Button gap | 12 px | Horizontal space between standard actions. |
-| Keyboard key gap | 6 px | Keyboard and keypad grid spacing. |
-| Icon-to-label gap | 8 px | Standard button icon and label spacing. |
-| Minimum touch target | 40 px | Smallest direct-touch control target. |
+| Token                  | Value  | Usage                                                          |
+| ---------------------- | ------ | -------------------------------------------------------------- |
+| Screen margin          | 20 px  | Normal left/right content inset.                               |
+| Standard button height | 40 px  | Standard icon-with-text actions.                               |
+| Standard button Y      | 270 px | Bottom action row on non-keyboard setup/settings screens.      |
+| Standard button radius | 20 px  | Rounded icon-with-text action buttons.                         |
+| Input radius           | 12 px  | Rounded outlined text-entry fields.                            |
+| Keyboard button radius | 6 px   | Compact keyboard and keypad controls.                          |
+| Selection row height   | 46 px  | Wi-Fi networks, receiver candidates, and future setup choices. |
+| Selection row radius   | 8 px   | Selection list rows.                                           |
+| Row gap                | 10 px  | Vertical space between repeated rows.                          |
+| Button gap             | 12 px  | Horizontal space between standard actions.                     |
+| Keyboard key gap       | 6 px   | Keyboard and keypad grid spacing.                              |
+| Icon-to-label gap      | 8 px   | Standard button icon and label spacing.                        |
+| Minimum touch target   | 40 px  | Smallest direct-touch control target.                          |
 
 ### Button Variants
 
-| Variant | Required Use | Treatment |
-| --- | --- | --- |
-| `standard-icon-text` | OK, Cancel, Save, Retry, Back, Confirm, Manual, Rescan, Discover, Verify, and equivalent standard actions outside compact contexts | Rounded 40 px control, icon left of label, Font 2 label, shared fill/outline/state colors. |
-| `keyboard-icon-only` | Keyboard OK, Cancel, backspace, visibility, and caps-lock compact controls | Rounded compact key, centered bitmap icon, aligned to the key's visual center. |
-| `pagination-text` | Previous/next page controls in constrained list screens | Rounded text button with the same surface, outline, font, and touch target treatment as standard actions. |
-| `documented-exception` | Controls that cannot use the standard or keyboard variants | Must be listed in Exceptions with reason and verification constraints. |
+| Variant                | Required Use                                                                                                                       | Treatment                                                                                                 |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `standard-icon-text`   | OK, Cancel, Save, Retry, Back, Confirm, Manual, Rescan, Discover, Verify, and equivalent standard actions outside compact contexts | Rounded 40 px control, icon left of label, Font 2 label, shared fill/outline/state colors.                |
+| `keyboard-icon-only`   | Keyboard OK, Cancel, backspace, visibility, and caps-lock compact controls                                                         | Rounded compact key, centered bitmap icon, aligned to the key's visual center.                            |
+| `pagination-text`      | Previous/next page controls in constrained list screens                                                                            | Rounded text button with the same surface, outline, font, and touch target treatment as standard actions. |
+| `documented-exception` | Controls that cannot use the standard or keyboard variants                                                                         | Must be listed in Exceptions with reason and verification constraints.                                    |
 
 Equivalent actions must use the same icon, label treatment, height, corner radius, and state color across screens. The keyboard is the approved compact-context exception for icon-only OK and Cancel. Cancel actions use the error state color unless they are inside a compact keyboard key.
 
@@ -218,39 +218,39 @@ The title and instruction line stay centered in both scanning and selection stat
 
 ### State Treatments
 
-| State | Treatment |
-| --- | --- |
-| Normal | Panel fill, dim outline, primary text. |
-| Pressed/focused | Accent fill or outline where implemented by the active control. |
-| Selected/success | Green state color plus success icon or supporting text. |
-| Warning | Yellow state color plus warning icon or explanatory text. |
-| Error | Red state color plus failure icon, concise message, and recovery action. |
-| Disabled/inactive/unavailable | Dimmed text and icon treatment; do not imply a successful state. |
-| Loading | Loading message plus restrained progress only when allowed by the operation type. |
+| State                         | Treatment                                                                         |
+| ----------------------------- | --------------------------------------------------------------------------------- |
+| Normal                        | Panel fill, dim outline, primary text.                                            |
+| Pressed/focused               | Accent fill or outline where implemented by the active control.                   |
+| Selected/success              | Green state color plus success icon or supporting text.                           |
+| Warning                       | Yellow state color plus warning icon or explanatory text.                         |
+| Error                         | Red state color plus failure icon, concise message, and recovery action.          |
+| Disabled/inactive/unavailable | Dimmed text and icon treatment; do not imply a successful state.                  |
+| Loading                       | Loading message plus restrained progress only when allowed by the operation type. |
 
 Searching screens show progress immediately. Non-searching operations, such as Wi-Fi connection and receiver verification, show movement only after they remain active for at least 500 ms. Progress updates must be driven from screen `update()` methods and must not block touch handling.
 
 ### Screen Application Matrix
 
-| Screen | Applied Patterns | Notes |
-| --- | --- | --- |
-| `HomeScreen` | Home hierarchy, setup status blocks, settings icon, audio-family state | The normal home layout remains volume-first and does not add idle progress animation. |
-| `SettingsScreen` | Screen title, rounded settings rows, standard OK action | Settings destinations use the same row treatment as setup selection lists. |
-| `NetworkListScreen` | Searching pattern, centered setup header, selection rows, pagination metadata, Manual/Rescan/Cancel buttons | Title stays `Wi-Fi Setup` in all states. |
-| `KeyboardScreen` | Input field, keyboard key grid, compact icon-only function buttons | OK and Cancel share y-coordinate, height, visual center, and icon center. |
-| `SetupStatusScreen` | Wi-Fi loading, error status, retry action, 500 ms non-search progress threshold | Success still returns through the existing flow rather than adding a confirmation stop. |
-| `ReceiverListScreen` | Searching pattern, centered setup header, receiver selection rows, Manual/Rescan/Cancel buttons | Title stays `Receiver Setup` in all states. |
-| `ReceiverIpScreen` | Manual IP input, keypad, standard Cancel/Verify actions, validation message | Numeric keypad uses compact key geometry; bottom actions use standard icon-with-text buttons. |
-| `ReceiverStatusScreen` | Verification loading, success, failure, Retry/Manual/Discover actions | Title remains Receiver Setup; loading, success, and error use the same status placement. Successful verification stays visible until the user taps OK. |
-| `CalibrationScreen` | Screen title, instruction text, success status, crosshair target | The red crosshair is a documented calibration target exception. |
+| Screen                 | Applied Patterns                                                                                            | Notes                                                                                                                                                  |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `HomeScreen`           | Home hierarchy, setup status blocks, settings icon, audio-family state                                      | The normal home layout remains volume-first and does not add idle progress animation.                                                                  |
+| `SettingsScreen`       | Screen title, rounded settings rows, standard OK action                                                     | Settings destinations use the same row treatment as setup selection lists.                                                                             |
+| `NetworkListScreen`    | Searching pattern, centered setup header, selection rows, pagination metadata, Manual/Rescan/Cancel buttons | Title stays `Wi-Fi Setup` in all states.                                                                                                               |
+| `KeyboardScreen`       | Input field, keyboard key grid, compact icon-only function buttons                                          | OK and Cancel share y-coordinate, height, visual center, and icon center.                                                                              |
+| `SetupStatusScreen`    | Wi-Fi loading, error status, retry action, 500 ms non-search progress threshold                             | Success still returns through the existing flow rather than adding a confirmation stop.                                                                |
+| `ReceiverListScreen`   | Searching pattern, centered setup header, receiver selection rows, Manual/Rescan/Cancel buttons             | Title stays `Receiver Setup` in all states.                                                                                                            |
+| `ReceiverIpScreen`     | Manual IP input, keypad, standard Cancel/Verify actions, validation message                                 | Numeric keypad uses compact key geometry; bottom actions use standard icon-with-text buttons.                                                          |
+| `ReceiverStatusScreen` | Verification loading, success, failure, Retry/Manual/Discover actions                                       | Title remains Receiver Setup; loading, success, and error use the same status placement. Successful verification stays visible until the user taps OK. |
+| `CalibrationScreen`    | Screen title, instruction text, success status, crosshair target                                            | The red crosshair is a documented calibration target exception.                                                                                        |
 
 ### Exceptions
 
-| Component | Shared Rule Bypassed | Reason | Required Checks |
-| --- | --- | --- | --- |
-| Keyboard OK/Cancel/function controls | Standard actions normally use icon-with-text buttons | The keyboard has compact fixed keys and limited horizontal space | Icon-only keys must be aligned, centered, 40 px or taller, and documented as keyboard-only. |
-| Calibration crosshair | Standard status and button controls | Calibration requires a precise visual target, not a generic touch button | Crosshair must remain visible and must not receive per-screen touch offsets. |
-| Home settings icon | Standard actions normally include text | The home screen needs a low-noise settings affordance that does not compete with volume | Icon must stay in the top-right hit target and the home hierarchy must remain volume-first. |
+| Component                            | Shared Rule Bypassed                                 | Reason                                                                                  | Required Checks                                                                             |
+| ------------------------------------ | ---------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Keyboard OK/Cancel/function controls | Standard actions normally use icon-with-text buttons | The keyboard has compact fixed keys and limited horizontal space                        | Icon-only keys must be aligned, centered, 40 px or taller, and documented as keyboard-only. |
+| Calibration crosshair                | Standard status and button controls                  | Calibration requires a precise visual target, not a generic touch button                | Crosshair must remain visible and must not receive per-screen touch offsets.                |
+| Home settings icon                   | Standard actions normally include text               | The home screen needs a low-noise settings affordance that does not compete with volume | Icon must stay in the top-right hit target and the home hierarchy must remain volume-first. |
 
 ### Hardware Visual Verification Checklist
 
