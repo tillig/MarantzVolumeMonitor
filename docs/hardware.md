@@ -1,5 +1,12 @@
 # Hardware Reference
 
+- [Canonical Build](#canonical-build)
+- [Bill Of Materials](#bill-of-materials)
+- [Power](#power)
+- [Display, Touch, and Backlight Wiring](#display-touch-and-backlight-wiring)
+- [Wiring Validation](#wiring-validation)
+- [Touch Calibration](#touch-calibration)
+
 ## Canonical Build
 
 This project is built around one canonical hardware configuration:
@@ -27,73 +34,101 @@ The firmware drives ESP32 GPIO13 as the backlight-control signal. When the recei
 
 The monitor uses one 5V 2A USB supply plugged into the ESP32. Display power, touch power, and the backlight-switch load path are all sourced from ESP32 power pins after USB power enters the ESP32.
 
-```text
-USB 5V 2A supply ----> ESP32 USB
-
-ESP32 5V/VIN pin ----+----> TFT VCC
-                     |
-                     +----> Pololu 2810 VIN
-
-ESP32 GND -----------> TFT GND
-ESP32 GND -----------> Pololu 2810 GND
-```
-
 All components must share ground. Before accepting the build, confirm the ESP32-fed 5V path remains stable with the display active:
 
 - USB input stays near 5V without ESP32 brownouts.
 - Voltage between TFT `VCC` and `GND` stays at least 4.75V while the display is active.
 - The ESP32 USB connector, `5V`/`VIN` pin, jumpers, and switch module do not become uncomfortably warm after 10 minutes.
 
-## Display And Backlight Wiring
+## Display, Touch, and Backlight Wiring
 
-The display uses the ESP32 VSPI pins, and the TFT `LED/BL` line is routed through the Pololu 2810.
+The display and touch controller share the ESP32 VSPI pins, and the TFT `LED/BL` line is routed through the Pololu 2810.
 
-| Connection        | ESP32 Pin Label | GPIO | Destination  | Purpose                             |
-| ----------------- | --------------- | ---- | ------------ | ----------------------------------- |
-| Power             | `VIN`           | 5V   | TFT `VCC`    | Main power for display logic        |
-| Ground            | `GND`           | GND  | TFT `GND`    | Shared ground                       |
-| Chip select       | `D5`            | 5    | TFT `CS`     | Display chip select                 |
-| Reset             | `D22`           | 22   | TFT `RESET`  | Display reset                       |
-| Data/command      | `D21`           | 21   | TFT `DC`     | Display data or command select      |
-| SPI MOSI          | `D23`           | 23   | TFT `MOSI`   | Display SPI MOSI                    |
-| SPI MISO          | `D19`           | 19   | TFT `MISO`   | Display SPI MISO                    |
-| SPI clock         | `D18`           | 18   | TFT `SCK`    | Display SPI clock                   |
-| Backlight source  | `VIN`           | 5V   | Pololu `VIN` | Switched backlight source input     |
-| Backlight output  | Pololu `VOUT`   | 5V   | TFT `LED/BL` | Switched TFT backlight feed         |
-| Backlight control | `D13`           | 13   | Pololu `ON`  | Firmware backlight command          |
-| Shared ground     | `GND`           | GND  | Pololu `GND` | Shared reference for switch control |
+> :warning: Note some pins have multiple connections - power, clock, MISO, MOSI. As long as they all connect _somehow_ you should be OK. For example, I connected T_CLK => SCK on the display component, then connected SCK to the ESP32 D18. It made the display-to-ESP32 wiring easier.
+
+| Connection        | ESP32 Pin Label | GPIO | Destination    | Purpose                             |
+| ----------------- | --------------- | ---- | -------------- | ----------------------------------- |
+| Power             | `VIN`           | 5V   | TFT `VCC`      | Main power for display logic        |
+| Backlight source  | `VIN`           | 5V   | Pololu `VIN`   | Switched backlight source input     |
+| Ground            | `GND`           | GND  | TFT `GND`      | Shared ground                       |
+| Shared ground     | `GND`           | GND  | Pololu `GND`   | Shared reference for switch control |
+| Chip select       | `D5`            | 5    | TFT `CS`       | Display chip select                 |
+| Backlight control | `D13`           | 13   | Pololu `ON`    | Firmware backlight command          |
+| Touch chip select | `D14`           | 14   | Touch `T_CS`   | Touch chip select                   |
+| SPI clock         | `D18`           | 18   | TFT `SCK`      | Display SPI clock                   |
+| Touch clock       | `D18`           | 18   | Touch `T_CLK`  | Touch clock, shared SPI             |
+| SPI MISO          | `D19`           | 19   | TFT `MISO`     | Display SPI MISO                    |
+| Touch MISO        | `D19`           | 19   | Touch `T_DO`   | Touch MISO, shared SPI              |
+| Data/command      | `D21`           | 21   | TFT `DC`       | Display data or command select      |
+| Reset             | `D22`           | 22   | TFT `RESET`    | Display reset                       |
+| SPI MOSI          | `D23`           | 23   | TFT `MOSI`     | Display SPI MOSI                    |
+| Touch MOSI        | `D23`           | 23   | Touch `T_DIN`  | Touch MOSI, shared SPI              |
+| Touch interrupt   | `D27`           | 27   | Touch `T_IRQ`  | Touch interrupt, optional           |
+| Backlight output  | Pololu `VOUT`   | 5V   | TFT `LED/BL`   | Switched TFT backlight feed         |
 
 Canonical wiring diagram:
 
-```text
-USB 5V 2A supply ----> ESP32 USB
+```mermaid
+flowchart LR
+    usb["USB 5V 2A Supply"] --> esp32_usb
+    subgraph esp32["Elegoo ESP32 DevKit V1"]
+      esp32_usb["USB C"]
+      esp32_vin["5V/VIN"]
+      esp32_gnd["GND"]
+      esp32_d13["D13"]
+      esp32_d5["D5"]
+      esp32_d14["D14"]
+      esp32_d18["D18"]
+      esp32_d19["D19"]
+      esp32_d21["D21"]
+      esp32_d22["D22"]
+      esp32_d23["D23"]
+      esp32_d27["D27"]
+    end
+    subgraph screen["SPI TFT with ST7796 and XPT2046"]
+      screen_vcc["VCC"]
+      screen_gnd["GND"]
+      screen_cs["CS"]
+      screen_reset["RESET"]
+      screen_dc["DC"]
+      screen_mosi["MOSI"]
+      screen_miso["MISO"]
+      screen_sck["SCK"]
+      screen_led["LED"]
+      screen_t_cs["T_CS"]
+      screen_t_irq["T_IRQ"]
+      screen_t_d0["T_D0"]
+      screen_t_din["T_DIN"]
+      screen_t_clk["T_CLK"]
+    end
+    subgraph mosfet["Pololu 2810"]
+      mosfet_vin["VIN"]
+      mosfet_vout["VOUT"]
+      mosfet_gnd["GND"]
+      mosfet_on["ON"]
+    end
 
-ESP32 5V/VIN pin ----+----> TFT VCC
-                     |
-                     +----> Pololu 2810 VIN
+    esp32_vin --> screen_vcc
+    esp32_vin --> mosfet_vin
+    esp32_gnd --> screen_gnd
+    esp32_gnd --> mosfet_gnd
+    esp32_d5 --> screen_cs
+    esp32_d13 --> mosfet_on
+    esp32_d14 --> screen_t_cs
+    esp32_d18 --> screen_t_clk
+    esp32_d18 --> screen_sck
+    esp32_d19 --> screen_t_d0
+    esp32_d19 --> screen_miso
+    esp32_d21 --> screen_dc
+    esp32_d22 --> screen_reset
+    esp32_d23 --> screen_t_din
+    esp32_d23 --> screen_mosi
+    esp32_d27 --> screen_t_irq
 
-Pololu 2810 VOUT ----> TFT LED/BL
-
-ESP32 GPIO13 --------> Pololu 2810 ON
-
-ESP32 GND -----------+----> TFT GND
-                     |
-                     +----> Pololu 2810 GND
+    mosfet_vout --> screen_led
 ```
 
 The Pololu board has duplicate `VIN`, `VOUT`, and `GND` pads that share the same node. Use the pad positions that make the wiring cleanest.
-
-## Touch Wiring
-
-The XPT2046 touch controller shares the SPI bus with the display.
-
-| Touch Pin | ESP32 Pin Label | GPIO | Purpose                   |
-| --------- | --------------- | ---- | ------------------------- |
-| `T_CS`    | `D14`           | 14   | Touch chip select         |
-| `T_IRQ`   | `D27`           | 27   | Touch interrupt, optional |
-| `T_DO`    | `D19`           | 19   | MISO, shared SPI          |
-| `T_DIN`   | `D23`           | 23   | MOSI, shared SPI          |
-| `T_CLK`   | `D18`           | 18   | SCK, shared SPI           |
 
 ## Wiring Validation
 
