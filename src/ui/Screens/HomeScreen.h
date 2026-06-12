@@ -53,6 +53,13 @@ private:
         bool active = false;
     };
 
+    struct ReceiverOffWakeCandidate {
+        uint32_t startedAtMs = 0;
+        TS_Point initialMapped;
+        TS_Point initialRaw;
+        bool active = false;
+    };
+
     MarantzStatus _lastStatus;
     DeviceConfig _config;
     uint16_t _textColors[7];
@@ -66,6 +73,7 @@ private:
     uint32_t _lastRefreshMs = 0;
     VolumeAnimation _volumeAnimation;
     ReceiverOffTimer _receiverOffTimer;
+    ReceiverOffWakeCandidate _receiverOffWakeCandidate;
 
     void drawVolume(float volume);
     void drawSource(const String& source);
@@ -82,6 +90,9 @@ private:
     void setDisplayState(DisplayState state, uint32_t now);
     void startReceiverOffTimer(uint32_t now);
     void stopReceiverOffTimer();
+    void startReceiverOffWakeCandidate(TS_Point mappedPoint, TS_Point rawPoint, uint32_t now);
+    void clearReceiverOffWakeCandidate();
+    bool updateReceiverOffWakeCandidate(uint32_t now);
     bool isReceiverOffTimerExpired(uint32_t now) const;
     bool isReceiverOffDisplayState(DisplayState state) const;
     bool isCalibrationButtonPressed(TS_Point p) const;

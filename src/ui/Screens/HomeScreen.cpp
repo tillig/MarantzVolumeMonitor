@@ -8,6 +8,7 @@
 #include "ReceiverListScreen.h"
 #include "../IconRenderer.h"
 #include "../ScreenManager.h"
+#include "../TouchManager.h"
 #include "../assets/IconBitmaps.h"
 #include "../../network/WiFiManager.h"
 
@@ -30,6 +31,8 @@ constexpr int VolumeLabelCenterY = 72;
 constexpr int VolumeUnitCenterY = 90;
 constexpr uint8_t VolumeSignFont = 4;
 constexpr int HomeMetadataBottomPadding = 10;
+constexpr uint32_t ReceiverOffWakeConfirmMs = 300;
+constexpr int16_t ReceiverOffWakeMinPressure = 450;
 constexpr GFXfont const* HomeSourceFont = &FreeSansBold18pt7b;
 constexpr uint8_t HomeSourceFontId = 1;
 constexpr uint8_t HomeModeFont = 4;
@@ -77,8 +80,8 @@ const char* displayStateName(HomeScreen::DisplayState state) {
     }
 }
 
-void logReceiverOffWakeTouch(const TS_Point& mappedPoint, const TS_Point& rawPoint) {
-    Serial.print("RECEIVER_OFF_WAKE_TOUCH mapped=(");
+void printPointDetails(const TS_Point& mappedPoint, const TS_Point& rawPoint) {
+    Serial.print(" mapped=(");
     Serial.print(mappedPoint.x);
     Serial.print(",");
     Serial.print(mappedPoint.y);
@@ -88,6 +91,28 @@ void logReceiverOffWakeTouch(const TS_Point& mappedPoint, const TS_Point& rawPoi
     Serial.print(rawPoint.y);
     Serial.print(") z=");
     Serial.println(rawPoint.z);
+}
+
+void logReceiverOffWakeCandidate(const TS_Point& mappedPoint, const TS_Point& rawPoint) {
+    Serial.print("RECEIVER_OFF_WAKE_CANDIDATE");
+    printPointDetails(mappedPoint, rawPoint);
+}
+
+void logReceiverOffWakeAccepted(const TS_Point& mappedPoint, const TS_Point& rawPoint, uint32_t durationMs) {
+    Serial.print("RECEIVER_OFF_WAKE_ACCEPTED duration=");
+    Serial.print(durationMs);
+    printPointDetails(mappedPoint, rawPoint);
+}
+
+void logReceiverOffWakeRejected(const char* reason,
+                                const TS_Point& mappedPoint,
+                                const TS_Point& rawPoint,
+                                uint32_t durationMs) {
+    Serial.print("RECEIVER_OFF_WAKE_REJECTED reason=");
+    Serial.print(reason);
+    Serial.print(" duration=");
+    Serial.print(durationMs);
+    printPointDetails(mappedPoint, rawPoint);
 }
 
 void logDisplayStateTransition(HomeScreen::DisplayState from, HomeScreen::DisplayState to) {
@@ -168,6 +193,10 @@ void HomeScreen::draw() {
 void HomeScreen::update() {
     uint32_t now = millis();
 
+    if (_displayState == DisplayState::ReceiverOffBlank && updateReceiverOffWakeCandidate(now)) {
+        return;
+    }
+
     if (now - _lastRefreshMs >= RefreshIntervalMs) {
         MarantzStatus previousStatus = _lastStatus;
         DisplayState previousDisplayState = _displayState;
@@ -230,10 +259,7 @@ void HomeScreen::update() {
 void HomeScreen::handleTouch(TS_Point p) {
     if (_displayState == DisplayState::ReceiverOffBlank) {
         TS_Point rawPoint = TouchManager::getInstance().getRawPoint();
-        logReceiverOffWakeTouch(p, rawPoint);
-        DisplayState wakeState = classifyDisplayState(_lastStatus);
-        setDisplayState(wakeState, millis());
-        draw();
+        startReceiverOffWakeCandidate(p, rawPoint, millis());
         return;
     }
 
@@ -390,6 +416,9 @@ void HomeScreen::setDisplayState(DisplayState state, uint32_t now) {
 
     DisplayState previousState = _displayState;
     _displayState = state;
+    if (state != DisplayState::ReceiverOffBlank) {
+        clearReceiverOffWakeCandidate();
+    }
     if (previousState != state && (isReceiverOffDisplayState(previousState) || isReceiverOffDisplayState(state))) {
         logDisplayStateTransition(previousState, state);
     }
@@ -412,6 +441,55 @@ void HomeScreen::startReceiverOffTimer(uint32_t now) {
 
 void HomeScreen::stopReceiverOffTimer() {
     _receiverOffTimer.active = false;
+}
+
+void HomeScreen::startReceiverOffWakeCandidate(TS_Point mappedPoint, TS_Point rawPoint, uint32_t now) {
+    if (_receiverOffWakeCandidate.active) {
+        return;
+    }
+
+    _receiverOffWakeCandidate.startedAtMs = now;
+    _receiverOffWakeCandidate.initialMapped = mappedPoint;
+    _receiverOffWakeCandidate.initialRaw = rawPoint;
+    _receiverOffWakeCandidate.active = true;
+    logReceiverOffWakeCandidate(mappedPoint, rawPoint);
+}
+
+void HomeScreen::clearReceiverOffWakeCandidate() {
+    _receiverOffWakeCandidate.active = false;
+}
+
+bool HomeScreen::updateReceiverOffWakeCandidate(uint32_t now) {
+    if (!_receiverOffWakeCandidate.active) {
+        return false;
+    }
+
+    uint32_t durationMs = now - _receiverOffWakeCandidate.startedAtMs;
+    TS_Point rawPoint = TouchManager::getInstance().getRawPoint();
+    TS_Point mappedPoint = TouchManager::getInstance().getPoint();
+
+    if (!TouchManager::getInstance().isTouchContactPresent()) {
+        logReceiverOffWakeRejected("released-too-soon", mappedPoint, rawPoint, durationMs);
+        clearReceiverOffWakeCandidate();
+        return false;
+    }
+
+    if (durationMs < ReceiverOffWakeConfirmMs) {
+        return false;
+    }
+
+    if (rawPoint.z < ReceiverOffWakeMinPressure) {
+        logReceiverOffWakeRejected("pressure-too-low", mappedPoint, rawPoint, durationMs);
+        clearReceiverOffWakeCandidate();
+        return false;
+    }
+
+    logReceiverOffWakeAccepted(mappedPoint, rawPoint, durationMs);
+    clearReceiverOffWakeCandidate();
+    DisplayState wakeState = classifyDisplayState(_lastStatus);
+    setDisplayState(wakeState, now);
+    draw();
+    return true;
 }
 
 bool HomeScreen::isReceiverOffTimerExpired(uint32_t now) const {
