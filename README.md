@@ -18,6 +18,8 @@ A modern, touchscreen-based volume monitor for Marantz home theater receivers, p
 
 Refer to [`docs/hardware.md`](docs/hardware.md) for detailed wiring, power, and touch calibration notes.
 
+I [included the 3D models for the box I made, too](./assets/box/README.md), if you want to use that.
+
 ## Software Setup
 
 This project uses [PlatformIO](https://platformio.org/) for development and [Spec Kit](https://github.com/tillig/speckit) for project management.
