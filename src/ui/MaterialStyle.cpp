@@ -196,7 +196,8 @@ void drawStandardButton(TFT_eSPI& tft, int x, int y, int w, int h,
 
     String text = truncateToWidth(tft, String(label), w - icon.width - IconLabelGap - 18,
                                   fontFor(TextRole::ButtonLabel));
-    int groupWidth = icon.width + IconLabelGap + tft.textWidth(text, fontFor(TextRole::ButtonLabel));
+    int iconWidth = icon.width > StandardButtonIconMaxSize ? StandardButtonIconMaxSize : icon.width;
+    int groupWidth = iconWidth + IconLabelGap + tft.textWidth(text, fontFor(TextRole::ButtonLabel));
     int horizontalInset = (w - groupWidth) / 2;
     if (horizontalInset < 8) {
         horizontalInset = 8;
@@ -204,10 +205,12 @@ void drawStandardButton(TFT_eSPI& tft, int x, int y, int w, int h,
     int startX = x + horizontalInset;
     int centerY = y + h / 2;
 
-    IconRenderer::drawCentered(tft, icon, startX + icon.width / 2, centerY, foreground);
+    IconRenderer::drawFittedCentered(tft, icon, startX + iconWidth / 2, centerY,
+                                     StandardButtonIconMaxSize, StandardButtonIconMaxSize,
+                                     foreground);
     tft.setTextDatum(ML_DATUM);
     tft.setTextColor(foreground, fill);
-    tft.drawString(text, startX + icon.width + IconLabelGap, centerY, fontFor(TextRole::ButtonLabel));
+    tft.drawString(text, startX + iconWidth + IconLabelGap, centerY, fontFor(TextRole::ButtonLabel));
 }
 
 void drawTextButton(TFT_eSPI& tft, int x, int y, int w, int h,
@@ -265,8 +268,9 @@ void drawListRow(TFT_eSPI& tft, const ListRowSpec& spec) {
         drawWifiSignal(tft, spec.x + 24, spec.y + spec.h / 2, spec.wifiSignalLevel);
         textX = spec.x + 48;
     } else if (spec.leadingIcon != nullptr) {
-        IconRenderer::drawCentered(tft, *spec.leadingIcon, spec.x + 24, spec.y + spec.h / 2,
-                                   DisplayManager::COLOR_TEXT_SECONDARY);
+        IconRenderer::drawFittedCentered(tft, *spec.leadingIcon, spec.x + 24, spec.y + spec.h / 2,
+                                         ListRowIconMaxSize, ListRowIconMaxSize,
+                                         DisplayManager::COLOR_TEXT_SECONDARY);
         textX = spec.x + 48;
     }
 
@@ -330,6 +334,15 @@ void drawChoiceRow(TFT_eSPI& tft, const ChoiceRowSpec& spec) {
     }
 }
 
+void drawPageHeader(TFT_eSPI& tft, const Icons::IconBitmap& icon,
+                    const String& title, const String& subtitle) {
+    IconRenderer::drawFittedCentered(tft, icon, PageHeaderIconCenterX, PageHeaderIconCenterY,
+                                     HeaderIconMaxSize, HeaderIconMaxSize,
+                                     DisplayManager::COLOR_TEXT_SECONDARY);
+    drawText(tft, title, PageHeaderTitleX, SetupHeaderTitleY, TextRole::ScreenTitle, TL_DATUM);
+    drawText(tft, subtitle, PageHeaderTitleX, SetupHeaderSubtitleY, TextRole::Body, TL_DATUM);
+}
+
 void drawSetupHeader(TFT_eSPI& tft, const String& title, const String& subtitle) {
     drawText(tft, title, ScreenWidth / 2, SetupHeaderTitleY, TextRole::ScreenTitle, TC_DATUM);
     drawText(tft, subtitle, ScreenWidth / 2, SetupHeaderSubtitleY, TextRole::Body, TC_DATUM);
@@ -374,7 +387,8 @@ void drawStatusBlock(TFT_eSPI& tft, StatusKind kind, const String& title,
         drawText(tft, message, ScreenWidth / 2, 194, TextRole::Body, TC_DATUM, state);
     }
     if (kind == StatusKind::Loading) {
-        drawProgressBar(tft, 150, 224, 180, progressFrame);
+        drawProgressBar(tft, StatusBlockProgressX, StatusBlockProgressY,
+                        StatusBlockProgressW, progressFrame);
     }
 }
 

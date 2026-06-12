@@ -3,6 +3,7 @@
 #include "CurrentSettingsScreen.h"
 #include "HomeScreen.h"
 #include "NetworkListScreen.h"
+#include "ResetDefaultsScreen.h"
 #include "ReceiverListScreen.h"
 #include "VolumeScaleScreen.h"
 #include "../ScreenManager.h"
@@ -91,7 +92,11 @@ void SettingsScreen::drawEntry(TFT_eSPI& tft, int entryIndex, int y) {
     } else if (entryIndex == 4) {
         icon = &Icons::TOUCH_CALIBRATION;
         primary = "Touch Calibration";
-        secondary = "Capture raw touch samples";
+        secondary = "Align touch on the device";
+    } else if (entryIndex == 5) {
+        icon = &Icons::WARNING;
+        primary = "Reset To Defaults";
+        secondary = "Reset Wi-Fi, receiver, or touch";
     }
 
     MaterialStyle::drawListRow(tft, {
@@ -121,6 +126,9 @@ void SettingsScreen::openEntry(int entryIndex) {
             return;
         case 4:
             ScreenManager::getInstance().setScreen(new CalibrationScreen(ScreenReturnTarget::Settings));
+            return;
+        case 5:
+            ScreenManager::getInstance().setScreen(new ResetDefaultsScreen());
             return;
         default:
             return;

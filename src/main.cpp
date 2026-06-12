@@ -19,6 +19,21 @@ void setup() {
 
     DeviceConfig config;
     if (ConfigStore::getInstance().loadConfig(config)) {
+        if (config.touchCalibration.isPresent) {
+            TouchManager::CalibrationProfile profile;
+            profile.version = config.touchCalibration.version;
+            profile.xFromRawX = config.touchCalibration.xFromRawX;
+            profile.xFromRawY = config.touchCalibration.xFromRawY;
+            profile.xOffset = config.touchCalibration.xOffset;
+            profile.yFromRawX = config.touchCalibration.yFromRawX;
+            profile.yFromRawY = config.touchCalibration.yFromRawY;
+            profile.yOffset = config.touchCalibration.yOffset;
+            profile.isDefault = false;
+            if (!TouchManager::getInstance().applyCalibrationProfile(profile)) {
+                TouchManager::getInstance().applyDefaultCalibration();
+            }
+        }
+
         if (config.wifiSsid.length() > 0) {
             Serial.print("Attempting WiFi auto-connect to ");
             Serial.println(config.wifiSsid);

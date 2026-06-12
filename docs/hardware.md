@@ -151,4 +151,10 @@ Then power the ESP32 by USB:
 
 Touch alignment on this hardware uses a measured 9-point affine transform in `src/ui/TouchManager.*`. Simple axis min/max calibration plus manual per-screen offsets was not accurate enough for the keyboard and list screens.
 
-`XPT2046_Touchscreen::setRotation(1)` already rotates controller readings to match the display orientation. If alignment drifts, use the `Calibrate` button on the unconfigured/setup Home Screen to capture a new 9-point dataset from the serial console, then update the affine coefficients in `TouchManager`. Do not add screen-specific hitbox offsets unless new hardware data proves the affine model is wrong.
+The firmware ships with measured default coefficients for the canonical hardware build. Calibration is optional: if no saved user calibration exists, the device uses that shipped default profile automatically.
+
+`XPT2046_Touchscreen::setRotation(1)` already rotates controller readings to match the display orientation. If alignment drifts, use `Touch Calibration` from `Settings` or the setup-path `Calibrate` action on the unconfigured Home flow. The device guides the same 9-point pattern on-screen, rejects taps outside the active target boundary, requires a full release before the next point, rejects suspicious duplicate raw samples, and computes the affine coefficients on-device.
+
+A successful calibration is applied immediately and stored in `/config.json` as an optional saved profile. On later boots, the firmware restores that saved profile if it remains numerically usable; otherwise it falls back to the shipped default profile automatically. Canceling calibration, failing calibration, or resetting other settings types does not overwrite the active touch profile.
+
+If a saved calibration needs to be cleared, open `Settings` > `Reset To Defaults`, choose `Calibration`, and confirm with `Reset`. That removes only the saved calibration data and reapplies the shipped default profile in the current session. Do not add screen-specific hitbox offsets unless new hardware data proves the affine model is wrong.

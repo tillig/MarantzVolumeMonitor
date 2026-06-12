@@ -12,7 +12,7 @@ public:
 
     void begin();
     void setBrightness(uint8_t brightness);
-    void setBacklightEnabled(bool enabled);
+    void setBacklightEnabled(bool enabled, const char* reason = nullptr);
     bool isBacklightEnabled() const { return _backlightEnabled; }
     TFT_eSPI& getTft() { return _tft; }
 

@@ -56,6 +56,47 @@ String truncateHomeSourceToWidth(TFT_eSPI& tft, const String& text, int maxWidth
 bool nearlyEqual(float left, float right, float epsilon = AnimationEpsilon) {
     return fabsf(left - right) <= epsilon;
 }
+
+const char* displayStateName(HomeScreen::DisplayState state) {
+    switch (state) {
+        case HomeScreen::DisplayState::WifiSetupRequired:
+            return "WifiSetupRequired";
+        case HomeScreen::DisplayState::WifiConnecting:
+            return "WifiConnecting";
+        case HomeScreen::DisplayState::ReceiverSetupRequired:
+            return "ReceiverSetupRequired";
+        case HomeScreen::DisplayState::ReceiverUnavailable:
+            return "ReceiverUnavailable";
+        case HomeScreen::DisplayState::ReceiverOffVisible:
+            return "ReceiverOffVisible";
+        case HomeScreen::DisplayState::ReceiverOffBlank:
+            return "ReceiverOffBlank";
+        case HomeScreen::DisplayState::Live:
+            return "Live";
+        default:
+            return "Unknown";
+    }
+}
+
+void logReceiverOffWakeTouch(const TS_Point& mappedPoint, const TS_Point& rawPoint) {
+    Serial.print("RECEIVER_OFF_WAKE_TOUCH mapped=(");
+    Serial.print(mappedPoint.x);
+    Serial.print(",");
+    Serial.print(mappedPoint.y);
+    Serial.print(") raw=(");
+    Serial.print(rawPoint.x);
+    Serial.print(",");
+    Serial.print(rawPoint.y);
+    Serial.print(") z=");
+    Serial.println(rawPoint.z);
+}
+
+void logDisplayStateTransition(HomeScreen::DisplayState from, HomeScreen::DisplayState to) {
+    Serial.print("HOME_DISPLAY_STATE ");
+    Serial.print(displayStateName(from));
+    Serial.print(" -> ");
+    Serial.println(displayStateName(to));
+}
 }
 
 HomeScreen::HomeScreen() {
@@ -84,7 +125,7 @@ void HomeScreen::draw() {
     TFT_eSPI& tft = display.getTft();
 
     if (_displayState != DisplayState::ReceiverOffBlank) {
-        display.setBacklightEnabled(true);
+        display.setBacklightEnabled(true, "HomeScreen::draw visible state");
     }
 
     tft.fillScreen(DisplayManager::COLOR_BACKGROUND);
@@ -109,7 +150,7 @@ void HomeScreen::draw() {
             drawSettingsButton();
             break;
         case DisplayState::ReceiverOffBlank:
-            display.setBacklightEnabled(false);
+            display.setBacklightEnabled(false, "HomeScreen::draw receiver off blank");
             break;
         case DisplayState::ReceiverUnavailable:
             drawReceiverStatusState("Receiver unavailable",
@@ -195,6 +236,8 @@ void HomeScreen::update() {
 
 void HomeScreen::handleTouch(TS_Point p) {
     if (_displayState == DisplayState::ReceiverOffBlank) {
+        TS_Point rawPoint = TouchManager::getInstance().getRawPoint();
+        logReceiverOffWakeTouch(p, rawPoint);
         DisplayState wakeState = classifyDisplayState(_lastStatus);
         setDisplayState(wakeState, millis());
         draw();
@@ -340,6 +383,10 @@ void HomeScreen::setDisplayState(DisplayState state, uint32_t now) {
 
     DisplayState previousState = _displayState;
     _displayState = state;
+    if (previousState != state && (isReceiverOffDisplayState(previousState) ||
+                                   isReceiverOffDisplayState(state))) {
+        logDisplayStateTransition(previousState, state);
+    }
 
     if (state == DisplayState::ReceiverOffVisible) {
         startReceiverOffTimer(now);

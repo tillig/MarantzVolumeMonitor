@@ -7,9 +7,6 @@
 #include "../assets/IconBitmaps.h"
 
 namespace {
-constexpr int HeaderIconCenterX = 32;
-constexpr int HeaderIconCenterY = 28;
-constexpr int HeaderTitleX = 56;
 constexpr int ChoiceRowX = 20;
 constexpr int ChoiceRowWidth = 440;
 constexpr int ChoiceRowTopY = 84;
@@ -28,14 +25,8 @@ void VolumeScaleScreen::draw() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
     tft.fillScreen(DisplayManager::COLOR_BACKGROUND);
 
-    IconRenderer::drawCentered(tft, Icons::SETTINGS, HeaderIconCenterX, HeaderIconCenterY,
-                               DisplayManager::COLOR_TEXT_SECONDARY);
-    MaterialStyle::drawText(tft, "Volume Display Scale", HeaderTitleX,
-                            MaterialStyle::SetupHeaderTitleY,
-                            MaterialStyle::TextRole::ScreenTitle, TL_DATUM);
-    MaterialStyle::drawText(tft, "Choose the home volume number format", HeaderTitleX,
-                            MaterialStyle::SetupHeaderSubtitleY,
-                            MaterialStyle::TextRole::Body, TL_DATUM);
+    MaterialStyle::drawPageHeader(tft, Icons::SETTINGS, "Volume Display Scale",
+                                  "Choose the home volume number format");
 
     MaterialStyle::drawChoiceRow(tft, {
         ChoiceRowX,

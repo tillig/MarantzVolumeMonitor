@@ -7,7 +7,7 @@ void ScreenManager::setScreen(Screen* screen) {
     }
     _currentScreen = screen;
     if (_currentScreen != nullptr) {
-        DisplayManager::getInstance().setBacklightEnabled(true);
+        DisplayManager::getInstance().setBacklightEnabled(true, "ScreenManager::setScreen");
         _currentScreen->draw();
     }
 }

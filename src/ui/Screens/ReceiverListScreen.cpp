@@ -15,20 +15,20 @@ ReceiverListScreen::ReceiverListScreen(ScreenReturnTarget returnTarget)
 void ReceiverListScreen::draw() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
     tft.fillScreen(DisplayManager::COLOR_BACKGROUND);
+    drawHeader(tft);
 
     ReceiverDiscovery& discovery = ReceiverDiscovery::getInstance();
     const std::vector<ReceiverCandidate>& candidates = discovery.getCandidates();
     ReceiverDiscoveryState state = discovery.getState();
 
     if (state == ReceiverDiscoveryState::Searching) {
-        MaterialStyle::drawSearchingState(tft, "Receiver Setup", "Searching for receivers...",
-                                          Icons::SCAN, _progressFrame);
+        MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Loading,
+                                       "Searching for receivers...",
+                                       "", Icons::SCAN, _progressFrame);
     } else if (candidates.empty()) {
-        drawHeader(tft);
         MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Empty, "No receivers found",
                                        "Rescan or enter an IP address.", Icons::WARNING);
     } else {
-        drawHeader(tft);
         for (size_t i = 0; i < candidates.size() && i < 3; ++i) {
             drawCandidateRow(tft, candidates[i], i,
                              MaterialStyle::SetupListTopY +
@@ -55,12 +55,12 @@ void ReceiverListScreen::update() {
             _lastProgressAtMs = now;
             _progressFrame++;
             TFT_eSPI& tft = DisplayManager::getInstance().getTft();
-            MaterialStyle::clearProgressBar(tft, MaterialStyle::SearchingProgressX,
-                                            MaterialStyle::SearchingProgressY,
-                                            MaterialStyle::SearchingProgressW);
-            MaterialStyle::drawProgressBar(tft, MaterialStyle::SearchingProgressX,
-                                           MaterialStyle::SearchingProgressY,
-                                           MaterialStyle::SearchingProgressW,
+            MaterialStyle::clearProgressBar(tft, MaterialStyle::StatusBlockProgressX,
+                                            MaterialStyle::StatusBlockProgressY,
+                                            MaterialStyle::StatusBlockProgressW);
+            MaterialStyle::drawProgressBar(tft, MaterialStyle::StatusBlockProgressX,
+                                           MaterialStyle::StatusBlockProgressY,
+                                           MaterialStyle::StatusBlockProgressW,
                                            _progressFrame);
         }
     }
@@ -95,7 +95,8 @@ void ReceiverListScreen::handleTouch(TS_Point p) {
 }
 
 void ReceiverListScreen::drawHeader(TFT_eSPI& tft) {
-    MaterialStyle::drawSetupHeader(tft, "Receiver Setup", "Select a discovered receiver");
+    MaterialStyle::drawPageHeader(tft, Icons::RECEIVER, "Receiver Setup",
+                                  "Select a discovered receiver");
 }
 
 void ReceiverListScreen::drawActions(TFT_eSPI& tft) {

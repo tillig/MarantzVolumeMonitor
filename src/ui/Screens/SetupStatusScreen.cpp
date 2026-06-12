@@ -25,6 +25,7 @@ void SetupStatusScreen::draw() {
                                        Icons::WIFI, _progressFrame);
         WiFiManager::getInstance().startConnect(_ssid, _password);
         _isConnecting = true;
+        _progressVisible = false;
         _startTime = millis();
         _lastProgressAtMs = _startTime;
     } else if (_failed) {
@@ -36,6 +37,7 @@ void SetupStatusScreen::draw() {
                                           Icons::RETRY, "Retry");
     } else {
         bool showProgress = millis() - _startTime >= MaterialStyle::ProgressThresholdMs;
+        _progressVisible = showProgress;
         if (showProgress) {
             MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Loading,
                                            "Connecting...",
@@ -82,11 +84,25 @@ void SetupStatusScreen::update() {
             draw();
         } else {
             uint32_t now = millis();
-            if (now - _startTime >= MaterialStyle::ProgressThresholdMs &&
+            bool shouldShowProgress = now - _startTime >= MaterialStyle::ProgressThresholdMs;
+            if (shouldShowProgress && !_progressVisible) {
+                _progressVisible = true;
+                draw();
+                return;
+            }
+
+            if (shouldShowProgress &&
                 now - _lastProgressAtMs >= MaterialStyle::ProgressFrameMs) {
                 _lastProgressAtMs = now;
                 _progressFrame++;
-                draw();
+                TFT_eSPI& tft = DisplayManager::getInstance().getTft();
+                MaterialStyle::clearProgressBar(tft, MaterialStyle::StatusBlockProgressX,
+                                                MaterialStyle::StatusBlockProgressY,
+                                                MaterialStyle::StatusBlockProgressW);
+                MaterialStyle::drawProgressBar(tft, MaterialStyle::StatusBlockProgressX,
+                                               MaterialStyle::StatusBlockProgressY,
+                                               MaterialStyle::StatusBlockProgressW,
+                                               _progressFrame);
             }
         }
     }

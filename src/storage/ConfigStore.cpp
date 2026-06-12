@@ -1,5 +1,23 @@
 #include "ConfigStore.h"
 
+#include <math.h>
+
+namespace {
+bool readFiniteFloat(JsonVariantConst value, float& target) {
+    if (value.isNull()) {
+        return false;
+    }
+
+    float candidate = value.as<float>();
+    if (!isfinite(candidate)) {
+        return false;
+    }
+
+    target = candidate;
+    return true;
+}
+}
+
 bool ConfigStore::ensureReady() {
     return _isReady || begin();
 }
@@ -18,7 +36,7 @@ bool ConfigStore::begin() {
     return true;
 }
 
-bool ConfigStore::loadConfig(DeviceConfig& config) {
+bool ConfigStore::loadDocument(JsonDocument& doc) {
     if (!ensureReady()) {
         return false;
     }
@@ -33,7 +51,6 @@ bool ConfigStore::loadConfig(DeviceConfig& config) {
         return false;
     }
 
-    JsonDocument doc;
     DeserializationError error = deserializeJson(doc, configFile);
     configFile.close();
 
@@ -42,11 +59,36 @@ bool ConfigStore::loadConfig(DeviceConfig& config) {
         return false;
     }
 
+    return true;
+}
+
+bool ConfigStore::loadConfig(DeviceConfig& config) {
+    JsonDocument doc;
+    if (!loadDocument(doc)) {
+        return false;
+    }
+
     config.wifiSsid = doc["wifiSsid"] | "";
     config.wifiPassword = doc["wifiPassword"] | "";
     config.receiverIp = doc["receiverIp"] | "";
     config.brightness = doc["brightness"] | 255;
     config.useDbScale = doc["useDbScale"] | false;
+    config.touchCalibration = TouchCalibrationConfig();
+
+    JsonVariantConst calibration = doc["touchCalibration"];
+    if (calibration.is<JsonObjectConst>()) {
+        TouchCalibrationConfig savedCalibration;
+        savedCalibration.version = calibration["version"] | 1;
+        if (readFiniteFloat(calibration["xFromRawX"], savedCalibration.xFromRawX) &&
+            readFiniteFloat(calibration["xFromRawY"], savedCalibration.xFromRawY) &&
+            readFiniteFloat(calibration["xOffset"], savedCalibration.xOffset) &&
+            readFiniteFloat(calibration["yFromRawX"], savedCalibration.yFromRawX) &&
+            readFiniteFloat(calibration["yFromRawY"], savedCalibration.yFromRawY) &&
+            readFiniteFloat(calibration["yOffset"], savedCalibration.yOffset)) {
+            savedCalibration.isPresent = true;
+            config.touchCalibration = savedCalibration;
+        }
+    }
 
     return true;
 }
@@ -62,6 +104,18 @@ bool ConfigStore::saveConfig(const DeviceConfig& config) {
     doc["receiverIp"] = config.receiverIp;
     doc["brightness"] = config.brightness;
     doc["useDbScale"] = config.useDbScale;
+    if (config.touchCalibration.isPresent) {
+        JsonObject calibration = doc["touchCalibration"].to<JsonObject>();
+        calibration["version"] = config.touchCalibration.version;
+        calibration["xFromRawX"] = config.touchCalibration.xFromRawX;
+        calibration["xFromRawY"] = config.touchCalibration.xFromRawY;
+        calibration["xOffset"] = config.touchCalibration.xOffset;
+        calibration["yFromRawX"] = config.touchCalibration.yFromRawX;
+        calibration["yFromRawY"] = config.touchCalibration.yFromRawY;
+        calibration["yOffset"] = config.touchCalibration.yOffset;
+    } else {
+        doc.remove("touchCalibration");
+    }
 
     File configFile = LittleFS.open(CONFIG_FILE, "w");
     if (!configFile) {
@@ -77,4 +131,26 @@ bool ConfigStore::saveConfig(const DeviceConfig& config) {
 
     configFile.close();
     return true;
+}
+
+bool ConfigStore::resetToDefaults(ResetTarget target) {
+    DeviceConfig config;
+    loadConfig(config);
+
+    switch (target) {
+        case ResetTarget::Wifi:
+            config.wifiSsid = "";
+            config.wifiPassword = "";
+            break;
+        case ResetTarget::Receiver:
+            config.receiverIp = "";
+            break;
+        case ResetTarget::Calibration:
+            config.touchCalibration = TouchCalibrationConfig();
+            break;
+        default:
+            break;
+    }
+
+    return saveConfig(config);
 }

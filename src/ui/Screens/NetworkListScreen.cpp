@@ -25,14 +25,16 @@ void NetworkListScreen::draw() {
         _lastProgressAtMs = millis();
     }
 
+    MaterialStyle::drawPageHeader(tft, Icons::WIFI, "Wi-Fi Setup", "Select a Wi-Fi network");
+
     if (_isScanning) {
-        MaterialStyle::drawSearchingState(tft, "Wi-Fi Setup", "Scanning for networks...", Icons::SCAN, _progressFrame);
+        MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Loading,
+                                       "Scanning for networks...",
+                                       "", Icons::SCAN, _progressFrame);
     } else if (_networks.empty()) {
-        MaterialStyle::drawSetupHeader(tft, "Wi-Fi Setup", "Select a Wi-Fi network");
         MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Empty, "No networks found",
                                        "Use Rescan or enter a network manually.", Icons::WARNING);
     } else {
-        MaterialStyle::drawSetupHeader(tft, "Wi-Fi Setup", "Select a Wi-Fi network");
         drawList();
     }
 
@@ -53,12 +55,12 @@ void NetworkListScreen::update() {
                 _lastProgressAtMs = now;
                 _progressFrame++;
                 TFT_eSPI& tft = DisplayManager::getInstance().getTft();
-                MaterialStyle::clearProgressBar(tft, MaterialStyle::SearchingProgressX,
-                                                MaterialStyle::SearchingProgressY,
-                                                MaterialStyle::SearchingProgressW);
-                MaterialStyle::drawProgressBar(tft, MaterialStyle::SearchingProgressX,
-                                               MaterialStyle::SearchingProgressY,
-                                               MaterialStyle::SearchingProgressW,
+                MaterialStyle::clearProgressBar(tft, MaterialStyle::StatusBlockProgressX,
+                                                MaterialStyle::StatusBlockProgressY,
+                                                MaterialStyle::StatusBlockProgressW);
+                MaterialStyle::drawProgressBar(tft, MaterialStyle::StatusBlockProgressX,
+                                               MaterialStyle::StatusBlockProgressY,
+                                               MaterialStyle::StatusBlockProgressW,
                                                _progressFrame);
             }
         }

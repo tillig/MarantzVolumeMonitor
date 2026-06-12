@@ -48,7 +48,7 @@ The main UI is optimized for a 15-foot viewing distance. It uses a high-contrast
 - With the receiver-off backlight circuit documented in `docs/hardware.md` wired and validated, the same 3-second transition also turns off the TFT `LED/BL` backlight. TFT logic, touch, receiver polling, and Settings recovery remain active.
 - While the Home Screen is blank because receiver-off was confirmed, touch wake remains active and the first tap wakes only. A separate visible tap on the settings icon is still required to open Settings.
 - A non-Settings tap on visible `Receiver off` restarts the 3-second timer and keeps the message visible briefly.
-- Settings exposes `Current Settings`, `Volume Display Scale`, Wi-Fi setup, receiver setup, and touch calibration.
+- Settings exposes `Current Settings`, `Volume Display Scale`, Wi-Fi setup, receiver setup, `Touch Calibration`, and `Reset To Defaults`.
 - Flows launched from Settings should return to Settings when complete; the Settings OK button returns to the Home Screen.
 - Returning Home while the receiver is still confirmed off shows `Receiver off` again and restarts the 3-second blanking timer. Settings and settings-launched setup flows stay visible while active.
 - Setup/boot states expose a bottom-right `Calibrate` maintenance action using the shared bottom action button size, position, and icon-with-text treatment.
@@ -94,11 +94,28 @@ The firmware build uses checked-in generated masks and does not decode SVG or PN
 
 - Settings navigation rows use the same rounded selection-row treatment as setup selection lists.
 - Row labels remain visible, supporting text clarifies the destination, and touch targets remain at least 40 px high.
-- Settings order is `Current Settings`, `Volume Display Scale`, `Wi-Fi Setup`, `Receiver Setup`, then `Touch Calibration`. Calibration is intentionally last because it is a maintenance/debug flow rather than a normal setup path.
+- Settings order is `Current Settings`, `Volume Display Scale`, `Wi-Fi Setup`, `Receiver Setup`, `Touch Calibration`, then `Reset To Defaults`. `Reset To Defaults` must remain last.
 - `Current Settings` opens a read-only overview screen for saved and live monitor state; it does not launch setup or editing directly.
 - `Volume Display Scale` opens a dedicated single-choice screen with `0-100` and `dB` options, explicit `OK` and `Cancel` actions, and a visible selected-state indicator that does not rely on color alone.
 - If all settings destinations do not fit cleanly on one screen with the standard row treatment, Settings uses labeled `PREV` and `NEXT` pagination controls above the bottom `OK` action rather than switching to icon-only navigation.
-- Touch Calibration uses the shared `touch-calibration` crosshair icon in both the Settings row and the boot/setup action button.
+- `Touch Calibration` uses the shared `touch-calibration` crosshair icon in both the Settings row and the boot/setup action button.
+- `Reset To Defaults` opens a dedicated child flow with exactly three choices: `Wi-Fi`, `Receiver`, and `Calibration`.
+- The reset flow requires an explicit confirmation step with `Reset` and `Cancel`. `Cancel` is non-destructive and returns to the reset selection screen.
+- Resetting `Calibration` restores the shipped touch profile immediately in the current session without clearing Wi-Fi or receiver settings.
+- Settings child screens use one shared page-header pattern: a small leading icon at the top-left, a left-aligned title, and a short left-aligned subtitle. This now applies to `Current Settings`, `Volume Display Scale`, `Wi-Fi Setup`, `Receiver Setup`, `Manual Receiver IP`, and `Reset To Defaults`.
+
+## Touch Calibration Screen
+
+- The screen title remains `Touch Calibration`.
+- The screen states that calibration is completed on the device and does not require serial capture or source edits.
+- Active calibration uses a purpose-built 3x3 crosshair layout rather than the normal settings page header so the points, instructions, and `Cancel` action do not overlap.
+- Instruction text sits between the top and middle point rows, and the `Cancel` button sits between the middle and bottom rows.
+- The active point number and point label remain visible during capture.
+- Only taps inside the active target ring are accepted.
+- The user must fully release touch before the next point can arm.
+- Suspicious duplicate raw samples that are too close to a previously accepted point are rejected and do not advance the session.
+- A successful 9-point run computes a new affine profile, applies it immediately, stores it, and returns to the caller after `OK`.
+- A canceled or failed run preserves the previously active calibration profile.
 
 ## Current Settings Screen
 
@@ -141,7 +158,7 @@ The firmware build uses checked-in generated masks and does not decode SVG or PN
 
 ## Touch Targets
 
-Touch hitboxes should be sized for direct finger input, with setup keyboards and keypads using large targets appropriate for the 480x320 display. Do not compensate for alignment problems with screen-specific hitbox offsets. Touch coordinates are globally calibrated in `TouchManager` with the 9-point affine transform described in [`docs/hardware.md`](./hardware.md).
+Touch hitboxes should be sized for direct finger input, with setup keyboards and keypads using large targets appropriate for the 480x320 display. Do not compensate for alignment problems with screen-specific hitbox offsets. Touch coordinates are globally calibrated in `TouchManager` with the 9-point affine transform described in [`docs/hardware.md`](./hardware.md). The active profile is either the shipped default for the canonical build or a saved on-device calibration profile loaded from config.
 
 ## Animation
 

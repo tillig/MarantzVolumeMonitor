@@ -19,8 +19,17 @@ constexpr int InputRadius = 12;
 constexpr int SearchingProgressX = 150;
 constexpr int SearchingProgressY = 186;
 constexpr int SearchingProgressW = 180;
+constexpr int StatusBlockProgressX = 150;
+constexpr int StatusBlockProgressY = 210;
+constexpr int StatusBlockProgressW = 180;
 constexpr int SetupHeaderTitleY = 14;
 constexpr int SetupHeaderSubtitleY = 46;
+constexpr int PageHeaderIconCenterX = 32;
+constexpr int PageHeaderIconCenterY = 28;
+constexpr int PageHeaderTitleX = 56;
+constexpr int HeaderIconMaxSize = 24;
+constexpr int ListRowIconMaxSize = 20;
+constexpr int StandardButtonIconMaxSize = 20;
 constexpr int SetupListTopY = 72;
 constexpr int KeyboardButtonRadius = 6;
 constexpr int ListRowHeight = 46;
@@ -147,6 +156,8 @@ void drawKeyboardTextButton(TFT_eSPI& tft, int x, int y, int w, int h,
                             ComponentState state = ComponentState::Normal);
 void drawListRow(TFT_eSPI& tft, const ListRowSpec& spec);
 void drawChoiceRow(TFT_eSPI& tft, const ChoiceRowSpec& spec);
+void drawPageHeader(TFT_eSPI& tft, const Icons::IconBitmap& icon,
+                    const String& title, const String& subtitle);
 void drawSetupHeader(TFT_eSPI& tft, const String& title, const String& subtitle);
 void drawSearchingState(TFT_eSPI& tft, const String& title, const String& message,
                         const Icons::IconBitmap& icon, uint8_t progressFrame);

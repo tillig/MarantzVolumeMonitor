@@ -14,9 +14,7 @@ void ReceiverIpScreen::draw() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
     tft.fillScreen(DisplayManager::COLOR_BACKGROUND);
 
-    IconRenderer::drawCentered(tft, Icons::RECEIVER, 32, 28, DisplayManager::COLOR_TEXT_SECONDARY);
-    MaterialStyle::drawText(tft, "Manual Receiver IP", 56, 14, MaterialStyle::TextRole::ScreenTitle, TL_DATUM);
-    MaterialStyle::drawText(tft, "IPv4 only", 56, 44, MaterialStyle::TextRole::Body, TL_DATUM);
+    MaterialStyle::drawPageHeader(tft, Icons::RECEIVER, "Manual Receiver IP", "IPv4 only");
 
     drawInput(tft);
     drawKeypad(tft);

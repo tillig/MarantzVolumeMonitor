@@ -9,9 +9,6 @@
 #include "../../network/WiFiManager.h"
 
 namespace {
-constexpr int HeaderIconCenterX = 32;
-constexpr int HeaderIconCenterY = 28;
-constexpr int HeaderTitleX = 56;
 constexpr int CardX = 20;
 constexpr int CardWidth = 440;
 constexpr int WifiCardY = MaterialStyle::SetupListTopY;
@@ -51,12 +48,8 @@ void CurrentSettingsScreen::draw() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
     tft.fillScreen(DisplayManager::COLOR_BACKGROUND);
 
-    IconRenderer::drawCentered(tft, Icons::SETTINGS, HeaderIconCenterX, HeaderIconCenterY,
-                               DisplayManager::COLOR_TEXT_SECONDARY);
-    MaterialStyle::drawText(tft, "Current Settings", HeaderTitleX, MaterialStyle::SetupHeaderTitleY,
-                            MaterialStyle::TextRole::ScreenTitle, TL_DATUM);
-    MaterialStyle::drawText(tft, "View saved and live monitor status", HeaderTitleX,
-                            MaterialStyle::SetupHeaderSubtitleY, MaterialStyle::TextRole::Body, TL_DATUM);
+    MaterialStyle::drawPageHeader(tft, Icons::SETTINGS, "Current Settings",
+                                  "View saved and live monitor status");
 
     MaterialStyle::drawInfoCard(tft, CardX, WifiCardY, CardWidth, WifiCardHeight,
                                 Icons::WIFI, "Wi-Fi");

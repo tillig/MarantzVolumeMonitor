@@ -40,6 +40,7 @@ src/
         ├── ReceiverListScreen.h/.cpp
         ├── ReceiverIpScreen.h/.cpp
         ├── ReceiverStatusScreen.h/.cpp
+        ├── ResetDefaultsScreen.h/.cpp
         └── CalibrationScreen.h/.cpp
 ```
 
@@ -47,13 +48,15 @@ Feature work may add classes inside these existing layer folders. New cross-laye
 
 ## Runtime Flow
 
-1. Boot initializes display, touch, and LittleFS-backed configuration storage, then attempts Wi-Fi auto-connect and applies any saved receiver IP.
+1. Boot initializes display, touch, and LittleFS-backed configuration storage, then attempts Wi-Fi auto-connect, applies any saved receiver IP, and restores the saved touch-calibration profile if it is usable.
 2. `HomeScreen` is the first screen and classifies the current state as Wi-Fi setup required, Wi-Fi connecting, receiver setup required, receiver unavailable, receiver off, or live.
 3. If Wi-Fi is not configured, the touchscreen flow branches through `NetworkListScreen`, `KeyboardScreen`, and `SetupStatusScreen` to collect and save credentials.
 4. If a receiver is not configured, the setup flow branches through `ReceiverListScreen`, `ReceiverIpScreen`, and `ReceiverStatusScreen` to discover or verify a receiver address before saving it.
-5. `SettingsScreen` provides access to `Current Settings`, Wi-Fi setup, receiver setup, and touch calibration, with pagination when all entries do not fit cleanly on one page.
+5. `SettingsScreen` provides access to `Current Settings`, `Volume Display Scale`, Wi-Fi setup, receiver setup, touch calibration, and `Reset To Defaults`, with pagination when all entries do not fit cleanly on one page.
 6. `HomeScreen` and `CurrentSettingsScreen` refresh live Wi-Fi and receiver state on an approximately 1-second cadence while visible. The current implementation performs synchronous status fetches through the network layer from those screen update paths.
 7. The live Home Screen renders normalized volume (`receiver dB + 80`), source, listening mode, audio-family icons, and receiver-off blank/backlight behavior.
+8. `CalibrationScreen` owns the guided 9-point calibration session UI, while `TouchManager` owns runtime profile validation, mapping, and default-vs-active calibration application.
+9. `ResetDefaultsScreen` owns the selective reset confirmation UI, while `ConfigStore` owns the actual config mutations for `Wi-Fi`, `Receiver`, and `Calibration`.
 
 ## Persisted Configuration
 
@@ -64,8 +67,9 @@ Feature work may add classes inside these existing layer folders. New cross-laye
 - `receiverIp`
 - `brightness`
 - `useDbScale`
+- `touchCalibration` (optional saved affine touch profile)
 
-The active on-device UI currently uses the Wi-Fi and receiver fields. `brightness` and `useDbScale` are persisted but not yet surfaced as user-configurable settings.
+The active on-device UI currently uses the Wi-Fi, receiver, `useDbScale`, and optional `touchCalibration` fields. `touchCalibration` is stored only after a successful on-device calibration and is ignored if it becomes unreadable or unusable, in which case the firmware falls back to the shipped default touch profile.
 
 ## Documentation Roles
 
