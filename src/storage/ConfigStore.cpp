@@ -16,7 +16,7 @@ bool readFiniteFloat(JsonVariantConst value, float& target) {
     target = candidate;
     return true;
 }
-}
+} // namespace
 
 bool ConfigStore::ensureReady() {
     return _isReady || begin();

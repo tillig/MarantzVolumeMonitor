@@ -35,11 +35,15 @@ void SettingsScreen::draw() {
         drawEntry(tft, entryIndex, entryY(i));
     }
 
-    MaterialStyle::drawPagination(tft, _pageIndex, totalPages(), _pageIndex > 0,
-                                  _pageIndex < totalPages() - 1);
+    MaterialStyle::drawPagination(tft, _pageIndex, totalPages(), _pageIndex > 0, _pageIndex < totalPages() - 1);
 
-    MaterialStyle::drawStandardButton(tft, 340, MaterialStyle::BottomActionY, 116, MaterialStyle::ButtonHeight,
-                                      Icons::KEYBOARD_OK, "OK",
+    MaterialStyle::drawStandardButton(tft,
+                                      340,
+                                      MaterialStyle::BottomActionY,
+                                      116,
+                                      MaterialStyle::ButtonHeight,
+                                      Icons::KEYBOARD_OK,
+                                      "OK",
                                       MaterialStyle::ComponentState::Success);
 }
 
@@ -99,15 +103,17 @@ void SettingsScreen::drawEntry(TFT_eSPI& tft, int entryIndex, int y) {
         secondary = "Reset Wi-Fi, receiver, or touch";
     }
 
-    MaterialStyle::drawListRow(tft, {
-        20, y, 440, MaterialStyle::ListRowHeight,
-        icon,
-        0,
-        primary,
-        secondary,
-        ">",
-        MaterialStyle::ComponentState::Normal
-    });
+    MaterialStyle::drawListRow(tft,
+                               {20,
+                                y,
+                                440,
+                                MaterialStyle::ListRowHeight,
+                                icon,
+                                0,
+                                primary,
+                                secondary,
+                                ">",
+                                MaterialStyle::ComponentState::Normal});
 }
 
 void SettingsScreen::openEntry(int entryIndex) {

@@ -23,17 +23,22 @@ Welcome! We appreciate your interest in contributing to the Marantz Volume Monit
 ## Quality Standards
 
 - **Validation:** All changes must pass `pre-commit` validation. Run `pre-commit run --all-files` before committing.
-- **Linting:** Markdown must pass `markdownlint` as configured in `.markdownlint.json`.
+- **Linting:** Markdown must pass `markdownlint` as configured in `.markdownlint.json`; C++ formatting must match `.clang-format`.
+- **Static Analysis:** PlatformIO static analysis must pass with the configured `cppcheck` checks.
 - **Firmware Build:** Run `platformio run` before finishing firmware changes.
+- **Continuous Integration:** GitHub Actions runs the same validation on pushes to `main`, `develop`, and `feature/*` branches, and on pull requests. If a `feature/*` branch already has an open pull request, the branch push build is skipped and the pull request build remains the authoritative CI result.
 
 ## Build And Validation
 
 Use these commands from the repository root:
 
 ```bash
-platformio run
 pre-commit run --all-files
+platformio check --fail-on-defect=low
+platformio run
 ```
+
+CI runs pre-commit and static analysis before the firmware build so formatting, metadata, and code-quality checks fail before compilation.
 
 If you change icon source artwork in `assets/icons/source/`, regenerate firmware icon masks before building:
 

@@ -55,11 +55,7 @@ enum class TextRole {
     CompactMetadata
 };
 
-enum class ButtonVariant {
-    StandardIconText,
-    KeyboardIconOnly,
-    DocumentedException
-};
+enum class ButtonVariant { StandardIconText, KeyboardIconOnly, DocumentedException };
 
 enum class ComponentState {
     Normal,
@@ -75,14 +71,7 @@ enum class ComponentState {
     Unavailable
 };
 
-enum class StatusKind {
-    Loading,
-    Success,
-    Warning,
-    Error,
-    Empty,
-    Unavailable
-};
+enum class StatusKind { Loading, Success, Warning, Error, Empty, Unavailable };
 
 struct ButtonSpec {
     int x;
@@ -136,42 +125,52 @@ uint16_t surfaceColorFor(ComponentState state = ComponentState::Normal);
 uint16_t outlineColorFor(ComponentState state = ComponentState::Normal);
 uint16_t stateColorFor(ComponentState state);
 
-void drawText(TFT_eSPI& tft, const String& text, int x, int y, TextRole role,
+void drawText(TFT_eSPI& tft,
+              const String& text,
+              int x,
+              int y,
+              TextRole role,
               uint8_t datum = MC_DATUM,
               ComponentState state = ComponentState::Normal);
 String truncateToWidth(TFT_eSPI& tft, const String& text, int maxWidth, uint8_t font);
 
-void drawStandardButton(TFT_eSPI& tft, int x, int y, int w, int h,
-                        const Icons::IconBitmap& icon, const char* label,
+void drawStandardButton(TFT_eSPI& tft,
+                        int x,
+                        int y,
+                        int w,
+                        int h,
+                        const Icons::IconBitmap& icon,
+                        const char* label,
                         ComponentState state = ComponentState::Normal);
-void drawTextButton(TFT_eSPI& tft, int x, int y, int w, int h,
-                    const char* label,
-                    ComponentState state = ComponentState::Normal);
-void drawKeyboardIconButton(TFT_eSPI& tft, int x, int y, int w, int h,
+void drawTextButton(
+    TFT_eSPI& tft, int x, int y, int w, int h, const char* label, ComponentState state = ComponentState::Normal);
+void drawKeyboardIconButton(TFT_eSPI& tft,
+                            int x,
+                            int y,
+                            int w,
+                            int h,
                             const Icons::IconBitmap& icon,
                             ComponentState state = ComponentState::Normal,
                             int iconYOffset = 0);
-void drawKeyboardTextButton(TFT_eSPI& tft, int x, int y, int w, int h,
-                            const String& label,
-                            ComponentState state = ComponentState::Normal);
+void drawKeyboardTextButton(
+    TFT_eSPI& tft, int x, int y, int w, int h, const String& label, ComponentState state = ComponentState::Normal);
 void drawListRow(TFT_eSPI& tft, const ListRowSpec& spec);
 void drawChoiceRow(TFT_eSPI& tft, const ChoiceRowSpec& spec);
-void drawPageHeader(TFT_eSPI& tft, const Icons::IconBitmap& icon,
-                    const String& title, const String& subtitle);
+void drawPageHeader(TFT_eSPI& tft, const Icons::IconBitmap& icon, const String& title, const String& subtitle);
 void drawSetupHeader(TFT_eSPI& tft, const String& title, const String& subtitle);
-void drawSearchingState(TFT_eSPI& tft, const String& title, const String& message,
-                        const Icons::IconBitmap& icon, uint8_t progressFrame);
-void drawStatusBlock(TFT_eSPI& tft, StatusKind kind, const String& title,
-                     const String& message, const Icons::IconBitmap& icon,
+void drawSearchingState(
+    TFT_eSPI& tft, const String& title, const String& message, const Icons::IconBitmap& icon, uint8_t progressFrame);
+void drawStatusBlock(TFT_eSPI& tft,
+                     StatusKind kind,
+                     const String& title,
+                     const String& message,
+                     const Icons::IconBitmap& icon,
                      uint8_t progressFrame = 0);
-void drawInfoCard(TFT_eSPI& tft, int x, int y, int w, int h,
-                  const Icons::IconBitmap& icon, const String& title);
+void drawInfoCard(TFT_eSPI& tft, int x, int y, int w, int h, const Icons::IconBitmap& icon, const String& title);
 void drawStatusRow(TFT_eSPI& tft, const StatusRowSpec& spec);
-void drawPagination(TFT_eSPI& tft, int currentPage, int totalPages,
-                    bool showPrev, bool showNext, int y = 230);
+void drawPagination(TFT_eSPI& tft, int currentPage, int totalPages, bool showPrev, bool showNext, int y = 230);
 void clearProgressBar(TFT_eSPI& tft, int x, int y, int w);
-void drawInputField(TFT_eSPI& tft, int x, int y, int w, int h, const String& value,
-                    TextRole role = TextRole::Body);
+void drawInputField(TFT_eSPI& tft, int x, int y, int w, int h, const String& value, TextRole role = TextRole::Body);
 void drawProgressBar(TFT_eSPI& tft, int x, int y, int w, uint8_t progressFrame);
 
 } // namespace MaterialStyle

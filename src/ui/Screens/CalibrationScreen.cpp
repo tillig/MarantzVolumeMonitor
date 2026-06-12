@@ -63,55 +63,60 @@ bool solve3x3(float matrix[3][4], float out[3]) {
     out[2] = matrix[2][3];
     return true;
 }
-}
+} // namespace
 
-CalibrationScreen::CalibrationScreen(ScreenReturnTarget returnTarget)
-    : _returnTarget(returnTarget) {}
+CalibrationScreen::CalibrationScreen(ScreenReturnTarget returnTarget) : _returnTarget(returnTarget) {}
 
 void CalibrationScreen::draw() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
     tft.fillScreen(DisplayManager::COLOR_BACKGROUND);
 
     if (_sessionState == SessionState::Complete) {
-        MaterialStyle::drawPageHeader(tft, Icons::TOUCH_CALIBRATION, "Touch Calibration",
-                                      "Calibration saved and applied");
-        MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Success,
+        MaterialStyle::drawPageHeader(
+            tft, Icons::TOUCH_CALIBRATION, "Touch Calibration", "Calibration saved and applied");
+        MaterialStyle::drawStatusBlock(tft,
+                                       MaterialStyle::StatusKind::Success,
                                        "Alignment updated",
                                        "Press OK to return to navigation.",
                                        Icons::SUCCESS);
-        MaterialStyle::drawStandardButton(tft, 182, MaterialStyle::BottomActionY, 116,
+        MaterialStyle::drawStandardButton(tft,
+                                          182,
+                                          MaterialStyle::BottomActionY,
+                                          116,
                                           MaterialStyle::ButtonHeight,
-                                          Icons::KEYBOARD_OK, "OK",
+                                          Icons::KEYBOARD_OK,
+                                          "OK",
                                           MaterialStyle::ComponentState::Success);
         return;
     }
 
     if (_sessionState == SessionState::RetryableFailure) {
-        MaterialStyle::drawPageHeader(tft, Icons::TOUCH_CALIBRATION, "Touch Calibration",
-                                      "Retry the full calibration");
-        MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Error,
-                                       _statusTitle, _statusMessage, Icons::WARNING);
-        MaterialStyle::drawText(tft, "Tap anywhere to retry, or Cancel to leave.", 240, 220,
-                                MaterialStyle::TextRole::Body, TC_DATUM);
-        MaterialStyle::drawStandardButton(tft, 172, MaterialStyle::BottomActionY,
-                                          136, MaterialStyle::ButtonHeight,
-                                          Icons::KEYBOARD_CANCEL, "Cancel",
+        MaterialStyle::drawPageHeader(tft, Icons::TOUCH_CALIBRATION, "Touch Calibration", "Retry the full calibration");
+        MaterialStyle::drawStatusBlock(
+            tft, MaterialStyle::StatusKind::Error, _statusTitle, _statusMessage, Icons::WARNING);
+        MaterialStyle::drawText(
+            tft, "Tap anywhere to retry, or Cancel to leave.", 240, 220, MaterialStyle::TextRole::Body, TC_DATUM);
+        MaterialStyle::drawStandardButton(tft,
+                                          172,
+                                          MaterialStyle::BottomActionY,
+                                          136,
+                                          MaterialStyle::ButtonHeight,
+                                          Icons::KEYBOARD_CANCEL,
+                                          "Cancel",
                                           MaterialStyle::ComponentState::Error);
         return;
     } else {
         const CalibrationPoint& point = _points[_step];
-        MaterialStyle::drawText(tft, "Touch Calibration", 240, 12,
-                                MaterialStyle::TextRole::ScreenTitle, TC_DATUM);
-        MaterialStyle::drawText(tft, "Tap each crosshair directly.", 240, 78,
-                                MaterialStyle::TextRole::Body, TC_DATUM);
+        MaterialStyle::drawText(tft, "Touch Calibration", 240, 12, MaterialStyle::TextRole::ScreenTitle, TC_DATUM);
+        MaterialStyle::drawText(tft, "Tap each crosshair directly.", 240, 78, MaterialStyle::TextRole::Body, TC_DATUM);
 
         if (_statusTitle.length() > 0) {
             String status = _statusTitle;
             if (_statusMessage.length() > 0) {
                 status += ": " + _statusMessage;
             }
-            MaterialStyle::drawText(tft, status, 240, 174,
-                                    MaterialStyle::TextRole::CompactMetadata, TC_DATUM, _statusState);
+            MaterialStyle::drawText(
+                tft, status, 240, 174, MaterialStyle::TextRole::CompactMetadata, TC_DATUM, _statusState);
         }
 
         tft.drawLine(point.x - 14, point.y, point.x + 14, point.y, TFT_RED);
@@ -120,9 +125,13 @@ void CalibrationScreen::draw() {
         tft.drawCircle(point.x, point.y, TargetRadiusPx, DisplayManager::COLOR_BAR_BG);
     }
 
-    MaterialStyle::drawStandardButton(tft, CancelButtonX, CancelButtonY,
-                                      CancelButtonWidth, MaterialStyle::ButtonHeight,
-                                      Icons::KEYBOARD_CANCEL, "Cancel",
+    MaterialStyle::drawStandardButton(tft,
+                                      CancelButtonX,
+                                      CancelButtonY,
+                                      CancelButtonWidth,
+                                      MaterialStyle::ButtonHeight,
+                                      Icons::KEYBOARD_CANCEL,
+                                      "Cancel",
                                       MaterialStyle::ComponentState::Error);
 }
 
@@ -219,22 +228,19 @@ void CalibrationScreen::resetSession() {
     }
 }
 
-void CalibrationScreen::setStatus(const String& title, const String& message,
-                                  MaterialStyle::ComponentState state) {
+void CalibrationScreen::setStatus(const String& title, const String& message, MaterialStyle::ComponentState state) {
     _statusTitle = title;
     _statusMessage = message;
     _statusState = state;
 }
 
 bool CalibrationScreen::isCancelPressed(TS_Point p) const {
-    return p.x >= CancelButtonX && p.x <= CancelButtonX + CancelButtonWidth &&
-           p.y >= CancelButtonY &&
+    return p.x >= CancelButtonX && p.x <= CancelButtonX + CancelButtonWidth && p.y >= CancelButtonY &&
            p.y <= CancelButtonY + MaterialStyle::ButtonHeight;
 }
 
 bool CalibrationScreen::isOkPressed(TS_Point p) const {
-    return p.x >= 182 && p.x <= 298 &&
-           p.y >= MaterialStyle::BottomActionY &&
+    return p.x >= 182 && p.x <= 298 && p.y >= MaterialStyle::BottomActionY &&
            p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight;
 }
 
@@ -272,15 +278,18 @@ bool CalibrationScreen::computeCalibrationProfile(TouchManager::CalibrationProfi
     profile = TouchManager::CalibrationProfile();
     profile.version = 1;
     profile.isDefault = false;
-    return solveLeastSquaresAxis(rawX, rawY, targetX, PointCount,
-                                 profile.xFromRawX, profile.xFromRawY, profile.xOffset) &&
-           solveLeastSquaresAxis(rawX, rawY, targetY, PointCount,
-                                 profile.yFromRawX, profile.yFromRawY, profile.yOffset);
+    return solveLeastSquaresAxis(
+               rawX, rawY, targetX, PointCount, profile.xFromRawX, profile.xFromRawY, profile.xOffset) &&
+           solveLeastSquaresAxis(
+               rawX, rawY, targetY, PointCount, profile.yFromRawX, profile.yFromRawY, profile.yOffset);
 }
 
-bool CalibrationScreen::solveLeastSquaresAxis(const float* rawX, const float* rawY,
-                                              const float* targets, size_t count,
-                                              float& fromRawX, float& fromRawY,
+bool CalibrationScreen::solveLeastSquaresAxis(const float* rawX,
+                                              const float* rawY,
+                                              const float* targets,
+                                              size_t count,
+                                              float& fromRawX,
+                                              float& fromRawY,
                                               float& offset) const {
     float sumXX = 0.0f;
     float sumXY = 0.0f;
@@ -302,11 +311,9 @@ bool CalibrationScreen::solveLeastSquaresAxis(const float* rawX, const float* ra
         sumYTarget += rawY[i] * targets[i];
     }
 
-    float matrix[3][4] = {
-        {sumXX, sumXY, sumX, sumXTarget},
-        {sumXY, sumYY, sumY, sumYTarget},
-        {sumX, sumY, static_cast<float>(count), sumTarget}
-    };
+    float matrix[3][4] = {{sumXX, sumXY, sumX, sumXTarget},
+                          {sumXY, sumYY, sumY, sumYTarget},
+                          {sumX, sumY, static_cast<float>(count), sumTarget}};
     float solution[3];
     if (!solve3x3(matrix, solution)) {
         return false;
@@ -366,9 +373,7 @@ bool CalibrationScreen::saveCalibrationProfile(const TouchManager::CalibrationPr
     config.touchCalibration.yOffset = profile.yOffset;
 
     if (!ConfigStore::getInstance().saveConfig(config)) {
-        setStatus("Save failed",
-                  "The new calibration could not be stored.",
-                  MaterialStyle::ComponentState::Error);
+        setStatus("Save failed", "The new calibration could not be stored.", MaterialStyle::ComponentState::Error);
         return false;
     }
 

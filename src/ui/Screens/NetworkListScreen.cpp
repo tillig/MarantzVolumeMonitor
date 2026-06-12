@@ -7,8 +7,7 @@
 #include "../assets/IconBitmaps.h"
 #include "../../storage/ConfigStore.h"
 
-NetworkListScreen::NetworkListScreen(ScreenReturnTarget returnTarget)
-    : _returnTarget(returnTarget) {
+NetworkListScreen::NetworkListScreen(ScreenReturnTarget returnTarget) : _returnTarget(returnTarget) {
     DeviceConfig config;
     ConfigStore::getInstance().loadConfig(config);
     _canCancel = _returnTarget == ScreenReturnTarget::Settings && config.wifiSsid.length() > 0;
@@ -28,12 +27,14 @@ void NetworkListScreen::draw() {
     MaterialStyle::drawPageHeader(tft, Icons::WIFI, "Wi-Fi Setup", "Select a Wi-Fi network");
 
     if (_isScanning) {
-        MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Loading,
-                                       "Scanning for networks...",
-                                       "", Icons::SCAN, _progressFrame);
+        MaterialStyle::drawStatusBlock(
+            tft, MaterialStyle::StatusKind::Loading, "Scanning for networks...", "", Icons::SCAN, _progressFrame);
     } else if (_networks.empty()) {
-        MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Empty, "No networks found",
-                                       "Use Rescan or enter a network manually.", Icons::WARNING);
+        MaterialStyle::drawStatusBlock(tft,
+                                       MaterialStyle::StatusKind::Empty,
+                                       "No networks found",
+                                       "Use Rescan or enter a network manually.",
+                                       Icons::WARNING);
     } else {
         drawList();
     }
@@ -55,10 +56,12 @@ void NetworkListScreen::update() {
                 _lastProgressAtMs = now;
                 _progressFrame++;
                 TFT_eSPI& tft = DisplayManager::getInstance().getTft();
-                MaterialStyle::clearProgressBar(tft, MaterialStyle::StatusBlockProgressX,
+                MaterialStyle::clearProgressBar(tft,
+                                                MaterialStyle::StatusBlockProgressX,
                                                 MaterialStyle::StatusBlockProgressY,
                                                 MaterialStyle::StatusBlockProgressW);
-                MaterialStyle::drawProgressBar(tft, MaterialStyle::StatusBlockProgressX,
+                MaterialStyle::drawProgressBar(tft,
+                                               MaterialStyle::StatusBlockProgressX,
                                                MaterialStyle::StatusBlockProgressY,
                                                MaterialStyle::StatusBlockProgressW,
                                                _progressFrame);
@@ -69,8 +72,7 @@ void NetworkListScreen::update() {
 
 void NetworkListScreen::handleTouch(TS_Point p) {
     // 1. Bottom Buttons (Manual / Rescan)
-    if (p.y >= MaterialStyle::BottomActionY &&
-        p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight) {
+    if (p.y >= MaterialStyle::BottomActionY && p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight) {
         if (_canCancel) {
             if (p.x >= 20 && p.x <= 150) {
                 ScreenManager::getInstance().setScreen(new KeyboardScreen("", _returnTarget));
@@ -111,8 +113,8 @@ void NetworkListScreen::handleTouch(TS_Point p) {
 
     // 3. Network list items
     if (p.y >= MaterialStyle::SetupListTopY && p.y < 240) {
-        int index = _scrollOffset + ((p.y - MaterialStyle::SetupListTopY) /
-                                     (MaterialStyle::ListRowHeight + MaterialStyle::RowGap));
+        int index = _scrollOffset +
+                    ((p.y - MaterialStyle::SetupListTopY) / (MaterialStyle::ListRowHeight + MaterialStyle::RowGap));
         if (index < _networks.size()) {
             ScreenManager::getInstance().setScreen(new KeyboardScreen(_networks[index].ssid, _returnTarget));
         }
@@ -128,23 +130,24 @@ void NetworkListScreen::drawList() {
         int y = MaterialStyle::SetupListTopY + (i * (MaterialStyle::ListRowHeight + MaterialStyle::RowGap));
 
         if (index < _networks.size()) {
-            MaterialStyle::drawListRow(tft, {
-                20, y, 440, MaterialStyle::ListRowHeight,
-                nullptr,
-                WiFiManager::signalLevelForRssi(_networks[index].rssi),
-                _networks[index].ssid,
-                "",
-                String(index + 1),
-                MaterialStyle::ComponentState::Normal
-            });
+            MaterialStyle::drawListRow(tft,
+                                       {20,
+                                        y,
+                                        440,
+                                        MaterialStyle::ListRowHeight,
+                                        nullptr,
+                                        WiFiManager::signalLevelForRssi(_networks[index].rssi),
+                                        _networks[index].ssid,
+                                        "",
+                                        String(index + 1),
+                                        MaterialStyle::ComponentState::Normal});
         }
     }
 
     // Draw Pagination Status
     String pageInfo = "Page " + String((_scrollOffset / itemsToShow) + 1) + " of " +
                       String((_networks.size() + itemsToShow - 1) / itemsToShow);
-    MaterialStyle::drawText(tft, pageInfo, 240, 246,
-                            MaterialStyle::TextRole::CompactMetadata, MC_DATUM);
+    MaterialStyle::drawText(tft, pageInfo, 240, 246, MaterialStyle::TextRole::CompactMetadata, MC_DATUM);
 
     if (_scrollOffset > 0) {
         MaterialStyle::drawTextButton(tft, 20, 230, 96, 32, "PREV");
@@ -159,17 +162,19 @@ void NetworkListScreen::drawActions(TFT_eSPI& tft) {
         const char* labels[] = {"Manual", "Rescan", "Cancel"};
         for (int i = 0; i < 3; ++i) {
             int x = 20 + i * 155;
-            const Icons::IconBitmap* icon = i == 0 ? &Icons::MANUAL_ENTRY : i == 1 ? &Icons::RETRY : &Icons::KEYBOARD_CANCEL;
-            MaterialStyle::ComponentState state = i == 2 ? MaterialStyle::ComponentState::Error
-                                                         : MaterialStyle::ComponentState::Normal;
-            MaterialStyle::drawStandardButton(tft, x, MaterialStyle::BottomActionY, 130,
-                                              MaterialStyle::ButtonHeight, *icon, labels[i], state);
+            const Icons::IconBitmap* icon = i == 0   ? &Icons::MANUAL_ENTRY
+                                            : i == 1 ? &Icons::RETRY
+                                                     : &Icons::KEYBOARD_CANCEL;
+            MaterialStyle::ComponentState state =
+                i == 2 ? MaterialStyle::ComponentState::Error : MaterialStyle::ComponentState::Normal;
+            MaterialStyle::drawStandardButton(
+                tft, x, MaterialStyle::BottomActionY, 130, MaterialStyle::ButtonHeight, *icon, labels[i], state);
         }
         return;
     }
 
-    MaterialStyle::drawStandardButton(tft, 20, MaterialStyle::BottomActionY, 200, MaterialStyle::ButtonHeight,
-                                      Icons::MANUAL_ENTRY, "Manual Entry");
-    MaterialStyle::drawStandardButton(tft, 260, MaterialStyle::BottomActionY, 200, MaterialStyle::ButtonHeight,
-                                      Icons::RETRY, "Rescan");
+    MaterialStyle::drawStandardButton(
+        tft, 20, MaterialStyle::BottomActionY, 200, MaterialStyle::ButtonHeight, Icons::MANUAL_ENTRY, "Manual Entry");
+    MaterialStyle::drawStandardButton(
+        tft, 260, MaterialStyle::BottomActionY, 200, MaterialStyle::ButtonHeight, Icons::RETRY, "Rescan");
 }

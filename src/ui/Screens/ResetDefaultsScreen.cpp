@@ -15,7 +15,7 @@ constexpr int RowTopY = 84;
 int rowY(int index) {
     return RowTopY + (index * (MaterialStyle::ListRowHeight + MaterialStyle::RowGap));
 }
-}
+} // namespace
 
 void ResetDefaultsScreen::draw() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
@@ -77,28 +77,34 @@ void ResetDefaultsScreen::handleTouch(TS_Point p) {
 }
 
 void ResetDefaultsScreen::drawSelection(TFT_eSPI& tft) {
-    MaterialStyle::drawPageHeader(tft, Icons::WARNING, "Reset To Defaults",
-                                  "Choose one settings type to reset");
+    MaterialStyle::drawPageHeader(tft, Icons::WARNING, "Reset To Defaults", "Choose one settings type to reset");
 
     for (int i = 0; i < 3; ++i) {
         ResetType type = static_cast<ResetType>(i);
-        const Icons::IconBitmap* icon = type == ResetType::Wifi ? &Icons::WIFI
-                                         : type == ResetType::Receiver ? &Icons::RECEIVER
-                                                                       : &Icons::TOUCH_CALIBRATION;
-        MaterialStyle::drawListRow(tft, {
-            RowX, rowY(i), RowWidth, MaterialStyle::ListRowHeight,
-            icon,
-            0,
-            labelFor(type),
-            detailFor(type),
-            ">",
-            MaterialStyle::ComponentState::Normal
-        });
+        const Icons::IconBitmap* icon = type == ResetType::Wifi       ? &Icons::WIFI
+                                        : type == ResetType::Receiver ? &Icons::RECEIVER
+                                                                      : &Icons::TOUCH_CALIBRATION;
+        MaterialStyle::drawListRow(tft,
+                                   {RowX,
+                                    rowY(i),
+                                    RowWidth,
+                                    MaterialStyle::ListRowHeight,
+                                    icon,
+                                    0,
+                                    labelFor(type),
+                                    detailFor(type),
+                                    ">",
+                                    MaterialStyle::ComponentState::Normal});
     }
 
-    MaterialStyle::drawStandardButton(tft, 172, MaterialStyle::BottomActionY, 136,
-                                      MaterialStyle::ButtonHeight, Icons::KEYBOARD_CANCEL,
-                                      "Cancel", MaterialStyle::ComponentState::Error);
+    MaterialStyle::drawStandardButton(tft,
+                                      172,
+                                      MaterialStyle::BottomActionY,
+                                      136,
+                                      MaterialStyle::ButtonHeight,
+                                      Icons::KEYBOARD_CANCEL,
+                                      "Cancel",
+                                      MaterialStyle::ComponentState::Error);
 }
 
 void ResetDefaultsScreen::drawConfirmation(TFT_eSPI& tft) {
@@ -106,64 +112,72 @@ void ResetDefaultsScreen::drawConfirmation(TFT_eSPI& tft) {
     MaterialStyle::drawPageHeader(tft, Icons::WARNING, "Reset To Defaults", subtitle);
 
     String message = String("Only ") + labelFor(_selectedType) + " will be cleared.";
-    MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Warning,
-                                   "Confirm reset",
-                                   message,
-                                   Icons::WARNING);
+    MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Warning, "Confirm reset", message, Icons::WARNING);
 
     if (_applyFailed) {
-        MaterialStyle::drawText(tft, "Reset failed. Try again.", 240, 222,
-                                MaterialStyle::TextRole::Body, TC_DATUM,
+        MaterialStyle::drawText(tft,
+                                "Reset failed. Try again.",
+                                240,
+                                222,
+                                MaterialStyle::TextRole::Body,
+                                TC_DATUM,
                                 MaterialStyle::ComponentState::Error);
     }
 
-    MaterialStyle::drawStandardButton(tft, 44, MaterialStyle::BottomActionY, 136,
-                                      MaterialStyle::ButtonHeight, Icons::KEYBOARD_CANCEL,
-                                      "Cancel", MaterialStyle::ComponentState::Error);
-    MaterialStyle::drawStandardButton(tft, 300, MaterialStyle::BottomActionY, 136,
-                                      MaterialStyle::ButtonHeight, Icons::WARNING,
-                                      "Reset", MaterialStyle::ComponentState::Warning);
+    MaterialStyle::drawStandardButton(tft,
+                                      44,
+                                      MaterialStyle::BottomActionY,
+                                      136,
+                                      MaterialStyle::ButtonHeight,
+                                      Icons::KEYBOARD_CANCEL,
+                                      "Cancel",
+                                      MaterialStyle::ComponentState::Error);
+    MaterialStyle::drawStandardButton(tft,
+                                      300,
+                                      MaterialStyle::BottomActionY,
+                                      136,
+                                      MaterialStyle::ButtonHeight,
+                                      Icons::WARNING,
+                                      "Reset",
+                                      MaterialStyle::ComponentState::Warning);
 }
 
 void ResetDefaultsScreen::drawCompleted(TFT_eSPI& tft) {
-    MaterialStyle::drawPageHeader(tft, Icons::SUCCESS, "Reset To Defaults",
-                                  "The selected defaults are restored");
-    MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Success,
-                                   "Reset complete",
-                                   "Press OK to return to Settings.",
-                                   Icons::SUCCESS);
-    MaterialStyle::drawStandardButton(tft, 182, MaterialStyle::BottomActionY, 116,
-                                      MaterialStyle::ButtonHeight, Icons::KEYBOARD_OK,
-                                      "OK", MaterialStyle::ComponentState::Success);
+    MaterialStyle::drawPageHeader(tft, Icons::SUCCESS, "Reset To Defaults", "The selected defaults are restored");
+    MaterialStyle::drawStatusBlock(
+        tft, MaterialStyle::StatusKind::Success, "Reset complete", "Press OK to return to Settings.", Icons::SUCCESS);
+    MaterialStyle::drawStandardButton(tft,
+                                      182,
+                                      MaterialStyle::BottomActionY,
+                                      116,
+                                      MaterialStyle::ButtonHeight,
+                                      Icons::KEYBOARD_OK,
+                                      "OK",
+                                      MaterialStyle::ComponentState::Success);
 }
 
 bool ResetDefaultsScreen::isChoicePressed(TS_Point p, int index) const {
     int y = rowY(index);
-    return p.x >= RowX && p.x <= RowX + RowWidth &&
-           p.y >= y && p.y <= y + MaterialStyle::ListRowHeight;
+    return p.x >= RowX && p.x <= RowX + RowWidth && p.y >= y && p.y <= y + MaterialStyle::ListRowHeight;
 }
 
 bool ResetDefaultsScreen::isCancelPressed(TS_Point p) const {
     if (_mode == Mode::ChoosingType) {
-        return p.x >= 172 && p.x <= 308 &&
-               p.y >= MaterialStyle::BottomActionY &&
+        return p.x >= 172 && p.x <= 308 && p.y >= MaterialStyle::BottomActionY &&
                p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight;
     }
 
-    return p.x >= 44 && p.x <= 180 &&
-           p.y >= MaterialStyle::BottomActionY &&
+    return p.x >= 44 && p.x <= 180 && p.y >= MaterialStyle::BottomActionY &&
            p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight;
 }
 
 bool ResetDefaultsScreen::isResetPressed(TS_Point p) const {
-    return p.x >= 300 && p.x <= 436 &&
-           p.y >= MaterialStyle::BottomActionY &&
+    return p.x >= 300 && p.x <= 436 && p.y >= MaterialStyle::BottomActionY &&
            p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight;
 }
 
 bool ResetDefaultsScreen::isOkPressed(TS_Point p) const {
-    return p.x >= 182 && p.x <= 298 &&
-           p.y >= MaterialStyle::BottomActionY &&
+    return p.x >= 182 && p.x <= 298 && p.y >= MaterialStyle::BottomActionY &&
            p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight;
 }
 

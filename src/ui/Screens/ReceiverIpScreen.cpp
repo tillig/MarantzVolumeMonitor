@@ -7,8 +7,7 @@
 #include "../assets/IconBitmaps.h"
 #include "../../network/ReceiverDiscovery.h"
 
-ReceiverIpScreen::ReceiverIpScreen(ScreenReturnTarget returnTarget)
-    : _returnTarget(returnTarget) {}
+ReceiverIpScreen::ReceiverIpScreen(ScreenReturnTarget returnTarget) : _returnTarget(returnTarget) {}
 
 void ReceiverIpScreen::draw() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
@@ -45,8 +44,7 @@ void ReceiverIpScreen::handleTouch(TS_Point p) {
         }
     }
 
-    if (p.y >= MaterialStyle::BottomActionY &&
-        p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight) {
+    if (p.y >= MaterialStyle::BottomActionY && p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight) {
         if (p.x >= 44 && p.x <= 180) {
             ScreenManager::getInstance().setScreen(new ReceiverListScreen(_returnTarget));
         } else if (p.x >= 300 && p.x <= 436) {
@@ -62,8 +60,12 @@ void ReceiverIpScreen::drawInput(TFT_eSPI& tft) {
 
     tft.fillRect(20, 266, 440, 12, DisplayManager::COLOR_BACKGROUND);
     if (_errorMessage.length() > 0) {
-        MaterialStyle::drawText(tft, _errorMessage, 240, 272,
-                                MaterialStyle::TextRole::CompactMetadata, MC_DATUM,
+        MaterialStyle::drawText(tft,
+                                _errorMessage,
+                                240,
+                                272,
+                                MaterialStyle::TextRole::CompactMetadata,
+                                MC_DATUM,
                                 MaterialStyle::ComponentState::Error);
     }
 }
@@ -82,11 +84,21 @@ void ReceiverIpScreen::drawKeypad(TFT_eSPI& tft) {
         }
     }
 
-    MaterialStyle::drawStandardButton(tft, 44, MaterialStyle::BottomActionY, 136, MaterialStyle::ButtonHeight,
-                                      Icons::KEYBOARD_CANCEL, "Cancel",
+    MaterialStyle::drawStandardButton(tft,
+                                      44,
+                                      MaterialStyle::BottomActionY,
+                                      136,
+                                      MaterialStyle::ButtonHeight,
+                                      Icons::KEYBOARD_CANCEL,
+                                      "Cancel",
                                       MaterialStyle::ComponentState::Error);
-    MaterialStyle::drawStandardButton(tft, 300, MaterialStyle::BottomActionY, 136, MaterialStyle::ButtonHeight,
-                                      Icons::KEYBOARD_OK, "Verify",
+    MaterialStyle::drawStandardButton(tft,
+                                      300,
+                                      MaterialStyle::BottomActionY,
+                                      136,
+                                      MaterialStyle::ButtonHeight,
+                                      Icons::KEYBOARD_OK,
+                                      "Verify",
                                       MaterialStyle::ComponentState::Success);
 }
 

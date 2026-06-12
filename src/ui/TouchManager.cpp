@@ -66,10 +66,10 @@ TS_Point TouchManager::getPoint() {
 }
 
 TS_Point TouchManager::mapRawPoint(const TS_Point& rawPoint) const {
-    float mappedX = (_activeProfile.xFromRawX * rawPoint.x) +
-                    (_activeProfile.xFromRawY * rawPoint.y) + _activeProfile.xOffset;
-    float mappedY = (_activeProfile.yFromRawX * rawPoint.x) +
-                    (_activeProfile.yFromRawY * rawPoint.y) + _activeProfile.yOffset;
+    float mappedX =
+        (_activeProfile.xFromRawX * rawPoint.x) + (_activeProfile.xFromRawY * rawPoint.y) + _activeProfile.xOffset;
+    float mappedY =
+        (_activeProfile.yFromRawX * rawPoint.x) + (_activeProfile.yFromRawY * rawPoint.y) + _activeProfile.yOffset;
     int16_t x = static_cast<int16_t>(lroundf(mappedX));
     int16_t y = static_cast<int16_t>(lroundf(mappedY));
 
@@ -110,14 +110,12 @@ TouchManager::CalibrationProfile TouchManager::defaultCalibrationProfile() {
 }
 
 bool TouchManager::isCalibrationProfileUsable(const CalibrationProfile& profile) {
-    if (!isfinite(profile.xFromRawX) || !isfinite(profile.xFromRawY) ||
-        !isfinite(profile.xOffset) || !isfinite(profile.yFromRawX) ||
-        !isfinite(profile.yFromRawY) || !isfinite(profile.yOffset)) {
+    if (!isfinite(profile.xFromRawX) || !isfinite(profile.xFromRawY) || !isfinite(profile.xOffset) ||
+        !isfinite(profile.yFromRawX) || !isfinite(profile.yFromRawY) || !isfinite(profile.yOffset)) {
         return false;
     }
 
-    float determinant = (profile.xFromRawX * profile.yFromRawY) -
-                        (profile.xFromRawY * profile.yFromRawX);
+    float determinant = (profile.xFromRawX * profile.yFromRawY) - (profile.xFromRawY * profile.yFromRawX);
     return fabsf(determinant) > 0.0001f;
 }
 

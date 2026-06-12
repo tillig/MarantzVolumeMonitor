@@ -5,27 +5,11 @@
 #include <WiFiUdp.h>
 #include <vector>
 
-enum class ReceiverSource {
-    Discovered,
-    Manual
-};
+enum class ReceiverSource { Discovered, Manual };
 
-enum class ReceiverDiscoveryState {
-    Idle,
-    Searching,
-    Complete,
-    TimedOut,
-    Failed
-};
+enum class ReceiverDiscoveryState { Idle, Searching, Complete, TimedOut, Failed };
 
-enum class ReceiverFailureReason {
-    None,
-    InvalidAddress,
-    Timeout,
-    NoStatus,
-    NetworkUnavailable,
-    SaveFailed
-};
+enum class ReceiverFailureReason { None, InvalidAddress, Timeout, NoStatus, NetworkUnavailable, SaveFailed };
 
 struct ReceiverCandidate {
     String name;
@@ -33,10 +17,12 @@ struct ReceiverCandidate {
     ReceiverSource source;
     uint32_t discoveredAtMs;
 
-    ReceiverCandidate()
-        : name(""), ipAddress(""), source(ReceiverSource::Discovered), discoveredAtMs(0) {}
+    ReceiverCandidate() : name(""), ipAddress(""), source(ReceiverSource::Discovered), discoveredAtMs(0) {}
 
-    ReceiverCandidate(const String& receiverName, const String& ip, ReceiverSource receiverSource, uint32_t discoveredAt)
+    ReceiverCandidate(const String& receiverName,
+                      const String& ip,
+                      ReceiverSource receiverSource,
+                      uint32_t discoveredAt)
         : name(receiverName), ipAddress(ip), source(receiverSource), discoveredAtMs(discoveredAt) {}
 };
 

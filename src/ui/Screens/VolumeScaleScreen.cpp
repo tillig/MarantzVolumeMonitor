@@ -15,7 +15,7 @@ constexpr int ChoiceRowGap = MaterialStyle::RowGap;
 int choiceRowY(int index) {
     return ChoiceRowTopY + (index * (MaterialStyle::ListRowHeight + ChoiceRowGap));
 }
-}
+} // namespace
 
 void VolumeScaleScreen::draw() {
     if (!_initialized) {
@@ -25,43 +25,52 @@ void VolumeScaleScreen::draw() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
     tft.fillScreen(DisplayManager::COLOR_BACKGROUND);
 
-    MaterialStyle::drawPageHeader(tft, Icons::SETTINGS, "Volume Display Scale",
-                                  "Choose the home volume number format");
+    MaterialStyle::drawPageHeader(tft, Icons::SETTINGS, "Volume Display Scale", "Choose the home volume number format");
 
-    MaterialStyle::drawChoiceRow(tft, {
-        ChoiceRowX,
-        choiceRowY(0),
-        ChoiceRowWidth,
-        MaterialStyle::ListRowHeight,
-        "0-100",
-        "Normalized home scale",
-        _pendingChoice == Choice::Normalized,
-        MaterialStyle::ComponentState::Normal
-    });
-    MaterialStyle::drawChoiceRow(tft, {
-        ChoiceRowX,
-        choiceRowY(1),
-        ChoiceRowWidth,
-        MaterialStyle::ListRowHeight,
-        "dB",
-        "Raw receiver volume",
-        _pendingChoice == Choice::Db,
-        MaterialStyle::ComponentState::Normal
-    });
+    MaterialStyle::drawChoiceRow(tft,
+                                 {ChoiceRowX,
+                                  choiceRowY(0),
+                                  ChoiceRowWidth,
+                                  MaterialStyle::ListRowHeight,
+                                  "0-100",
+                                  "Normalized home scale",
+                                  _pendingChoice == Choice::Normalized,
+                                  MaterialStyle::ComponentState::Normal});
+    MaterialStyle::drawChoiceRow(tft,
+                                 {ChoiceRowX,
+                                  choiceRowY(1),
+                                  ChoiceRowWidth,
+                                  MaterialStyle::ListRowHeight,
+                                  "dB",
+                                  "Raw receiver volume",
+                                  _pendingChoice == Choice::Db,
+                                  MaterialStyle::ComponentState::Normal});
 
     if (_saveFailed) {
-        MaterialStyle::drawText(tft, "Save failed. Try again.", 240, 206,
-                                MaterialStyle::TextRole::Body, TC_DATUM,
+        MaterialStyle::drawText(tft,
+                                "Save failed. Try again.",
+                                240,
+                                206,
+                                MaterialStyle::TextRole::Body,
+                                TC_DATUM,
                                 MaterialStyle::ComponentState::Error);
     }
 
-    MaterialStyle::drawStandardButton(tft, 44, MaterialStyle::BottomActionY, 136,
+    MaterialStyle::drawStandardButton(tft,
+                                      44,
+                                      MaterialStyle::BottomActionY,
+                                      136,
                                       MaterialStyle::ButtonHeight,
-                                      Icons::KEYBOARD_CANCEL, "Cancel",
+                                      Icons::KEYBOARD_CANCEL,
+                                      "Cancel",
                                       MaterialStyle::ComponentState::Error);
-    MaterialStyle::drawStandardButton(tft, 300, MaterialStyle::BottomActionY, 136,
+    MaterialStyle::drawStandardButton(tft,
+                                      300,
+                                      MaterialStyle::BottomActionY,
+                                      136,
                                       MaterialStyle::ButtonHeight,
-                                      Icons::KEYBOARD_OK, "OK",
+                                      Icons::KEYBOARD_OK,
+                                      "OK",
                                       MaterialStyle::ComponentState::Success);
 }
 
@@ -111,25 +120,23 @@ void VolumeScaleScreen::loadChoice() {
 
 bool VolumeScaleScreen::isNormalizedPressed(TS_Point p) const {
     int y = choiceRowY(0);
-    return p.x >= ChoiceRowX && p.x <= ChoiceRowX + ChoiceRowWidth &&
-           p.y >= y && p.y <= y + MaterialStyle::ListRowHeight;
+    return p.x >= ChoiceRowX && p.x <= ChoiceRowX + ChoiceRowWidth && p.y >= y &&
+           p.y <= y + MaterialStyle::ListRowHeight;
 }
 
 bool VolumeScaleScreen::isDbPressed(TS_Point p) const {
     int y = choiceRowY(1);
-    return p.x >= ChoiceRowX && p.x <= ChoiceRowX + ChoiceRowWidth &&
-           p.y >= y && p.y <= y + MaterialStyle::ListRowHeight;
+    return p.x >= ChoiceRowX && p.x <= ChoiceRowX + ChoiceRowWidth && p.y >= y &&
+           p.y <= y + MaterialStyle::ListRowHeight;
 }
 
 bool VolumeScaleScreen::isCancelPressed(TS_Point p) const {
-    return p.x >= 44 && p.x <= 180 &&
-           p.y >= MaterialStyle::BottomActionY &&
+    return p.x >= 44 && p.x <= 180 && p.y >= MaterialStyle::BottomActionY &&
            p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight;
 }
 
 bool VolumeScaleScreen::isOkPressed(TS_Point p) const {
-    return p.x >= 300 && p.x <= 436 &&
-           p.y >= MaterialStyle::BottomActionY &&
+    return p.x >= 300 && p.x <= 436 && p.y >= MaterialStyle::BottomActionY &&
            p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight;
 }
 

@@ -13,6 +13,12 @@ repos:
       - id: check-yaml
       - id: trailing-whitespace
       - id: check-merge-conflict
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: dd18dad857d6133e90bbe478f4f2f22ec0030269 # frozen: v22.1.5
+    hooks:
+      - id: clang-format
+        exclude: ^src/ui/assets/IconBitmaps\.cpp$
+        files: \.(c|cc|cpp|cxx|h|hh|hpp|hxx)$
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: "c7c1c7640e610068e8e4754e9f1bf109bd987dc7" # post-v0.48.0 with patches
     hooks:

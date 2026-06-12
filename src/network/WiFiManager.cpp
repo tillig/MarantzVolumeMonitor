@@ -1,5 +1,9 @@
 #include "WiFiManager.h"
 
+#include <algorithm>
+#include <iterator>
+#include <map>
+
 void WiFiManager::startConnect(const String& ssid, const String& password) {
     WiFi.begin(ssid.c_str(), password.c_str());
 }
@@ -51,8 +55,6 @@ uint8_t WiFiManager::signalLevelForRssi(int32_t rssi) {
     return 3;
 }
 
-#include <map>
-
 std::vector<WiFiManager::NetworkInfo> WiFiManager::getScanResults() {
     std::vector<NetworkInfo> networks;
     int n = WiFi.scanComplete();
@@ -70,9 +72,11 @@ std::vector<WiFiManager::NetworkInfo> WiFiManager::getScanResults() {
             }
         }
 
-        for (auto const& entry : deduped) {
-            networks.push_back(entry.second);
-        }
+        networks.reserve(deduped.size());
+        std::transform(deduped.begin(),
+                       deduped.end(),
+                       std::back_inserter(networks),
+                       [](const std::pair<const String, NetworkInfo>& entry) { return entry.second; });
 
         // Sort by RSSI (strongest first)
         std::sort(networks.begin(), networks.end(), [](const NetworkInfo& a, const NetworkInfo& b) {

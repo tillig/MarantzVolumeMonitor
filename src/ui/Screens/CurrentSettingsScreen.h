@@ -32,7 +32,11 @@ private:
     void clearCardBody(TFT_eSPI& tft, int cardY, int cardHeight) const;
     void drawWifiSummary(TFT_eSPI& tft) const;
     void drawReceiverSummary(TFT_eSPI& tft) const;
-    void drawSummaryLine(TFT_eSPI& tft, int x, int y, int maxWidth, const String& text,
+    void drawSummaryLine(TFT_eSPI& tft,
+                         int x,
+                         int y,
+                         int maxWidth,
+                         const String& text,
                          MaterialStyle::ComponentState state,
                          uint8_t datum = TL_DATUM) const;
     String wifiHeadlineText() const;

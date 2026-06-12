@@ -11,17 +11,9 @@ public:
     void handleTouch(TS_Point p) override;
 
 private:
-    enum class ResetType {
-        Wifi,
-        Receiver,
-        Calibration
-    };
+    enum class ResetType { Wifi, Receiver, Calibration };
 
-    enum class Mode {
-        ChoosingType,
-        Confirming,
-        Completed
-    };
+    enum class Mode { ChoosingType, Confirming, Completed };
 
     Mode _mode = Mode::ChoosingType;
     ResetType _selectedType = ResetType::Wifi;

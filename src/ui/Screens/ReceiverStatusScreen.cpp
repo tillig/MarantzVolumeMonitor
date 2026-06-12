@@ -17,16 +17,18 @@ void ReceiverStatusScreen::draw() {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
     tft.fillScreen(DisplayManager::COLOR_BACKGROUND);
 
-    MaterialStyle::drawText(tft, "Receiver Setup", 240, 14,
-                            MaterialStyle::TextRole::ScreenTitle, TC_DATUM);
+    MaterialStyle::drawText(tft, "Receiver Setup", 240, 14, MaterialStyle::TextRole::ScreenTitle, TC_DATUM);
 
     if (_complete && _result.success) {
-        MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Success,
-                                       "Receiver saved",
-                                       "Tap OK to continue.", Icons::SUCCESS);
-        MaterialStyle::drawStandardButton(tft, 182, MaterialStyle::BottomActionY, 116,
+        MaterialStyle::drawStatusBlock(
+            tft, MaterialStyle::StatusKind::Success, "Receiver saved", "Tap OK to continue.", Icons::SUCCESS);
+        MaterialStyle::drawStandardButton(tft,
+                                          182,
+                                          MaterialStyle::BottomActionY,
+                                          116,
                                           MaterialStyle::ButtonHeight,
-                                          Icons::KEYBOARD_OK, "OK",
+                                          Icons::KEYBOARD_OK,
+                                          "OK",
                                           MaterialStyle::ComponentState::Success);
         return;
     }
@@ -38,18 +40,19 @@ void ReceiverStatusScreen::draw() {
                                                     : MaterialStyle::StatusKind::Unavailable,
                                        "Verifying...",
                                        MaterialStyle::truncateToWidth(tft, _candidate.name, 340, 2),
-                                       Icons::SCAN, _progressFrame);
+                                       Icons::SCAN,
+                                       _progressFrame);
         return;
     }
 
-    MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Error,
-                                   failureText(), "Choose a recovery action.", Icons::FAILURE);
-    MaterialStyle::drawStandardButton(tft, 20, MaterialStyle::BottomActionY, 130, MaterialStyle::ButtonHeight,
-                                      Icons::RETRY, "Retry");
-    MaterialStyle::drawStandardButton(tft, 175, MaterialStyle::BottomActionY, 130, MaterialStyle::ButtonHeight,
-                                      Icons::MANUAL_ENTRY, "Manual");
-    MaterialStyle::drawStandardButton(tft, 330, MaterialStyle::BottomActionY, 130, MaterialStyle::ButtonHeight,
-                                      Icons::SCAN, "Discover");
+    MaterialStyle::drawStatusBlock(
+        tft, MaterialStyle::StatusKind::Error, failureText(), "Choose a recovery action.", Icons::FAILURE);
+    MaterialStyle::drawStandardButton(
+        tft, 20, MaterialStyle::BottomActionY, 130, MaterialStyle::ButtonHeight, Icons::RETRY, "Retry");
+    MaterialStyle::drawStandardButton(
+        tft, 175, MaterialStyle::BottomActionY, 130, MaterialStyle::ButtonHeight, Icons::MANUAL_ENTRY, "Manual");
+    MaterialStyle::drawStandardButton(
+        tft, 330, MaterialStyle::BottomActionY, 130, MaterialStyle::ButtonHeight, Icons::SCAN, "Discover");
 }
 
 void ReceiverStatusScreen::update() {
@@ -74,8 +77,7 @@ void ReceiverStatusScreen::handleTouch(TS_Point p) {
         return;
     }
 
-    if (p.y >= MaterialStyle::BottomActionY &&
-        p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight) {
+    if (p.y >= MaterialStyle::BottomActionY && p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight) {
         if (_result.success && p.x >= 182 && p.x <= 298) {
             if (_returnTarget == ScreenReturnTarget::Settings) {
                 ScreenManager::getInstance().setScreen(new SettingsScreen());

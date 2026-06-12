@@ -16,14 +16,8 @@ struct TouchCalibrationConfig {
     float yOffset;
 
     TouchCalibrationConfig()
-        : isPresent(false),
-          version(1),
-          xFromRawX(0.0f),
-          xFromRawY(0.0f),
-          xOffset(0.0f),
-          yFromRawX(0.0f),
-          yFromRawY(0.0f),
-          yOffset(0.0f) {}
+        : isPresent(false), version(1), xFromRawX(0.0f), xFromRawY(0.0f), xOffset(0.0f), yFromRawX(0.0f),
+          yFromRawY(0.0f), yOffset(0.0f) {}
 };
 
 struct DeviceConfig {
@@ -34,21 +28,12 @@ struct DeviceConfig {
     bool useDbScale;
     TouchCalibrationConfig touchCalibration;
 
-    DeviceConfig()
-        : wifiSsid(""),
-          wifiPassword(""),
-          receiverIp(""),
-          brightness(255),
-          useDbScale(false) {}
+    DeviceConfig() : wifiSsid(""), wifiPassword(""), receiverIp(""), brightness(255), useDbScale(false) {}
 };
 
 class ConfigStore {
 public:
-    enum class ResetTarget {
-        Wifi,
-        Receiver,
-        Calibration
-    };
+    enum class ResetTarget { Wifi, Receiver, Calibration };
 
     static ConfigStore& getInstance() {
         static ConfigStore instance;

@@ -32,11 +32,7 @@ private:
         int16_t mappedY = 0;
     };
 
-    enum class SessionState {
-        Collecting,
-        RetryableFailure,
-        Complete
-    };
+    enum class SessionState { Collecting, RetryableFailure, Complete };
 
     uint8_t _step = 0;
     bool _awaitingRelease = false;
@@ -47,29 +43,31 @@ private:
     String _statusMessage;
     MaterialStyle::ComponentState _statusState = MaterialStyle::ComponentState::Normal;
 
-    CalibrationPoint _points[PointCount] = {
-        {48, 40, "Top Left"},
-        {240, 40, "Top Center"},
-        {432, 40, "Top Right"},
-        {48, 144, "Mid Left"},
-        {240, 144, "Center"},
-        {432, 144, "Mid Right"},
-        {48, 276, "Bottom Left"},
-        {240, 276, "Bottom Center"},
-        {432, 276, "Bottom Right"}
-    };
+    CalibrationPoint _points[PointCount] = {{48, 40, "Top Left"},
+                                            {240, 40, "Top Center"},
+                                            {432, 40, "Top Right"},
+                                            {48, 144, "Mid Left"},
+                                            {240, 144, "Center"},
+                                            {432, 144, "Mid Right"},
+                                            {48, 276, "Bottom Left"},
+                                            {240, 276, "Bottom Center"},
+                                            {432, 276, "Bottom Right"}};
     CalibrationSample _samples[PointCount];
 
     void resetSession();
-    void setStatus(const String& title, const String& message,
-                   MaterialStyle::ComponentState state);
+    void setStatus(const String& title, const String& message, MaterialStyle::ComponentState state);
     bool isCancelPressed(TS_Point p) const;
     bool isOkPressed(TS_Point p) const;
     bool isWithinActiveTarget(const TS_Point& mappedPoint) const;
     bool isSuspiciousDuplicate(const TS_Point& rawPoint) const;
     bool computeCalibrationProfile(TouchManager::CalibrationProfile& profile) const;
-    bool solveLeastSquaresAxis(const float* rawX, const float* rawY, const float* targets,
-                               size_t count, float& fromRawX, float& fromRawY, float& offset) const;
+    bool solveLeastSquaresAxis(const float* rawX,
+                               const float* rawY,
+                               const float* targets,
+                               size_t count,
+                               float& fromRawX,
+                               float& fromRawY,
+                               float& offset) const;
     bool validateCalibrationProfile(const TouchManager::CalibrationProfile& profile);
     bool saveCalibrationProfile(const TouchManager::CalibrationProfile& profile);
     void exitScreen() const;

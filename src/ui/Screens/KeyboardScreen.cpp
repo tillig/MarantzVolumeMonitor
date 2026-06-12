@@ -8,13 +8,13 @@
 #include "../assets/IconBitmaps.h"
 
 // Explicit Control Chars to avoid ASCII collisions
-#define KEY_SHIFT     '\x01'
-#define KEY_MODE      '\x02'
+#define KEY_SHIFT '\x01'
+#define KEY_MODE '\x02'
 #define KEY_BACKSPACE '\x03'
-#define KEY_OK        '\x04'
-#define KEY_CANCEL    '\x05'
-#define KEY_EYE       '\x06'
-#define KEY_SPACE     ' '
+#define KEY_OK '\x04'
+#define KEY_CANCEL '\x05'
+#define KEY_EYE '\x06'
+#define KEY_SPACE ' '
 
 KeyboardScreen::KeyboardScreen(const String& ssid, ScreenReturnTarget returnTarget)
     : _ssid(ssid), _returnTarget(returnTarget) {
@@ -28,8 +28,8 @@ void KeyboardScreen::draw() {
     tft.fillScreen(DisplayManager::COLOR_BACKGROUND);
 
     String title = (_ssid == "") ? "Manual SSID Entry" : "Wi-Fi Password: " + _ssid;
-    MaterialStyle::drawText(tft, MaterialStyle::truncateToWidth(tft, title, 440, 2),
-                            240, 5, MaterialStyle::TextRole::Body, TC_DATUM);
+    MaterialStyle::drawText(
+        tft, MaterialStyle::truncateToWidth(tft, title, 440, 2), 240, 5, MaterialStyle::TextRole::Body, TC_DATUM);
 
     drawInputArea();
     drawKeys();
@@ -47,13 +47,15 @@ void KeyboardScreen::handleTouch(TS_Point p) {
             if (key.isFunction) {
                 switch (key.label) {
                     case KEY_BACKSPACE:
-                        if (_password.length() > 0) _password.remove(_password.length() - 1);
+                        if (_password.length() > 0)
+                            _password.remove(_password.length() - 1);
                         break;
                     case KEY_OK:
                         if (_ssid == "") {
                             ScreenManager::getInstance().setScreen(new KeyboardScreen(_password, _returnTarget));
                         } else {
-                            ScreenManager::getInstance().setScreen(new SetupStatusScreen(_ssid, _password, _returnTarget));
+                            ScreenManager::getInstance().setScreen(
+                                new SetupStatusScreen(_ssid, _password, _returnTarget));
                         }
                         return;
                     case KEY_CANCEL:
@@ -98,26 +100,20 @@ void KeyboardScreen::initKeys() {
     std::vector<std::vector<char>> layout;
     const bool isPasswordEntry = _ssid != "";
     if (_currentMode == Mode::Uppercase) {
-        layout = {
-            {'1','2','3','4','5','6','7','8','9','0'},
-            {'Q','W','E','R','T','Y','U','I','O','P'},
-            {'A','S','D','F','G','H','J','K','L'},
-            {'Z','X','C','V','B','N','M', KEY_BACKSPACE}
-        };
+        layout = {{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'},
+                  {'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'},
+                  {'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'},
+                  {'Z', 'X', 'C', 'V', 'B', 'N', 'M', KEY_BACKSPACE}};
     } else if (_currentMode == Mode::Lowercase) {
-        layout = {
-            {'1','2','3','4','5','6','7','8','9','0'},
-            {'q','w','e','r','t','y','u','i','o','p'},
-            {'a','s','d','f','g','h','j','k','l'},
-            {'z','x','c','v','b','n','m', KEY_BACKSPACE}
-        };
+        layout = {{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'},
+                  {'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'},
+                  {'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'},
+                  {'z', 'x', 'c', 'v', 'b', 'n', 'm', KEY_BACKSPACE}};
     } else {
-        layout = {
-            {'!','@','#','$','%','^','&','*','(',')'},
-            {'-','_','=','+','[',']','{','}',';',':'},
-            {'\'','"',',','.','/','?','|','\\','`','~'},
-            {'<','>', KEY_BACKSPACE}
-        };
+        layout = {{'!', '@', '#', '$', '%', '^', '&', '*', '(', ')'},
+                  {'-', '_', '=', '+', '[', ']', '{', '}', ';', ':'},
+                  {'\'', '"', ',', '.', '/', '?', '|', '\\', '`', '~'},
+                  {'<', '>', KEY_BACKSPACE}};
     }
     if (isPasswordEntry) {
         layout.back().push_back(KEY_EYE);
@@ -146,7 +142,8 @@ void KeyboardScreen::initKeys() {
     int spaceW = 120; // Width for spacebar
     int bottomY = startY + 4 * (keyH + margin);
 
-    int totalWidth = (_currentMode != Mode::Symbols) ? (funcW*4 + spaceW + margin*4) : (funcW*3 + spaceW + margin*3);
+    int totalWidth =
+        (_currentMode != Mode::Symbols) ? (funcW * 4 + spaceW + margin * 4) : (funcW * 3 + spaceW + margin * 3);
     int x = (480 - totalWidth) / 2;
 
     if (_currentMode != Mode::Symbols) {
@@ -173,26 +170,31 @@ void KeyboardScreen::drawKeys() {
         } else if (key.label == KEY_BACKSPACE) {
             MaterialStyle::drawKeyboardIconButton(tft, key.x, key.y, key.w, key.h, Icons::KEYBOARD_BACKSPACE);
         } else if (key.label == KEY_OK) {
-            MaterialStyle::drawKeyboardIconButton(tft, key.x, key.y, key.w, key.h,
-                                                  Icons::KEYBOARD_OK,
-                                                  MaterialStyle::ComponentState::Success);
+            MaterialStyle::drawKeyboardIconButton(
+                tft, key.x, key.y, key.w, key.h, Icons::KEYBOARD_OK, MaterialStyle::ComponentState::Success);
         } else if (key.label == KEY_CANCEL) {
-            MaterialStyle::drawKeyboardIconButton(tft, key.x, key.y, key.w, key.h,
-                                                  Icons::KEYBOARD_CANCEL, MaterialStyle::ComponentState::Error);
+            MaterialStyle::drawKeyboardIconButton(
+                tft, key.x, key.y, key.w, key.h, Icons::KEYBOARD_CANCEL, MaterialStyle::ComponentState::Error);
         } else if (key.label == KEY_SHIFT) {
-            MaterialStyle::drawKeyboardIconButton(tft, key.x, key.y, key.w, key.h,
+            MaterialStyle::drawKeyboardIconButton(tft,
+                                                  key.x,
+                                                  key.y,
+                                                  key.w,
+                                                  key.h,
                                                   Icons::KEYBOARD_CAPS_LOCK,
                                                   _capsLock ? MaterialStyle::ComponentState::Selected
                                                             : MaterialStyle::ComponentState::Normal);
         } else {
             String label;
-            if (key.label == KEY_MODE) label = (_currentMode == Mode::Symbols) ? "ABC" : "!@#$";
-            else if (key.label == KEY_SPACE) label = "SPACE";
-            else label = String(key.label);
+            if (key.label == KEY_MODE)
+                label = (_currentMode == Mode::Symbols) ? "ABC" : "!@#$";
+            else if (key.label == KEY_SPACE)
+                label = "SPACE";
+            else
+                label = String(key.label);
 
-            MaterialStyle::ComponentState state = key.isFunction
-                                                     ? MaterialStyle::ComponentState::Normal
-                                                     : MaterialStyle::ComponentState::Inactive;
+            MaterialStyle::ComponentState state =
+                key.isFunction ? MaterialStyle::ComponentState::Normal : MaterialStyle::ComponentState::Inactive;
             MaterialStyle::drawKeyboardTextButton(tft, key.x, key.y, key.w, key.h, label, state);
         }
     }
@@ -205,7 +207,8 @@ void KeyboardScreen::drawInputArea() {
     if (_showPassword || _ssid == "") {
         displayStr = _password;
     } else {
-        for (int i = 0; i < _password.length(); ++i) displayStr += "*";
+        for (int i = 0; i < _password.length(); ++i)
+            displayStr += "*";
     }
     displayStr += "_";
 

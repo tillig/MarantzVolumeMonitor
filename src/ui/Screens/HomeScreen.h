@@ -8,12 +8,7 @@
 
 class HomeScreen : public Screen {
 public:
-    enum class Layout {
-        Classic,
-        Modern,
-        Minimal,
-        Unified
-    };
+    enum class Layout { Classic, Modern, Minimal, Unified };
 
     enum class DisplayState {
         WifiSetupRequired,
@@ -121,20 +116,14 @@ private:
     int volumeSweep(float volume) const;
     uint16_t volumeArcColor(int sweep) const;
     void drawVolumeArcDelta(TFT_eSPI& target, float previousVolume, float currentVolume);
-    void drawVolumeArcSegment(TFT_eSPI& target, int x, int y, int r, int startSweep,
-                              int endSweep, bool colored);
-    void drawVolumeCap(TFT_eSPI& target, int x, int y, int r, int sweep,
-                       uint16_t color);
-    void drawVolumeValueText(TFT_eSPI& target, const String& valueText, uint8_t font,
-                             int centerX, int centerY);
+    void drawVolumeArcSegment(TFT_eSPI& target, int x, int y, int r, int startSweep, int endSweep, bool colored);
+    void drawVolumeCap(TFT_eSPI& target, int x, int y, int r, int sweep, uint16_t color);
+    void drawVolumeValueText(TFT_eSPI& target, const String& valueText, uint8_t font, int centerX, int centerY);
     void drawVolumeNegativeSign(TFT_eSPI& target, int x, int centerY);
-    void drawVolumeValueTextDelta(TFT_eSPI& target, const String& valueText,
-                                  uint8_t font);
-    void drawVolumeTextAt(TFT_eSPI& target, const String& text, int x, int y,
-                          uint8_t font);
+    void drawVolumeValueTextDelta(TFT_eSPI& target, const String& valueText, uint8_t font);
+    void drawVolumeTextAt(TFT_eSPI& target, const String& text, int x, int y, uint8_t font);
     void clearRect(const Rect& rect);
-    void drawReceiverStatusState(const String& title, const String& message,
-                                 MaterialStyle::StatusKind kind);
+    void drawReceiverStatusState(const String& title, const String& message, MaterialStyle::StatusKind kind);
 
     // Layout-specific drawing
     void drawLayoutClassic();

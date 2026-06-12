@@ -4,10 +4,7 @@
 #include "../DisplayManager.h"
 #include "../TouchManager.h"
 
-enum class ScreenReturnTarget {
-    Home,
-    Settings
-};
+enum class ScreenReturnTarget { Home, Settings };
 
 class Screen {
 public:

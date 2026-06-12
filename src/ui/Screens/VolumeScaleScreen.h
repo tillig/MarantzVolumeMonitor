@@ -11,10 +11,7 @@ public:
     void handleTouch(TS_Point p) override;
 
 private:
-    enum class Choice {
-        Normalized,
-        Db
-    };
+    enum class Choice { Normalized, Db };
 
     bool _initialized = false;
     bool _saveFailed = false;

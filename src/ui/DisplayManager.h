@@ -13,8 +13,12 @@ public:
     void begin();
     void setBrightness(uint8_t brightness);
     void setBacklightEnabled(bool enabled, const char* reason = nullptr);
-    bool isBacklightEnabled() const { return _backlightEnabled; }
-    TFT_eSPI& getTft() { return _tft; }
+    bool isBacklightEnabled() const {
+        return _backlightEnabled;
+    }
+    TFT_eSPI& getTft() {
+        return _tft;
+    }
 
     // Constants for colors from UIPlan.md
     static const uint16_t COLOR_BACKGROUND = 0x0841; // #101010

@@ -6,11 +6,7 @@
 
 class KeyboardScreen : public Screen {
 public:
-    enum class Mode {
-        Lowercase,
-        Uppercase,
-        Symbols
-    };
+    enum class Mode { Lowercase, Uppercase, Symbols };
 
     KeyboardScreen(const String& ssid, ScreenReturnTarget returnTarget = ScreenReturnTarget::Home);
     void draw() override;

@@ -86,16 +86,16 @@ bool ReceiverDiscovery::isValidIpv4(const String& value) {
     }
 
     int parts = 0;
-    int start = 0;
-    while (start < value.length()) {
-        int dot = value.indexOf('.', start);
+    int segmentStart = 0;
+    while (segmentStart < value.length()) {
+        int dot = value.indexOf('.', segmentStart);
         int end = dot == -1 ? value.length() : dot;
-        if (end == start || end - start > 3) {
+        if (end == segmentStart || end - segmentStart > 3) {
             return false;
         }
 
         int octet = 0;
-        for (int i = start; i < end; ++i) {
+        for (int i = segmentStart; i < end; ++i) {
             if (!isDigit(value[i])) {
                 return false;
             }
@@ -109,7 +109,7 @@ bool ReceiverDiscovery::isValidIpv4(const String& value) {
         if (dot == -1) {
             break;
         }
-        start = dot + 1;
+        segmentStart = dot + 1;
     }
 
     return parts == 4;
@@ -218,23 +218,23 @@ String ReceiverDiscovery::extractXmlValue(const String& xml, const String& tagNa
 
     String openTag = "<" + lowerTagName;
     String closeTag = "</" + lowerTagName + ">";
-    int start = lowerXml.indexOf(openTag);
-    if (start < 0) {
+    int valueStart = lowerXml.indexOf(openTag);
+    if (valueStart < 0) {
         return "";
     }
 
-    start = lowerXml.indexOf('>', start);
-    if (start < 0) {
+    valueStart = lowerXml.indexOf('>', valueStart);
+    if (valueStart < 0) {
         return "";
     }
-    start++;
+    valueStart++;
 
-    int end = lowerXml.indexOf(closeTag, start);
+    int end = lowerXml.indexOf(closeTag, valueStart);
     if (end < 0) {
         return "";
     }
 
-    String value = xml.substring(start, end);
+    String value = xml.substring(valueStart, end);
     value.trim();
     return value;
 }

@@ -7,8 +7,7 @@
 #include "../MaterialStyle.h"
 #include "../assets/IconBitmaps.h"
 
-ReceiverListScreen::ReceiverListScreen(ScreenReturnTarget returnTarget)
-    : _returnTarget(returnTarget) {
+ReceiverListScreen::ReceiverListScreen(ScreenReturnTarget returnTarget) : _returnTarget(returnTarget) {
     startDiscovery();
 }
 
@@ -22,15 +21,19 @@ void ReceiverListScreen::draw() {
     ReceiverDiscoveryState state = discovery.getState();
 
     if (state == ReceiverDiscoveryState::Searching) {
-        MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Loading,
-                                       "Searching for receivers...",
-                                       "", Icons::SCAN, _progressFrame);
+        MaterialStyle::drawStatusBlock(
+            tft, MaterialStyle::StatusKind::Loading, "Searching for receivers...", "", Icons::SCAN, _progressFrame);
     } else if (candidates.empty()) {
-        MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Empty, "No receivers found",
-                                       "Rescan or enter an IP address.", Icons::WARNING);
+        MaterialStyle::drawStatusBlock(tft,
+                                       MaterialStyle::StatusKind::Empty,
+                                       "No receivers found",
+                                       "Rescan or enter an IP address.",
+                                       Icons::WARNING);
     } else {
         for (size_t i = 0; i < candidates.size() && i < 3; ++i) {
-            drawCandidateRow(tft, candidates[i], i,
+            drawCandidateRow(tft,
+                             candidates[i],
+                             i,
                              MaterialStyle::SetupListTopY +
                                  (int)i * (MaterialStyle::ListRowHeight + MaterialStyle::RowGap));
         }
@@ -55,10 +58,12 @@ void ReceiverListScreen::update() {
             _lastProgressAtMs = now;
             _progressFrame++;
             TFT_eSPI& tft = DisplayManager::getInstance().getTft();
-            MaterialStyle::clearProgressBar(tft, MaterialStyle::StatusBlockProgressX,
+            MaterialStyle::clearProgressBar(tft,
+                                            MaterialStyle::StatusBlockProgressX,
                                             MaterialStyle::StatusBlockProgressY,
                                             MaterialStyle::StatusBlockProgressW);
-            MaterialStyle::drawProgressBar(tft, MaterialStyle::StatusBlockProgressX,
+            MaterialStyle::drawProgressBar(tft,
+                                           MaterialStyle::StatusBlockProgressX,
                                            MaterialStyle::StatusBlockProgressY,
                                            MaterialStyle::StatusBlockProgressW,
                                            _progressFrame);
@@ -75,8 +80,7 @@ void ReceiverListScreen::handleTouch(TS_Point p) {
         return;
     }
 
-    if (p.y >= MaterialStyle::BottomActionY &&
-        p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight) {
+    if (p.y >= MaterialStyle::BottomActionY && p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight) {
         if (p.x >= 20 && p.x <= 150) {
             ReceiverDiscovery::getInstance().stop();
             ScreenManager::getInstance().setScreen(new ReceiverIpScreen(_returnTarget));
@@ -95,32 +99,35 @@ void ReceiverListScreen::handleTouch(TS_Point p) {
 }
 
 void ReceiverListScreen::drawHeader(TFT_eSPI& tft) {
-    MaterialStyle::drawPageHeader(tft, Icons::RECEIVER, "Receiver Setup",
-                                  "Select a discovered receiver");
+    MaterialStyle::drawPageHeader(tft, Icons::RECEIVER, "Receiver Setup", "Select a discovered receiver");
 }
 
 void ReceiverListScreen::drawActions(TFT_eSPI& tft) {
     const char* labels[] = {"Manual", "Rescan", "Cancel"};
     for (int i = 0; i < 3; ++i) {
         int x = 20 + i * 155;
-        const Icons::IconBitmap* icon = i == 0 ? &Icons::MANUAL_ENTRY : i == 1 ? &Icons::RETRY : &Icons::KEYBOARD_CANCEL;
-        MaterialStyle::ComponentState state = i == 2 ? MaterialStyle::ComponentState::Error
-                                                     : MaterialStyle::ComponentState::Normal;
-        MaterialStyle::drawStandardButton(tft, x, MaterialStyle::BottomActionY, 130,
-                                          MaterialStyle::ButtonHeight, *icon, labels[i], state);
+        const Icons::IconBitmap* icon = i == 0   ? &Icons::MANUAL_ENTRY
+                                        : i == 1 ? &Icons::RETRY
+                                                 : &Icons::KEYBOARD_CANCEL;
+        MaterialStyle::ComponentState state =
+            i == 2 ? MaterialStyle::ComponentState::Error : MaterialStyle::ComponentState::Normal;
+        MaterialStyle::drawStandardButton(
+            tft, x, MaterialStyle::BottomActionY, 130, MaterialStyle::ButtonHeight, *icon, labels[i], state);
     }
 }
 
 void ReceiverListScreen::drawCandidateRow(TFT_eSPI& tft, const ReceiverCandidate& candidate, int index, int y) {
-    MaterialStyle::drawListRow(tft, {
-        24, y, 432, MaterialStyle::ListRowHeight,
-        &Icons::RECEIVER,
-        0,
-        candidate.name,
-        candidate.ipAddress,
-        String(index + 1),
-        MaterialStyle::ComponentState::Normal
-    });
+    MaterialStyle::drawListRow(tft,
+                               {24,
+                                y,
+                                432,
+                                MaterialStyle::ListRowHeight,
+                                &Icons::RECEIVER,
+                                0,
+                                candidate.name,
+                                candidate.ipAddress,
+                                String(index + 1),
+                                MaterialStyle::ComponentState::Normal});
 }
 
 void ReceiverListScreen::startDiscovery() {
@@ -137,8 +144,7 @@ int ReceiverListScreen::touchedCandidateIndex(TS_Point p) const {
     }
 
     for (int i = 0; i < 3; ++i) {
-        int y = MaterialStyle::SetupListTopY +
-                i * (MaterialStyle::ListRowHeight + MaterialStyle::RowGap);
+        int y = MaterialStyle::SetupListTopY + i * (MaterialStyle::ListRowHeight + MaterialStyle::RowGap);
         if (p.y >= y && p.y <= y + MaterialStyle::ListRowHeight) {
             return i;
         }

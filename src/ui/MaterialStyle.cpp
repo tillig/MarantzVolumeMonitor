@@ -46,7 +46,7 @@ void drawProgressSegment(TFT_eSPI& tft, int x, int y, int w, int h, uint8_t prog
 void drawWifiSignal(TFT_eSPI& tft, int centerX, int centerY, int level) {
     int x = centerX - 12;
     int baseY = centerY + 9;
-    uint16_t active = level >= 3 ? DisplayManager::COLOR_ICON_ACTIVE
+    uint16_t active = level >= 3   ? DisplayManager::COLOR_ICON_ACTIVE
                       : level == 2 ? DisplayManager::COLOR_WARNING
                                    : DisplayManager::COLOR_ERROR;
     for (int i = 0; i < 3; ++i) {
@@ -55,7 +55,7 @@ void drawWifiSignal(TFT_eSPI& tft, int centerX, int centerY, int level) {
         tft.fillRoundRect(x + (i * 8), baseY - h, 6, h, 3, color);
     }
 }
-}
+} // namespace
 
 namespace MaterialStyle {
 
@@ -156,8 +156,7 @@ uint16_t stateColorFor(ComponentState state) {
     }
 }
 
-void drawText(TFT_eSPI& tft, const String& text, int x, int y, TextRole role,
-              uint8_t datum, ComponentState state) {
+void drawText(TFT_eSPI& tft, const String& text, int x, int y, TextRole role, uint8_t datum, ComponentState state) {
     tft.setTextDatum(datum);
     tft.setTextColor(textColorFor(role, state), DisplayManager::COLOR_BACKGROUND);
     tft.drawString(text, x, y, fontFor(role));
@@ -181,9 +180,8 @@ String truncateToWidth(TFT_eSPI& tft, const String& text, int maxWidth, uint8_t 
     return out + ellipsis;
 }
 
-void drawStandardButton(TFT_eSPI& tft, int x, int y, int w, int h,
-                        const Icons::IconBitmap& icon, const char* label,
-                        ComponentState state) {
+void drawStandardButton(
+    TFT_eSPI& tft, int x, int y, int w, int h, const Icons::IconBitmap& icon, const char* label, ComponentState state) {
     uint16_t fill = buttonFillFor(state);
     uint16_t outline = outlineColorFor(state);
     uint16_t foreground = (state == ComponentState::Disabled || state == ComponentState::Unavailable)
@@ -194,8 +192,8 @@ void drawStandardButton(TFT_eSPI& tft, int x, int y, int w, int h,
     tft.fillRoundRect(x, y, w, h, radius, fill);
     tft.drawRoundRect(x, y, w, h, radius, outline);
 
-    String text = truncateToWidth(tft, String(label), w - icon.width - IconLabelGap - 18,
-                                  fontFor(TextRole::ButtonLabel));
+    String text =
+        truncateToWidth(tft, String(label), w - icon.width - IconLabelGap - 18, fontFor(TextRole::ButtonLabel));
     int iconWidth = icon.width > StandardButtonIconMaxSize ? StandardButtonIconMaxSize : icon.width;
     int groupWidth = iconWidth + IconLabelGap + tft.textWidth(text, fontFor(TextRole::ButtonLabel));
     int horizontalInset = (w - groupWidth) / 2;
@@ -205,16 +203,14 @@ void drawStandardButton(TFT_eSPI& tft, int x, int y, int w, int h,
     int startX = x + horizontalInset;
     int centerY = y + h / 2;
 
-    IconRenderer::drawFittedCentered(tft, icon, startX + iconWidth / 2, centerY,
-                                     StandardButtonIconMaxSize, StandardButtonIconMaxSize,
-                                     foreground);
+    IconRenderer::drawFittedCentered(
+        tft, icon, startX + iconWidth / 2, centerY, StandardButtonIconMaxSize, StandardButtonIconMaxSize, foreground);
     tft.setTextDatum(ML_DATUM);
     tft.setTextColor(foreground, fill);
     tft.drawString(text, startX + iconWidth + IconLabelGap, centerY, fontFor(TextRole::ButtonLabel));
 }
 
-void drawTextButton(TFT_eSPI& tft, int x, int y, int w, int h,
-                    const char* label, ComponentState state) {
+void drawTextButton(TFT_eSPI& tft, int x, int y, int w, int h, const char* label, ComponentState state) {
     uint16_t fill = buttonFillFor(state);
     uint16_t foreground = (state == ComponentState::Disabled || state == ComponentState::Unavailable)
                               ? DisplayManager::COLOR_TEXT_DIMMED
@@ -228,9 +224,8 @@ void drawTextButton(TFT_eSPI& tft, int x, int y, int w, int h,
     tft.drawString(text, x + w / 2, y + h / 2, fontFor(TextRole::ButtonLabel));
 }
 
-void drawKeyboardIconButton(TFT_eSPI& tft, int x, int y, int w, int h,
-                            const Icons::IconBitmap& icon, ComponentState state,
-                            int iconYOffset) {
+void drawKeyboardIconButton(
+    TFT_eSPI& tft, int x, int y, int w, int h, const Icons::IconBitmap& icon, ComponentState state, int iconYOffset) {
     uint16_t fill = buttonFillFor(state);
     uint16_t foreground = (state == ComponentState::Selected || state == ComponentState::Focused)
                               ? DisplayManager::COLOR_TEXT_DARK
@@ -243,8 +238,7 @@ void drawKeyboardIconButton(TFT_eSPI& tft, int x, int y, int w, int h,
     IconRenderer::drawCentered(tft, icon, x + w / 2, y + h / 2 + iconYOffset, foreground);
 }
 
-void drawKeyboardTextButton(TFT_eSPI& tft, int x, int y, int w, int h,
-                            const String& label, ComponentState state) {
+void drawKeyboardTextButton(TFT_eSPI& tft, int x, int y, int w, int h, const String& label, ComponentState state) {
     uint16_t fill = buttonFillFor(state);
     uint16_t foreground = (state == ComponentState::Selected || state == ComponentState::Focused)
                               ? DisplayManager::COLOR_TEXT_DARK
@@ -258,8 +252,7 @@ void drawKeyboardTextButton(TFT_eSPI& tft, int x, int y, int w, int h,
 }
 
 void drawListRow(TFT_eSPI& tft, const ListRowSpec& spec) {
-    uint16_t fill = spec.state == ComponentState::Selected ? DisplayManager::COLOR_BAR_BG
-                                                           : DisplayManager::COLOR_PANEL;
+    uint16_t fill = spec.state == ComponentState::Selected ? DisplayManager::COLOR_BAR_BG : DisplayManager::COLOR_PANEL;
     tft.fillRoundRect(spec.x, spec.y, spec.w, spec.h, ListRowRadius, fill);
     tft.drawRoundRect(spec.x, spec.y, spec.w, spec.h, ListRowRadius, outlineColorFor(spec.state));
 
@@ -268,8 +261,12 @@ void drawListRow(TFT_eSPI& tft, const ListRowSpec& spec) {
         drawWifiSignal(tft, spec.x + 24, spec.y + spec.h / 2, spec.wifiSignalLevel);
         textX = spec.x + 48;
     } else if (spec.leadingIcon != nullptr) {
-        IconRenderer::drawFittedCentered(tft, *spec.leadingIcon, spec.x + 24, spec.y + spec.h / 2,
-                                         ListRowIconMaxSize, ListRowIconMaxSize,
+        IconRenderer::drawFittedCentered(tft,
+                                         *spec.leadingIcon,
+                                         spec.x + 24,
+                                         spec.y + spec.h / 2,
+                                         ListRowIconMaxSize,
+                                         ListRowIconMaxSize,
                                          DisplayManager::COLOR_TEXT_SECONDARY);
         textX = spec.x + 48;
     }
@@ -292,23 +289,19 @@ void drawListRow(TFT_eSPI& tft, const ListRowSpec& spec) {
     if (spec.trailing.length() > 0) {
         tft.setTextDatum(MR_DATUM);
         tft.setTextColor(DisplayManager::COLOR_TEXT_DIMMED, fill);
-        tft.drawString(spec.trailing, spec.x + spec.w - 16, spec.y + spec.h / 2,
-                       fontFor(TextRole::CompactMetadata));
+        tft.drawString(spec.trailing, spec.x + spec.w - 16, spec.y + spec.h / 2, fontFor(TextRole::CompactMetadata));
     }
 }
 
 void drawChoiceRow(TFT_eSPI& tft, const ChoiceRowSpec& spec) {
-    uint16_t fill = spec.selected ? DisplayManager::COLOR_BAR_BG
-                                  : DisplayManager::COLOR_PANEL;
+    uint16_t fill = spec.selected ? DisplayManager::COLOR_BAR_BG : DisplayManager::COLOR_PANEL;
     ComponentState outlineState = spec.selected ? ComponentState::Selected : spec.state;
     tft.fillRoundRect(spec.x, spec.y, spec.w, spec.h, ListRowRadius, fill);
-    tft.drawRoundRect(spec.x, spec.y, spec.w, spec.h, ListRowRadius,
-                      outlineColorFor(outlineState));
+    tft.drawRoundRect(spec.x, spec.y, spec.w, spec.h, ListRowRadius, outlineColorFor(outlineState));
 
     int indicatorCenterX = spec.x + 24;
     int indicatorCenterY = spec.y + (spec.h / 2);
-    uint16_t indicatorColor = spec.selected ? DisplayManager::COLOR_ACCENT
-                                            : DisplayManager::COLOR_TEXT_DIMMED;
+    uint16_t indicatorColor = spec.selected ? DisplayManager::COLOR_ACCENT : DisplayManager::COLOR_TEXT_DIMMED;
     tft.drawCircle(indicatorCenterX, indicatorCenterY, 10, indicatorColor);
     tft.drawCircle(indicatorCenterX, indicatorCenterY, 9, indicatorColor);
     if (spec.selected) {
@@ -318,10 +311,8 @@ void drawChoiceRow(TFT_eSPI& tft, const ChoiceRowSpec& spec) {
     int textX = spec.x + 48;
     int trailingInset = 16;
     int textWidth = spec.w - (textX - spec.x) - trailingInset;
-    String primary = truncateToWidth(tft, spec.primary, textWidth,
-                                     fontFor(TextRole::ListPrimary));
-    String secondary = truncateToWidth(tft, spec.secondary, textWidth,
-                                       fontFor(TextRole::ListSecondary));
+    String primary = truncateToWidth(tft, spec.primary, textWidth, fontFor(TextRole::ListPrimary));
+    String secondary = truncateToWidth(tft, spec.secondary, textWidth, fontFor(TextRole::ListSecondary));
 
     tft.setTextDatum(ML_DATUM);
     tft.setTextColor(textColorFor(TextRole::ListPrimary, ComponentState::Normal), fill);
@@ -334,10 +325,13 @@ void drawChoiceRow(TFT_eSPI& tft, const ChoiceRowSpec& spec) {
     }
 }
 
-void drawPageHeader(TFT_eSPI& tft, const Icons::IconBitmap& icon,
-                    const String& title, const String& subtitle) {
-    IconRenderer::drawFittedCentered(tft, icon, PageHeaderIconCenterX, PageHeaderIconCenterY,
-                                     HeaderIconMaxSize, HeaderIconMaxSize,
+void drawPageHeader(TFT_eSPI& tft, const Icons::IconBitmap& icon, const String& title, const String& subtitle) {
+    IconRenderer::drawFittedCentered(tft,
+                                     icon,
+                                     PageHeaderIconCenterX,
+                                     PageHeaderIconCenterY,
+                                     HeaderIconMaxSize,
+                                     HeaderIconMaxSize,
                                      DisplayManager::COLOR_TEXT_SECONDARY);
     drawText(tft, title, PageHeaderTitleX, SetupHeaderTitleY, TextRole::ScreenTitle, TL_DATUM);
     drawText(tft, subtitle, PageHeaderTitleX, SetupHeaderSubtitleY, TextRole::Body, TL_DATUM);
@@ -348,15 +342,18 @@ void drawSetupHeader(TFT_eSPI& tft, const String& title, const String& subtitle)
     drawText(tft, subtitle, ScreenWidth / 2, SetupHeaderSubtitleY, TextRole::Body, TC_DATUM);
 }
 
-void drawSearchingState(TFT_eSPI& tft, const String& title, const String& message,
-                        const Icons::IconBitmap& icon, uint8_t progressFrame) {
+void drawSearchingState(
+    TFT_eSPI& tft, const String& title, const String& message, const Icons::IconBitmap& icon, uint8_t progressFrame) {
     drawSetupHeader(tft, title, message);
     IconRenderer::drawCentered(tft, icon, ScreenWidth / 2, 104, DisplayManager::COLOR_TEXT_SECONDARY);
     drawProgressBar(tft, SearchingProgressX, SearchingProgressY, SearchingProgressW, progressFrame);
 }
 
-void drawStatusBlock(TFT_eSPI& tft, StatusKind kind, const String& title,
-                     const String& message, const Icons::IconBitmap& icon,
+void drawStatusBlock(TFT_eSPI& tft,
+                     StatusKind kind,
+                     const String& title,
+                     const String& message,
+                     const Icons::IconBitmap& icon,
                      uint8_t progressFrame) {
     ComponentState state = ComponentState::Normal;
     switch (kind) {
@@ -387,13 +384,11 @@ void drawStatusBlock(TFT_eSPI& tft, StatusKind kind, const String& title,
         drawText(tft, message, ScreenWidth / 2, 194, TextRole::Body, TC_DATUM, state);
     }
     if (kind == StatusKind::Loading) {
-        drawProgressBar(tft, StatusBlockProgressX, StatusBlockProgressY,
-                        StatusBlockProgressW, progressFrame);
+        drawProgressBar(tft, StatusBlockProgressX, StatusBlockProgressY, StatusBlockProgressW, progressFrame);
     }
 }
 
-void drawInfoCard(TFT_eSPI& tft, int x, int y, int w, int h,
-                  const Icons::IconBitmap& icon, const String& title) {
+void drawInfoCard(TFT_eSPI& tft, int x, int y, int w, int h, const Icons::IconBitmap& icon, const String& title) {
     tft.fillRoundRect(x, y, w, h, ListRowRadius, DisplayManager::COLOR_PANEL);
     tft.drawRoundRect(x, y, w, h, ListRowRadius, DisplayManager::COLOR_BAR_BG);
     IconRenderer::drawCentered(tft, icon, x + 18, y + 16, DisplayManager::COLOR_TEXT_SECONDARY);
@@ -403,15 +398,12 @@ void drawInfoCard(TFT_eSPI& tft, int x, int y, int w, int h,
 void drawStatusRow(TFT_eSPI& tft, const StatusRowSpec& spec) {
     if (spec.wifiSignalLevel > 0) {
         drawText(tft, spec.label, spec.x + 12, spec.y + 2, TextRole::CompactMetadata, TL_DATUM);
-        int metadataWidth = spec.metadata.length() > 0
-                                ? tft.textWidth(spec.metadata, fontFor(TextRole::Body))
-                                : 0;
+        int metadataWidth = spec.metadata.length() > 0 ? tft.textWidth(spec.metadata, fontFor(TextRole::Body)) : 0;
         int metadataRight = spec.x + spec.w - 12;
         if (spec.metadata.length() > 0) {
             tft.setTextDatum(MR_DATUM);
             tft.setTextColor(textColorFor(TextRole::Body, spec.state), DisplayManager::COLOR_PANEL);
-            tft.drawString(spec.metadata, metadataRight, spec.y + spec.h / 2 + 2,
-                           fontFor(TextRole::Body));
+            tft.drawString(spec.metadata, metadataRight, spec.y + spec.h / 2 + 2, fontFor(TextRole::Body));
         }
         int wifiCenterX = metadataRight - metadataWidth - 18;
         drawWifiSignal(tft, wifiCenterX, spec.y + spec.h / 2 + 1, spec.wifiSignalLevel);
@@ -422,15 +414,13 @@ void drawStatusRow(TFT_eSPI& tft, const StatusRowSpec& spec) {
         String value = truncateToWidth(tft, spec.value, valueMaxWidth, fontFor(TextRole::Body));
         tft.setTextDatum(MR_DATUM);
         tft.setTextColor(textColorFor(TextRole::Body, spec.state), DisplayManager::COLOR_PANEL);
-        tft.drawString(value, spec.x + spec.w - 12, spec.y + spec.h / 2 + 2,
-                       fontFor(TextRole::Body));
+        tft.drawString(value, spec.x + spec.w - 12, spec.y + spec.h / 2 + 2, fontFor(TextRole::Body));
     }
 
     tft.drawFastHLine(spec.x + 12, spec.y + spec.h - 1, spec.w - 24, DisplayManager::COLOR_BAR_BG);
 }
 
-void drawPagination(TFT_eSPI& tft, int currentPage, int totalPages,
-                    bool showPrev, bool showNext, int y) {
+void drawPagination(TFT_eSPI& tft, int currentPage, int totalPages, bool showPrev, bool showNext, int y) {
     if (totalPages <= 1) {
         return;
     }
@@ -450,8 +440,7 @@ void clearProgressBar(TFT_eSPI& tft, int x, int y, int w) {
     tft.fillRect(x - 2, y - 2, w + 4, 12, DisplayManager::COLOR_BACKGROUND);
 }
 
-void drawInputField(TFT_eSPI& tft, int x, int y, int w, int h, const String& value,
-                    TextRole role) {
+void drawInputField(TFT_eSPI& tft, int x, int y, int w, int h, const String& value, TextRole role) {
     tft.fillRoundRect(x, y, w, h, InputRadius, DisplayManager::COLOR_PANEL);
     tft.drawRoundRect(x, y, w, h, InputRadius, DisplayManager::COLOR_ACCENT);
     String text = truncateToWidth(tft, value, w - 20, fontFor(role));

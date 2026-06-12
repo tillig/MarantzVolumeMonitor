@@ -5,7 +5,8 @@
 
 class SetupStatusScreen : public Screen {
 public:
-    SetupStatusScreen(const String& ssid, const String& password,
+    SetupStatusScreen(const String& ssid,
+                      const String& password,
                       ScreenReturnTarget returnTarget = ScreenReturnTarget::Home);
     void draw() override;
     void update() override;

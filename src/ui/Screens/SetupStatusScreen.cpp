@@ -19,32 +19,35 @@ void SetupStatusScreen::draw() {
     MaterialStyle::drawText(tft, "Wi-Fi Setup", 240, 10, MaterialStyle::TextRole::ScreenTitle, TC_DATUM);
 
     if (!_isConnecting && !_failed) {
-        MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Unavailable,
+        MaterialStyle::drawStatusBlock(tft,
+                                       MaterialStyle::StatusKind::Unavailable,
                                        "Connecting to",
                                        MaterialStyle::truncateToWidth(tft, _ssid, 380, 4),
-                                       Icons::WIFI, _progressFrame);
+                                       Icons::WIFI,
+                                       _progressFrame);
         WiFiManager::getInstance().startConnect(_ssid, _password);
         _isConnecting = true;
         _progressVisible = false;
         _startTime = millis();
         _lastProgressAtMs = _startTime;
     } else if (_failed) {
-        MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Error,
-                                       _failureMessage, "Check credentials and try again.",
-                                       Icons::FAILURE);
-        MaterialStyle::drawStandardButton(tft, 140, MaterialStyle::BottomActionY, 200,
-                                          MaterialStyle::ButtonHeight,
-                                          Icons::RETRY, "Retry");
+        MaterialStyle::drawStatusBlock(
+            tft, MaterialStyle::StatusKind::Error, _failureMessage, "Check credentials and try again.", Icons::FAILURE);
+        MaterialStyle::drawStandardButton(
+            tft, 140, MaterialStyle::BottomActionY, 200, MaterialStyle::ButtonHeight, Icons::RETRY, "Retry");
     } else {
         bool showProgress = millis() - _startTime >= MaterialStyle::ProgressThresholdMs;
         _progressVisible = showProgress;
         if (showProgress) {
-            MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Loading,
+            MaterialStyle::drawStatusBlock(tft,
+                                           MaterialStyle::StatusKind::Loading,
                                            "Connecting...",
                                            MaterialStyle::truncateToWidth(tft, _ssid, 380, 2),
-                                           Icons::WIFI, _progressFrame);
+                                           Icons::WIFI,
+                                           _progressFrame);
         } else {
-            MaterialStyle::drawStatusBlock(tft, MaterialStyle::StatusKind::Unavailable,
+            MaterialStyle::drawStatusBlock(tft,
+                                           MaterialStyle::StatusKind::Unavailable,
                                            "Connecting...",
                                            MaterialStyle::truncateToWidth(tft, _ssid, 380, 2),
                                            Icons::WIFI);
@@ -91,15 +94,16 @@ void SetupStatusScreen::update() {
                 return;
             }
 
-            if (shouldShowProgress &&
-                now - _lastProgressAtMs >= MaterialStyle::ProgressFrameMs) {
+            if (shouldShowProgress && now - _lastProgressAtMs >= MaterialStyle::ProgressFrameMs) {
                 _lastProgressAtMs = now;
                 _progressFrame++;
                 TFT_eSPI& tft = DisplayManager::getInstance().getTft();
-                MaterialStyle::clearProgressBar(tft, MaterialStyle::StatusBlockProgressX,
+                MaterialStyle::clearProgressBar(tft,
+                                                MaterialStyle::StatusBlockProgressX,
                                                 MaterialStyle::StatusBlockProgressY,
                                                 MaterialStyle::StatusBlockProgressW);
-                MaterialStyle::drawProgressBar(tft, MaterialStyle::StatusBlockProgressX,
+                MaterialStyle::drawProgressBar(tft,
+                                               MaterialStyle::StatusBlockProgressX,
                                                MaterialStyle::StatusBlockProgressY,
                                                MaterialStyle::StatusBlockProgressW,
                                                _progressFrame);
