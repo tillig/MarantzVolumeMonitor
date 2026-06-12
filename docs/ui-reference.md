@@ -55,10 +55,11 @@ The main UI is optimized for a 15-foot viewing distance. It uses a high-contrast
 
 ### Source And Mode Text
 
-- Typography: white, Font 4
-- Vertical position: centered near `Y=255`
-- Source: left-aligned near `X=28`
-- Mode: right-aligned with the text edge near `X=452`
+- Typography: source uses white `FreeSansBold18pt7b`; mode stays white built-in Font 4
+- Vertical position: source and mode share a baseline near `Y=260`, which places the row slightly higher between the gauge and icon strip
+- Source: left-aligned near `X=28` and allowed to extend roughly to the screen center before truncation
+- Mode: right-aligned with the text edge near `X=452` and baseline-aligned to the source
+- Truncate long values with an ellipsis instead of shrinking neighboring regions. The source gets the larger type priority if space is tight.
 - Show raw receiver values without labels such as `SRC:`
 
 ### Audio Family Icons
@@ -165,7 +166,7 @@ This catalog covers the on-device 480x320 touchscreen UI in `src/ui/Screens`. It
 
 ### Typography Roles
 
-The firmware uses TFT_eSPI built-in bitmap fonts by number rather than desktop or mobile font families such as Roboto, Arial, Verdana, or Times New Roman. This is intentional: built-in TFT fonts are deterministic, fast, memory-light, and already readable on the 480x320 embedded display. Material Design's typography guidance is applied through consistent roles, hierarchy, spacing, and state treatment rather than exact Roboto typeface matching. Do not add generated smooth-font assets unless the memory, build, and readability tradeoffs are evaluated as a separate feature.
+The firmware primarily uses TFT_eSPI built-in bitmap fonts by number rather than desktop or mobile font families such as Roboto, Arial, Verdana, or Times New Roman. This is intentional: built-in TFT fonts are deterministic, fast, memory-light, and already readable on the 480x320 embedded display. Material Design's typography guidance is applied through consistent roles, hierarchy, spacing, and state treatment rather than exact Roboto typeface matching. The current documented exception is the Home Screen source label, which uses `FreeSansBold18pt7b` because the built-in jump from Font 4 to the next full-character option is too large for that slot while the source needs higher distance readability than the mode. Do not add generated smooth-font assets or more ad hoc font exceptions unless the memory, build, and readability tradeoffs are evaluated as a separate feature.
 
 | Role                | Font | Color                     | Usage And Alignment                                                                        |
 | ------------------- | ---- | ------------------------- | ------------------------------------------------------------------------------------------ |

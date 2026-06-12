@@ -5,7 +5,7 @@ A modern, touchscreen-based volume monitor for Marantz home theater receivers, p
 ## Features
 
 - **Wi-Fi Connectivity:** No more Ethernet cables; connects directly to your home network.
-- **4" Touchscreen:** Large, high-contrast display with a modern Dark Mode UI.
+- **4" Touchscreen:** Large, high-contrast display with a modern Dark Mode UI and an enlarged Home Screen source label for distance readability.
 - **Polling Home Status:** Roughly once-per-second updates for the Home Screen volume, input source, and audio mode.
 - **Interactive UI:** Touch-driven configuration menus for Wi-Fi and Receiver setup.
 - **Auto-Discovery:** SSDP support to find your Marantz receiver on the network automatically.

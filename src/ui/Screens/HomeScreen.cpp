@@ -29,6 +29,29 @@ constexpr int VolumeValueCenterY = 139;
 constexpr int VolumeLabelCenterY = 72;
 constexpr int VolumeUnitCenterY = 90;
 constexpr uint8_t VolumeSignFont = 4;
+constexpr int HomeMetadataBottomPadding = 10;
+constexpr GFXfont const* HomeSourceFont = &FreeSansBold18pt7b;
+constexpr uint8_t HomeSourceFontId = 1;
+constexpr uint8_t HomeModeFont = 4;
+
+String truncateHomeSourceToWidth(TFT_eSPI& tft, const String& text, int maxWidth) {
+    if (text.length() == 0 || tft.textWidth(text, HomeSourceFontId) <= maxWidth) {
+        return text;
+    }
+
+    const String ellipsis = "...";
+    int ellipsisWidth = tft.textWidth(ellipsis, HomeSourceFontId);
+    if (ellipsisWidth >= maxWidth) {
+        return ellipsis;
+    }
+
+    String out = text;
+    while (out.length() > 0 &&
+           tft.textWidth(out, HomeSourceFontId) + ellipsisWidth > maxWidth) {
+        out.remove(out.length() - 1);
+    }
+    return out + ellipsis;
+}
 
 bool nearlyEqual(float left, float right, float epsilon = AnimationEpsilon) {
     return fabsf(left - right) <= epsilon;
@@ -524,15 +547,21 @@ void HomeScreen::redrawLiveMetadataRegion() {
     clearRect(liveModeRegion());
     clearRect(liveAudioIconsRegion());
 
+    Rect sourceRegion = liveSourceRegion();
+    Rect modeRegion = liveModeRegion();
+    int metadataBaselineY = sourceRegion.y + sourceRegion.h - HomeMetadataBottomPadding;
+
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
     tft.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY, DisplayManager::COLOR_BACKGROUND);
-    tft.setTextDatum(ML_DATUM);
-    tft.drawString(
-        MaterialStyle::truncateToWidth(tft, displaySource(), liveSourceRegion().w, 4),
-        liveSourceRegion().x, 255, 4);
-    tft.setTextDatum(MR_DATUM);
-    tft.drawString(MaterialStyle::truncateToWidth(tft, displayMode(), liveModeRegion().w, 4),
-                   liveModeRegion().x + liveModeRegion().w, 255, 4);
+    tft.setFreeFont(HomeSourceFont);
+    tft.setTextDatum(L_BASELINE);
+    tft.drawString(truncateHomeSourceToWidth(tft, displaySource(), sourceRegion.w),
+                   sourceRegion.x, metadataBaselineY, HomeSourceFontId);
+    tft.setFreeFont(nullptr);
+    tft.setTextDatum(R_BASELINE);
+    tft.drawString(MaterialStyle::truncateToWidth(tft, displayMode(), modeRegion.w,
+                                                  HomeModeFont),
+                   modeRegion.x + modeRegion.w, metadataBaselineY, HomeModeFont);
 
     drawAudioFamilyIcons();
 }
@@ -589,7 +618,7 @@ HomeScreen::Rect HomeScreen::liveGaugeRegion() const {
 }
 
 HomeScreen::Rect HomeScreen::liveSourceRegion() const {
-    return {28, 226, 172, 44};
+    return {28, 226, 212, 44};
 }
 
 HomeScreen::Rect HomeScreen::liveModeRegion() const {
