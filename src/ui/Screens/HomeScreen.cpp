@@ -27,6 +27,8 @@ constexpr int ArcCapRadius = 7;
 constexpr int VolumeValueCenterX = 240;
 constexpr int VolumeValueCenterY = 139;
 constexpr int VolumeLabelCenterY = 72;
+constexpr int VolumeUnitCenterY = 90;
+constexpr uint8_t VolumeSignFont = 4;
 
 bool nearlyEqual(float left, float right, float epsilon = AnimationEpsilon) {
     return fabsf(left - right) <= epsilon;
@@ -113,6 +115,7 @@ void HomeScreen::update() {
         String previousIpAddress = _ipAddress;
         String previousWifiSsid = _config.wifiSsid;
         String previousReceiverIp = _config.receiverIp;
+        bool previousUseDbScale = _config.useDbScale;
 
         refreshState();
         DisplayState classifiedState = classifyDisplayState(_lastStatus);
@@ -126,7 +129,8 @@ void HomeScreen::update() {
                                   previousWifiConnected != _isWifiConnected ||
                                   previousIpAddress != _ipAddress ||
                                   previousWifiSsid != _config.wifiSsid ||
-                                  previousReceiverIp != _config.receiverIp;
+                                  previousReceiverIp != _config.receiverIp ||
+                                  previousUseDbScale != _config.useDbScale;
 
         if (_displayState == DisplayState::Live) {
             float previousDisplayVolume = displayVolume(previousStatus.volume);
@@ -362,10 +366,25 @@ bool HomeScreen::isSettingsAccessible() const {
 
 String HomeScreen::formatVolume(float volume) const {
     char buffer[12];
-    dtostrf(volume, 1, 1, buffer);
+    float numericValue = numericDisplayValue(volume);
+    if (_config.useDbScale && numericValue < 0.0f) {
+        numericValue = -numericValue;
+    }
+    dtostrf(numericValue, 1, 1, buffer);
     String value(buffer);
     value.trim();
     return value;
+}
+
+float HomeScreen::numericDisplayValue(float normalizedVolume) const {
+    if (_config.useDbScale) {
+        return normalizedVolume - 80.0f;
+    }
+    return normalizedVolume;
+}
+
+bool HomeScreen::volumeHasNegativeSign(float normalizedVolume) const {
+    return _config.useDbScale && numericDisplayValue(normalizedVolume) < 0.0f;
 }
 
 String HomeScreen::displaySource() const {
@@ -433,6 +452,7 @@ void HomeScreen::syncDisplayedVolume(float volume) {
     _volumeAnimation.lastRenderedVolume = volume;
     _volumeAnimation.lastRenderedText = "";
     _volumeAnimation.lastRenderedFont = 0;
+    _volumeAnimation.lastRenderedHadNegativeSign = volumeHasNegativeSign(volume);
     _volumeAnimation.startMs = millis();
     _volumeAnimation.durationMs = 0;
     _volumeAnimation.lastFrameMs = 0;
@@ -480,6 +500,8 @@ void HomeScreen::redrawLiveVolumeFrame(bool forceFull) {
         renderLiveVolumeRegion(tft, 0, 0);
         _volumeAnimation.lastRenderedText = formatVolume(_volumeAnimation.displayedVolume);
         _volumeAnimation.lastRenderedFont = volumeFont(_volumeAnimation.lastRenderedText);
+        _volumeAnimation.lastRenderedHadNegativeSign =
+            volumeHasNegativeSign(_volumeAnimation.displayedVolume);
         _volumeAnimation.lastRenderedVolume = _volumeAnimation.displayedVolume;
         return;
     }
@@ -492,6 +514,8 @@ void HomeScreen::redrawLiveVolumeFrame(bool forceFull) {
 
     _volumeAnimation.lastRenderedText = volumeText;
     _volumeAnimation.lastRenderedFont = font;
+    _volumeAnimation.lastRenderedHadNegativeSign =
+        volumeHasNegativeSign(_volumeAnimation.displayedVolume);
     _volumeAnimation.lastRenderedVolume = _volumeAnimation.displayedVolume;
 }
 
@@ -555,6 +579,9 @@ void HomeScreen::renderLiveVolumeRegion(TFT_eSPI& target, int originX, int origi
     target.setTextDatum(MC_DATUM);
     target.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
     target.drawString("VOLUME", 240 - originX, VolumeLabelCenterY - originY, 2);
+    if (_config.useDbScale) {
+        target.drawString("dB", 240 - originX, VolumeUnitCenterY - originY, 2);
+    }
 }
 
 HomeScreen::Rect HomeScreen::liveGaugeRegion() const {
@@ -589,11 +616,18 @@ HomeScreen::Rect HomeScreen::volumeTextRegion(float volume) const {
     String volumeText = formatVolume(volume);
     uint8_t font = volumeFont(volumeText);
     int textWidth = tft.textWidth(volumeText, font);
+    if (volumeHasNegativeSign(volume)) {
+        textWidth += volumeNegativeSignWidth(tft);
+    }
     int textHeight = tft.fontHeight(font);
     int left = VolumeValueCenterX - (textWidth / 2);
     int top = VolumeValueCenterY - (textHeight / 2);
 
     return {left - 3, top - 2, textWidth + 8, textHeight + 4};
+}
+
+int HomeScreen::volumeNegativeSignWidth(TFT_eSPI& target) const {
+    return target.textWidth("-", VolumeSignFont) + 6;
 }
 
 int HomeScreen::volumeSweep(float volume) const {
@@ -674,24 +708,48 @@ void HomeScreen::drawVolumeCap(TFT_eSPI& target, int x, int y, int r, int sweep,
 void HomeScreen::drawVolumeValueText(TFT_eSPI& target, const String& valueText,
                                      uint8_t font, int centerX, int centerY) {
     int textWidth = target.textWidth(valueText, font);
+    bool hasNegativeSign = volumeHasNegativeSign(_volumeAnimation.displayedVolume);
+    int totalWidth = textWidth;
+    if (hasNegativeSign) {
+        totalWidth += volumeNegativeSignWidth(target);
+    }
     int textHeight = target.fontHeight(font);
-    int left = centerX - (textWidth / 2);
+    int left = centerX - (totalWidth / 2);
     int top = centerY - (textHeight / 2);
 
     target.setTextDatum(TL_DATUM);
-    drawVolumeTextAt(target, valueText, left, top, font);
+    int valueLeft = left;
+    if (hasNegativeSign) {
+        drawVolumeNegativeSign(target, left, centerY);
+        valueLeft += volumeNegativeSignWidth(target);
+    }
+    drawVolumeTextAt(target, valueText, valueLeft, top, font);
+}
+
+void HomeScreen::drawVolumeNegativeSign(TFT_eSPI& target, int x, int centerY) {
+    int signTop = centerY - (target.fontHeight(VolumeSignFont) / 2);
+    target.setTextDatum(TL_DATUM);
+    target.setTextColor(DisplayManager::COLOR_TEXT_PRIMARY);
+    target.drawString("-", x, signTop, VolumeSignFont);
+    target.drawString("-", x + 1, signTop, VolumeSignFont);
 }
 
 void HomeScreen::drawVolumeValueTextDelta(TFT_eSPI& target, const String& valueText,
                                           uint8_t font) {
     int textWidth = target.textWidth(valueText, font);
+    bool hasNegativeSign = volumeHasNegativeSign(_volumeAnimation.displayedVolume);
     int textHeight = target.fontHeight(font);
-    int left = VolumeValueCenterX - (textWidth / 2);
+    int totalWidth = textWidth;
+    if (hasNegativeSign) {
+        totalWidth += volumeNegativeSignWidth(target);
+    }
+    int left = VolumeValueCenterX - (totalWidth / 2);
     int top = VolumeValueCenterY - (textHeight / 2);
     String previousText = _volumeAnimation.lastRenderedText;
 
     bool requiresFullTextRedraw =
         previousText.length() == 0 ||
+        _volumeAnimation.lastRenderedHadNegativeSign != hasNegativeSign ||
         previousText.length() != valueText.length() ||
         _volumeAnimation.lastRenderedFont != font ||
         target.textWidth(previousText, font) != textWidth;
@@ -722,6 +780,9 @@ void HomeScreen::drawVolumeValueTextDelta(TFT_eSPI& target, const String& valueT
     }
 
     int x = left;
+    if (hasNegativeSign) {
+        x += volumeNegativeSignWidth(target);
+    }
     for (uint8_t i = 0; i < valueText.length(); i++) {
         String previousChar = previousText.substring(i, i + 1);
         String currentChar = valueText.substring(i, i + 1);

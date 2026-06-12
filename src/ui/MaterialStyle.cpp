@@ -293,6 +293,43 @@ void drawListRow(TFT_eSPI& tft, const ListRowSpec& spec) {
     }
 }
 
+void drawChoiceRow(TFT_eSPI& tft, const ChoiceRowSpec& spec) {
+    uint16_t fill = spec.selected ? DisplayManager::COLOR_BAR_BG
+                                  : DisplayManager::COLOR_PANEL;
+    ComponentState outlineState = spec.selected ? ComponentState::Selected : spec.state;
+    tft.fillRoundRect(spec.x, spec.y, spec.w, spec.h, ListRowRadius, fill);
+    tft.drawRoundRect(spec.x, spec.y, spec.w, spec.h, ListRowRadius,
+                      outlineColorFor(outlineState));
+
+    int indicatorCenterX = spec.x + 24;
+    int indicatorCenterY = spec.y + (spec.h / 2);
+    uint16_t indicatorColor = spec.selected ? DisplayManager::COLOR_ACCENT
+                                            : DisplayManager::COLOR_TEXT_DIMMED;
+    tft.drawCircle(indicatorCenterX, indicatorCenterY, 10, indicatorColor);
+    tft.drawCircle(indicatorCenterX, indicatorCenterY, 9, indicatorColor);
+    if (spec.selected) {
+        tft.fillCircle(indicatorCenterX, indicatorCenterY, 5, indicatorColor);
+    }
+
+    int textX = spec.x + 48;
+    int trailingInset = 16;
+    int textWidth = spec.w - (textX - spec.x) - trailingInset;
+    String primary = truncateToWidth(tft, spec.primary, textWidth,
+                                     fontFor(TextRole::ListPrimary));
+    String secondary = truncateToWidth(tft, spec.secondary, textWidth,
+                                       fontFor(TextRole::ListSecondary));
+
+    tft.setTextDatum(ML_DATUM);
+    tft.setTextColor(textColorFor(TextRole::ListPrimary, ComponentState::Normal), fill);
+    int primaryY = spec.secondary.length() > 0 ? spec.y + 16 : spec.y + (spec.h / 2);
+    tft.drawString(primary, textX, primaryY, fontFor(TextRole::ListPrimary));
+
+    if (spec.secondary.length() > 0) {
+        tft.setTextColor(textColorFor(TextRole::ListSecondary, spec.state), fill);
+        tft.drawString(secondary, textX, spec.y + 34, fontFor(TextRole::ListSecondary));
+    }
+}
+
 void drawSetupHeader(TFT_eSPI& tft, const String& title, const String& subtitle) {
     drawText(tft, title, ScreenWidth / 2, SetupHeaderTitleY, TextRole::ScreenTitle, TC_DATUM);
     drawText(tft, subtitle, ScreenWidth / 2, SetupHeaderSubtitleY, TextRole::Body, TC_DATUM);

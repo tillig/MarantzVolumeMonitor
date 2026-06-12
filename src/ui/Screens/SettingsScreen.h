@@ -11,7 +11,7 @@ public:
 
 private:
     static constexpr int ItemsPerPage = 3;
-    static constexpr int EntryCount = 4;
+    static constexpr int EntryCount = 5;
 
     int _pageIndex = 0;
 

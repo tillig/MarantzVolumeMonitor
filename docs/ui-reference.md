@@ -29,8 +29,12 @@ The main UI is optimized for a 15-foot viewing distance. It uses a high-contrast
 
 - Center point: `(240, 140)`
 - Volume number: white, Font 8 with Font 7 fallback for wider values, centered near `Y=139`
-- Live volume always shows one decimal place on the normalized home scale of `0.0` to `100.0` (`receiver dB + 80`).
+- Live volume always shows one decimal place.
+- `0-100` mode shows the normalized home scale of `0.0` to `100.0` (`receiver dB + 80`).
+- `dB` mode shows the raw receiver volume value while the gauge continues using the normalized scale.
+- In `dB` mode, the main digits keep the same visual family as the normalized mode and the minus sign is treated separately so the digits do not fall back to a different face.
 - Volume caption: dimmed gray, Font 2, centered near `Y=72`
+- A small `dB` unit label appears centered below `VOLUME` only while `dB` mode is active. It stays static while the live value animates and disappears again when the scale returns to `0-100`.
 - Gauge arc: outer radius 125 px, inner radius 109 px, 240-degree span
 - Gauge colors: green/yellow/red fill over `#303030` background
 - These home fonts are intentionally larger than setup-screen roles so the main status remains readable from 15 feet.
@@ -44,7 +48,7 @@ The main UI is optimized for a 15-foot viewing distance. It uses a high-contrast
 - With the receiver-off backlight circuit documented in `docs/hardware.md` wired and validated, the same 3-second transition also turns off the TFT `LED/BL` backlight. TFT logic, touch, receiver polling, and Settings recovery remain active.
 - While the Home Screen is blank because receiver-off was confirmed, touch wake remains active and the first tap wakes only. A separate visible tap on the settings icon is still required to open Settings.
 - A non-Settings tap on visible `Receiver off` restarts the 3-second timer and keeps the message visible briefly.
-- Settings exposes `Current Settings`, Wi-Fi setup, receiver setup, and touch calibration.
+- Settings exposes `Current Settings`, `Volume Display Scale`, Wi-Fi setup, receiver setup, and touch calibration.
 - Flows launched from Settings should return to Settings when complete; the Settings OK button returns to the Home Screen.
 - Returning Home while the receiver is still confirmed off shows `Receiver off` again and restarts the 3-second blanking timer. Settings and settings-launched setup flows stay visible while active.
 - Setup/boot states expose a bottom-right `Calibrate` maintenance action using the shared bottom action button size, position, and icon-with-text treatment.
@@ -89,8 +93,9 @@ The firmware build uses checked-in generated masks and does not decode SVG or PN
 
 - Settings navigation rows use the same rounded selection-row treatment as setup selection lists.
 - Row labels remain visible, supporting text clarifies the destination, and touch targets remain at least 40 px high.
-- Settings order is `Current Settings`, `Wi-Fi Setup`, `Receiver Setup`, then `Touch Calibration`. Calibration is intentionally last because it is a maintenance/debug flow rather than a normal setup path.
+- Settings order is `Current Settings`, `Volume Display Scale`, `Wi-Fi Setup`, `Receiver Setup`, then `Touch Calibration`. Calibration is intentionally last because it is a maintenance/debug flow rather than a normal setup path.
 - `Current Settings` opens a read-only overview screen for saved and live monitor state; it does not launch setup or editing directly.
+- `Volume Display Scale` opens a dedicated single-choice screen with `0-100` and `dB` options, explicit `OK` and `Cancel` actions, and a visible selected-state indicator that does not rely on color alone.
 - If all settings destinations do not fit cleanly on one screen with the standard row treatment, Settings uses labeled `PREV` and `NEXT` pagination controls above the bottom `OK` action rather than switching to icon-only navigation.
 - Touch Calibration uses the shared `touch-calibration` crosshair icon in both the Settings row and the boot/setup action button.
 
@@ -103,6 +108,15 @@ The firmware build uses checked-in generated masks and does not decode SVG or PN
 - Missing saved values show `Unconfigured`. Saved Wi-Fi without a live link shows `Disconnected`. A saved receiver without resolved UPnP identity falls back to `Configured receiver`. Live values that cannot be read show `Unavailable`. Powered-off receiver state remains distinct from general receiver unavailability by showing `Off` instead of `Unavailable`.
 - The screen refreshes current Wi-Fi and receiver status while it remains visible, using the same restrained polling rhythm as the rest of the appliance UI.
 - Live refreshes redraw only the card body content so the screen does not visibly flash during normal status updates.
+
+## Volume Display Scale Screen
+
+- `Volume Display Scale` is a dedicated settings child screen with two single-choice options: `0-100` and `dB`.
+- The currently saved option is visible when the screen opens.
+- The selected option uses a radio-style indicator plus the normal row treatment, so the choice is clear without relying on color alone.
+- Tapping an option changes only the pending selection on the screen.
+- `OK` applies the pending selection, saves it, and returns to `Settings`.
+- `Cancel` discards any pending selection change and returns to `Settings`.
 
 ## Keyboard Icons
 
@@ -209,6 +223,8 @@ Wi-Fi network rows and receiver candidate rows use the shared selection row:
 - Empty or unavailable lists use a status block plus the same bottom recovery buttons as populated lists.
 - Pagination metadata stays above bottom actions and previous/next controls render as rounded text buttons instead of raw links.
 
+Single-choice settings rows, such as `Volume Display Scale`, use the same rounded row treatment with a dedicated radio-style selected-state indicator on the left. The indicator stays visible even when the row also uses selected or focused color treatment.
+
 ### Searching Screens
 
 Wi-Fi scanning and receiver discovery use one searching pattern:
@@ -248,6 +264,7 @@ Searching screens show progress immediately. Non-searching operations, such as W
 | ---------------------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `HomeScreen`           | Home hierarchy, setup status blocks, settings icon, audio-family state                                      | The normal home layout remains volume-first and does not add idle progress animation.                                                                  |
 | `SettingsScreen`       | Screen title, rounded settings rows, standard OK action                                                     | Settings destinations use the same row treatment as setup selection lists.                                                                             |
+| `VolumeScaleScreen`    | Screen title, single-choice rows, standard Cancel/OK actions                                                | The selected option uses a radio-style indicator and returns to `Settings` after both actions.                                                         |
 | `NetworkListScreen`    | Searching pattern, centered setup header, selection rows, pagination metadata, Manual/Rescan/Cancel buttons | Title stays `Wi-Fi Setup` in all states.                                                                                                               |
 | `KeyboardScreen`       | Input field, keyboard key grid, compact icon-only function buttons                                          | OK and Cancel share y-coordinate, height, visual center, and icon center.                                                                              |
 | `SetupStatusScreen`    | Wi-Fi loading, error status, retry action, 500 ms non-search progress threshold                             | Success still returns through the existing flow rather than adding a confirmation stop.                                                                |

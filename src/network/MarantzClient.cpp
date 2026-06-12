@@ -7,6 +7,100 @@ const char* const ModeTags[] = {
     "SurroundMode",
     "selectNOS"
 };
+
+const char* const MasterVolumeNestedTags[] = {
+    "dispvalue",
+    "DispValue",
+    "displayvalue",
+    "DisplayValue",
+    "value",
+    "Value"
+};
+
+constexpr float MinimumReceiverVolumeDb = -80.0f;
+
+bool isMinimumVolumeSentinel(const String& value) {
+    if (value.length() == 0) {
+        return false;
+    }
+
+    bool sawDash = false;
+    for (uint16_t i = 0; i < value.length(); ++i) {
+        char current = value.charAt(i);
+        if (current == '-') {
+            sawDash = true;
+            continue;
+        }
+        if (current == ' ') {
+            continue;
+        }
+        return false;
+    }
+
+    return sawDash;
+}
+
+bool isNonNegativeZeroValue(const String& value) {
+    if (value.length() == 0) {
+        return false;
+    }
+
+    bool sawZeroDigit = false;
+    for (uint16_t i = 0; i < value.length(); ++i) {
+        char current = value.charAt(i);
+        if (current == '0') {
+            sawZeroDigit = true;
+            continue;
+        }
+        if (current == '.' || current == '+') {
+            continue;
+        }
+        if (current == '-') {
+            return false;
+        }
+        return false;
+    }
+
+    return sawZeroDigit;
+}
+
+float parseReceiverVolume(const String& rawValue, bool* hasValue) {
+    String value = rawValue;
+    value.trim();
+    if (value.length() == 0) {
+        if (hasValue != nullptr) {
+            *hasValue = false;
+        }
+        return MinimumReceiverVolumeDb;
+    }
+
+    if (isMinimumVolumeSentinel(value)) {
+        if (hasValue != nullptr) {
+            *hasValue = true;
+        }
+        return MinimumReceiverVolumeDb;
+    }
+
+    float parsedVolume = value.toFloat();
+    bool isNumeric = value.indexOf('.') >= 0 || value.indexOf('-') >= 0 ||
+                     value.indexOf('+') >= 0 || parsedVolume != 0.0f ||
+                     isNonNegativeZeroValue(value);
+    if (!isNumeric) {
+        if (hasValue != nullptr) {
+            *hasValue = false;
+        }
+        return MinimumReceiverVolumeDb;
+    }
+
+    if (parsedVolume == 0.0f && isNonNegativeZeroValue(value)) {
+        parsedVolume = MinimumReceiverVolumeDb;
+    }
+
+    if (hasValue != nullptr) {
+        *hasValue = true;
+    }
+    return parsedVolume;
+}
 }
 
 void MarantzClient::setReceiverIp(const String& ip) {
@@ -40,11 +134,11 @@ MarantzStatus MarantzClient::fetchStatus(const String& ip) {
         if (httpCode == HTTP_CODE_OK) {
             String payload = http.getString();
 
-            String volStr = extractStatusValue(payload, "MasterVolume");
-            if (volStr != "") {
-                status.volume = volStr.toFloat();
-                status.hasVolume = true;
-            }
+            String volStr = extractPreferredStatusValue(payload, "MasterVolume",
+                                                        MasterVolumeNestedTags,
+                                                        sizeof(MasterVolumeNestedTags) /
+                                                            sizeof(MasterVolumeNestedTags[0]));
+            status.volume = parseReceiverVolume(volStr, &status.hasVolume);
 
             String powerStr = extractStatusValue(payload, "Power");
             status.powerKnown = powerStr.length() > 0;
@@ -85,17 +179,26 @@ String MarantzClient::extractValue(const String& xml, const String& tag) {
 }
 
 String MarantzClient::extractStatusValue(const String& xml, const String& tag) {
+    const char* const defaultNestedTags[] = {"value", "Value"};
+    return extractPreferredStatusValue(xml, tag, defaultNestedTags,
+                                       sizeof(defaultNestedTags) /
+                                           sizeof(defaultNestedTags[0]));
+}
+
+String MarantzClient::extractPreferredStatusValue(const String& xml, const String& tag,
+                                                  const char* const nestedTags[],
+                                                  size_t nestedTagCount) {
     String value = extractValue(xml, tag);
     value.trim();
 
     if (value.indexOf('<') >= 0) {
-        String nestedValue = extractValue(value, "value");
-        if (nestedValue.length() == 0) {
-            nestedValue = extractValue(value, "Value");
-        }
-        if (nestedValue.length() > 0) {
-            value = nestedValue;
-            value.trim();
+        for (size_t i = 0; i < nestedTagCount; ++i) {
+            String nestedValue = extractValue(value, nestedTags[i]);
+            if (nestedValue.length() > 0) {
+                value = nestedValue;
+                value.trim();
+                break;
+            }
         }
     }
 

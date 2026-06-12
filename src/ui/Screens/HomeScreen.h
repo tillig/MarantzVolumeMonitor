@@ -46,6 +46,7 @@ private:
         float lastRenderedVolume = -80.0f;
         String lastRenderedText;
         uint8_t lastRenderedFont = 0;
+        bool lastRenderedHadNegativeSign = false;
         uint32_t startMs = 0;
         uint32_t durationMs = 0;
         uint32_t lastFrameMs = 0;
@@ -93,6 +94,8 @@ private:
     bool isSettingsAccessible() const;
     int activeAudioFamilyIndex() const;
     String formatVolume(float volume) const;
+    float numericDisplayValue(float normalizedVolume) const;
+    bool volumeHasNegativeSign(float normalizedVolume) const;
     String displaySource() const;
     String displayMode() const;
     float displayVolume(float receiverVolume) const;
@@ -114,6 +117,7 @@ private:
     Rect liveModeRegion() const;
     Rect liveAudioIconsRegion() const;
     Rect volumeTextRegion(float volume) const;
+    int volumeNegativeSignWidth(TFT_eSPI& target) const;
     int volumeSweep(float volume) const;
     uint16_t volumeArcColor(int sweep) const;
     void drawVolumeArcDelta(TFT_eSPI& target, float previousVolume, float currentVolume);
@@ -123,6 +127,7 @@ private:
                        uint16_t color);
     void drawVolumeValueText(TFT_eSPI& target, const String& valueText, uint8_t font,
                              int centerX, int centerY);
+    void drawVolumeNegativeSign(TFT_eSPI& target, int x, int centerY);
     void drawVolumeValueTextDelta(TFT_eSPI& target, const String& valueText,
                                   uint8_t font);
     void drawVolumeTextAt(TFT_eSPI& target, const String& text, int x, int y,

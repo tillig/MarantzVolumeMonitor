@@ -4,6 +4,7 @@
 #include "HomeScreen.h"
 #include "NetworkListScreen.h"
 #include "ReceiverListScreen.h"
+#include "VolumeScaleScreen.h"
 #include "../ScreenManager.h"
 #include "../MaterialStyle.h"
 #include "../assets/IconBitmaps.h"
@@ -76,14 +77,18 @@ void SettingsScreen::drawEntry(TFT_eSPI& tft, int entryIndex, int y) {
     const char* secondary = "View Wi-Fi and receiver state";
 
     if (entryIndex == 1) {
+        icon = &Icons::SETTINGS;
+        primary = "Volume Display Scale";
+        secondary = "Choose 0-100 or dB";
+    } else if (entryIndex == 2) {
         icon = &Icons::WIFI;
         primary = "Wi-Fi Setup";
         secondary = "Choose network and password";
-    } else if (entryIndex == 2) {
+    } else if (entryIndex == 3) {
         icon = &Icons::RECEIVER;
         primary = "Receiver Setup";
         secondary = "Discover or enter receiver";
-    } else if (entryIndex == 3) {
+    } else if (entryIndex == 4) {
         icon = &Icons::TOUCH_CALIBRATION;
         primary = "Touch Calibration";
         secondary = "Capture raw touch samples";
@@ -106,12 +111,15 @@ void SettingsScreen::openEntry(int entryIndex) {
             ScreenManager::getInstance().setScreen(new CurrentSettingsScreen());
             return;
         case 1:
-            ScreenManager::getInstance().setScreen(new NetworkListScreen(ScreenReturnTarget::Settings));
+            ScreenManager::getInstance().setScreen(new VolumeScaleScreen());
             return;
         case 2:
-            ScreenManager::getInstance().setScreen(new ReceiverListScreen(ScreenReturnTarget::Settings));
+            ScreenManager::getInstance().setScreen(new NetworkListScreen(ScreenReturnTarget::Settings));
             return;
         case 3:
+            ScreenManager::getInstance().setScreen(new ReceiverListScreen(ScreenReturnTarget::Settings));
+            return;
+        case 4:
             ScreenManager::getInstance().setScreen(new CalibrationScreen(ScreenReturnTarget::Settings));
             return;
         default:

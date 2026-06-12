@@ -98,6 +98,17 @@ struct ListRowSpec {
     ComponentState state;
 };
 
+struct ChoiceRowSpec {
+    int x;
+    int y;
+    int w;
+    int h;
+    String primary;
+    String secondary;
+    bool selected;
+    ComponentState state;
+};
+
 struct StatusRowSpec {
     int x;
     int y;
@@ -135,6 +146,7 @@ void drawKeyboardTextButton(TFT_eSPI& tft, int x, int y, int w, int h,
                             const String& label,
                             ComponentState state = ComponentState::Normal);
 void drawListRow(TFT_eSPI& tft, const ListRowSpec& spec);
+void drawChoiceRow(TFT_eSPI& tft, const ChoiceRowSpec& spec);
 void drawSetupHeader(TFT_eSPI& tft, const String& title, const String& subtitle);
 void drawSearchingState(TFT_eSPI& tft, const String& title, const String& message,
                         const Icons::IconBitmap& icon, uint8_t progressFrame);

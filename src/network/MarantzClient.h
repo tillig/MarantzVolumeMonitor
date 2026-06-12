@@ -37,6 +37,9 @@ private:
     MarantzStatus fetchStatus(const String& ip);
     String extractValue(const String& xml, const String& tag);
     String extractStatusValue(const String& xml, const String& tag);
+    String extractPreferredStatusValue(const String& xml, const String& tag,
+                                       const char* const nestedTags[],
+                                       size_t nestedTagCount);
     String extractFirstStatusValue(const String& xml, const char* const tags[], size_t tagCount);
 };
 
