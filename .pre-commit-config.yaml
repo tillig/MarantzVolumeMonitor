@@ -20,7 +20,7 @@ repos:
         exclude: ^src/ui/assets/IconBitmaps\.cpp$
         files: \.(c|cc|cpp|cxx|h|hh|hpp|hxx)$
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: "c7c1c7640e610068e8e4754e9f1bf109bd987dc7" # post-v0.48.0 with patches
+    rev: "a4d5d37e66ebcd6b3705204a1d6dbb56dea66338"  # frozen: v0.49.0
     hooks:
       - id: markdownlint
         args:
