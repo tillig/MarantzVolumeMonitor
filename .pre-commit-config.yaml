@@ -14,19 +14,19 @@ repos:
       - id: trailing-whitespace
       - id: check-merge-conflict
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: dd18dad857d6133e90bbe478f4f2f22ec0030269 # frozen: v22.1.5
+    rev: e2b496dc2bd8340c2524cb9a2d2a943cde1bb6df  # frozen: v23.1.1
     hooks:
       - id: clang-format
         exclude: ^src/ui/assets/IconBitmaps\.cpp$
         files: \.(c|cc|cpp|cxx|h|hh|hpp|hxx)$
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: "a4d5d37e66ebcd6b3705204a1d6dbb56dea66338"  # frozen: v0.49.0
+    rev: "5b5dddc4fb0f83c3ea1fc5616fa63e115dce83e0"  # frozen: v0.49.1
     hooks:
       - id: markdownlint
         args:
           - --fix
   - repo: https://github.com/tillig/json-sort-cli
-    rev: 2b7e147e0933bd30b58133b6f287e5c695ff4f0e # frozen: v3.0.1
+    rev: f628ee730c3de493fe79688696555a31364f0a10  # frozen: v3.0.3
     hooks:
       - id: json-sort
         args:
