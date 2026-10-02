@@ -5,7 +5,7 @@ Welcome! We appreciate your interest in contributing to the Marantz Volume Monit
 ## Development Environment
 
 - **Framework:** Arduino
-- **Platform:** [pioarduino Espressif 32](https://github.com/pioarduino/platform-espressif32) (Arduino-ESP32 3.x) on an Elegoo ESP32 DevKit V1, pinned in `platformio.ini` so local and CI builds match
+- **Platform:** [pioarduino Espressif 32](https://github.com/pioarduino/platform-espressif32) (Arduino-ESP32 3.x) on an Elegoo ESP32 DevKit V1, pinned in `platformio.ini` so local and CI builds match; requires PlatformIO Core 6.2 or later
 - **Tooling:** PlatformIO, [Spec Kit](https://github.com/tillig/speckit)
 - **Key Libraries:**
   - `TFT_eSPI`: High-performance graphics library.
