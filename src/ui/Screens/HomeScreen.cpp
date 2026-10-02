@@ -10,6 +10,7 @@
 #include "../ScreenManager.h"
 #include "../TouchManager.h"
 #include "../assets/IconBitmaps.h"
+#include "../../network/ReceiverMonitor.h"
 #include "../../network/WiFiManager.h"
 
 namespace {
@@ -367,12 +368,11 @@ void HomeScreen::refreshState() {
     _ipAddress = _isWifiConnected ? WiFiManager::getInstance().getIPAddress() : "";
 
     _lastStatus = MarantzStatus();
-    if (_hasReceiverConfig) {
-        MarantzClient::getInstance().setReceiverIp(_config.receiverIp);
-    }
+    _hasReceiverStatus = false;
+    ReceiverMonitor::getInstance().setReceiverIp(_config.receiverIp);
 
     if (_hasWifiConfig && _hasReceiverConfig && _isWifiConnected) {
-        _lastStatus = MarantzClient::getInstance().getStatus();
+        _hasReceiverStatus = ReceiverMonitor::getInstance().latestStatus(_config.receiverIp, _lastStatus);
     }
 }
 
@@ -385,6 +385,10 @@ HomeScreen::DisplayState HomeScreen::classifyDisplayState(const MarantzStatus& s
     }
     if (!_hasReceiverConfig) {
         return DisplayState::ReceiverSetupRequired;
+    }
+    if (!_hasReceiverStatus) {
+        // The first poll after Wi-Fi connects is still in flight.
+        return DisplayState::WifiConnecting;
     }
     if (status.isValid && status.powerKnown && !status.power) {
         return DisplayState::ReceiverOffVisible;

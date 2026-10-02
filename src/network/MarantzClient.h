@@ -25,15 +25,12 @@ public:
         return instance;
     }
 
-    void setReceiverIp(const String& ip);
-    MarantzStatus getStatus();
+    MarantzStatus fetchStatus(const String& ip);
     bool verifyReceiver(const String& ip, MarantzStatus* verifiedStatus = nullptr);
 
 private:
-    MarantzClient() : _receiverIp("") {}
-    String _receiverIp;
+    MarantzClient() {}
 
-    MarantzStatus fetchStatus(const String& ip);
     String extractValue(const String& xml, const String& tag);
     String extractStatusValue(const String& xml, const String& tag);
     String extractPreferredStatusValue(const String& xml,

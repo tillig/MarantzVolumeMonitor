@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "network/MarantzClient.h"
+#include "network/ReceiverMonitor.h"
 #include "network/WiFiManager.h"
 #include "storage/ConfigStore.h"
 #include "ui/DisplayManager.h"
@@ -40,10 +40,9 @@ void setup() {
             WiFiManager::getInstance().startConnect(config.wifiSsid, config.wifiPassword);
         }
 
-        if (config.receiverIp.length() > 0) {
-            MarantzClient::getInstance().setReceiverIp(config.receiverIp);
-        }
+        ReceiverMonitor::getInstance().setReceiverIp(config.receiverIp);
     }
+    ReceiverMonitor::getInstance().begin();
 
     // Initial Screen (Start with HomeScreen for prototyping)
     ScreenManager::getInstance().setScreen(new HomeScreen());
