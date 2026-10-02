@@ -64,6 +64,7 @@ private:
     bool _hasWifiConfig = false;
     bool _hasReceiverConfig = false;
     bool _isWifiConnected = false;
+    bool _hasReceiverStatus = false;
     String _ipAddress;
     uint32_t _lastRefreshMs = 0;
     VolumeAnimation _volumeAnimation;

@@ -19,6 +19,7 @@ src/
 ├── network/
 │   ├── MarantzClient.h/.cpp
 │   ├── ReceiverDiscovery.h/.cpp
+│   ├── ReceiverMonitor.h/.cpp
 │   └── WiFiManager.h/.cpp
 ├── storage/
 │   └── ConfigStore.h/.cpp
@@ -53,7 +54,7 @@ Feature work may add classes inside these existing layer folders. New cross-laye
 3. If Wi-Fi is not configured, the touchscreen flow branches through `NetworkListScreen`, `KeyboardScreen`, and `SetupStatusScreen` to collect and save credentials.
 4. If a receiver is not configured, the setup flow branches through `ReceiverListScreen`, `ReceiverIpScreen`, and `ReceiverStatusScreen` to discover or verify a receiver address before saving it.
 5. `SettingsScreen` provides access to `Current Settings`, `Volume Display Scale`, Wi-Fi setup, receiver setup, touch calibration, and `Reset To Defaults`, with pagination when all entries do not fit cleanly on one page.
-6. `HomeScreen` and `CurrentSettingsScreen` refresh live Wi-Fi and receiver state on an approximately 1-second cadence while visible. The current implementation performs synchronous status fetches through the network layer from those screen update paths.
+6. `ReceiverMonitor` polls the saved receiver about once per second on a background FreeRTOS task, so slow or unreachable receivers never block touch handling. `HomeScreen` and `CurrentSettingsScreen` read its latest result on an approximately 1-second cadence while visible.
 7. The live Home Screen renders normalized volume (`receiver dB + 80`), source, listening mode, audio-family icons, and receiver-off blank/backlight behavior.
 8. `CalibrationScreen` owns the guided 9-point calibration session UI, while `TouchManager` owns runtime profile validation, mapping, and default-vs-active calibration application.
 9. `ResetDefaultsScreen` owns the selective reset confirmation UI, while `ConfigStore` owns the actual config mutations for `Wi-Fi`, `Receiver`, and `Calibration`.
