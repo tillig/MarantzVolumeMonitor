@@ -1,4 +1,7 @@
 #include <Arduino.h>
+#include "diagnostics/DeviceInfo.h"
+#include "diagnostics/DiagnosticLog.h"
+#include "network/DiagnosticsServer.h"
 #include "network/ReceiverMonitor.h"
 #include "network/WiFiManager.h"
 #include "storage/ConfigStore.h"
@@ -11,11 +14,14 @@ void setup() {
     Serial.begin(115200);
     delay(1000);
     Serial.println("Marantz Volume Monitor v2 Starting...");
+    DiagnosticLog::getInstance().add(
+        "Boot: firmware %s, reset reason %s", DeviceInfo::firmwareVersion(), DeviceInfo::resetReasonName());
 
     // Initialize Hardware via Managers
     DisplayManager::getInstance().begin();
     TouchManager::getInstance().begin();
     ConfigStore::getInstance().begin();
+    WiFiManager::getInstance().begin();
 
     DeviceConfig config;
     if (ConfigStore::getInstance().loadConfig(config)) {
@@ -43,6 +49,7 @@ void setup() {
         ReceiverMonitor::getInstance().setReceiverIp(config.receiverIp);
     }
     ReceiverMonitor::getInstance().begin();
+    DiagnosticsServer::getInstance().begin();
 
     // Initial Screen (Start with HomeScreen for prototyping)
     ScreenManager::getInstance().setScreen(new HomeScreen());
@@ -63,6 +70,8 @@ void loop() {
         lastTouchDispatchMs = millis();
     }
     lastTouchState = isTouched;
+
+    WiFiManager::getInstance().update();
 
     // 2. Update Active Screen (polling, animations, etc.)
     ScreenManager::getInstance().update();

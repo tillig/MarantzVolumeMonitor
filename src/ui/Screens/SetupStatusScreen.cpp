@@ -6,6 +6,7 @@
 #include "../DisplayManager.h"
 #include "../MaterialStyle.h"
 #include "../assets/IconBitmaps.h"
+#include "../../diagnostics/DiagnosticLog.h"
 #include "../../network/WiFiManager.h"
 #include "../../storage/ConfigStore.h"
 
@@ -32,7 +33,7 @@ void SetupStatusScreen::draw() {
         _lastProgressAtMs = _startTime;
     } else if (_failed) {
         MaterialStyle::drawStatusBlock(
-            tft, MaterialStyle::StatusKind::Error, _failureMessage, "Check credentials and try again.", Icons::FAILURE);
+            tft, MaterialStyle::StatusKind::Error, _failureMessage, _failureDetail, Icons::FAILURE);
         MaterialStyle::drawStandardButton(
             tft, 140, MaterialStyle::BottomActionY, 200, MaterialStyle::ButtonHeight, Icons::RETRY, "Retry");
     } else {
@@ -69,6 +70,7 @@ void SetupStatusScreen::update() {
             if (!ConfigStore::getInstance().saveConfig(config)) {
                 _failed = true;
                 _failureMessage = "Save Failed";
+                _failureDetail = "Credentials could not be stored.";
                 Serial.println("WiFi connected, but saving credentials failed");
                 draw();
                 return;
@@ -84,6 +86,17 @@ void SetupStatusScreen::update() {
             _isConnecting = false;
             _failed = true;
             _failureMessage = "Connection Failed";
+            uint8_t reason = WiFiManager::getInstance().lastDisconnectReason();
+            _failureDetail = WiFiManager::describeDisconnectReason(reason);
+            if (reason != 0) {
+                _failureDetail += " Code " + String(reason) + ".";
+            }
+            DiagnosticLog::getInstance().add("Wi-Fi setup for %s failed: status %d, reason %u %s",
+                                             _ssid.c_str(),
+                                             static_cast<int>(status),
+                                             reason,
+                                             WiFiManager::disconnectReasonName(reason).c_str());
+            restoreSavedConnection();
             draw();
         } else {
             uint32_t now = millis();
@@ -109,6 +122,17 @@ void SetupStatusScreen::update() {
                                                _progressFrame);
             }
         }
+    }
+}
+
+void SetupStatusScreen::restoreSavedConnection() {
+    // Without this, the retry loop would keep using the credentials that just failed.
+    DeviceConfig config;
+    ConfigStore::getInstance().loadConfig(config);
+    if (config.wifiSsid.length() > 0) {
+        WiFiManager::getInstance().startConnect(config.wifiSsid, config.wifiPassword);
+    } else {
+        WiFiManager::getInstance().stopConnecting();
     }
 }
 

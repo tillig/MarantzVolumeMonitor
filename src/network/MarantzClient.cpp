@@ -112,6 +112,7 @@ MarantzStatus MarantzClient::fetchStatus(const String& ip) {
     if (http.begin(client, url)) {
         http.setTimeout(5000);
         int httpCode = http.GET();
+        status.httpCode = httpCode;
         if (httpCode == HTTP_CODE_OK) {
             String payload = http.getString();
 

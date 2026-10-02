@@ -13,9 +13,12 @@ struct MarantzStatus {
     String input;
     String mode;
     bool isValid;
+    // HTTP status code, or a negative HTTPClient error code when the request did not complete.
+    int httpCode;
 
     MarantzStatus()
-        : power(false), powerKnown(false), volume(-80.0), hasVolume(false), input(""), mode(""), isValid(false) {}
+        : power(false), powerKnown(false), volume(-80.0), hasVolume(false), input(""), mode(""), isValid(false),
+          httpCode(0) {}
 };
 
 class MarantzClient {

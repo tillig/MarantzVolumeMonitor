@@ -8,6 +8,7 @@ The firmware uses a small layered architecture:
 - **Network layer**: Wi-Fi connection management, SSDP/UPnP receiver discovery, and Marantz HTTP status access.
 - **Storage layer**: Persistent device configuration using LittleFS.
 - **Hardware layer**: TFT_eSPI display access and XPT2046 touch input.
+- **Diagnostics**: An in-memory event log that any layer may write to, read by `DiagnosticsScreen` and `DiagnosticsServer`.
 
 Screens should not perform network I/O directly. They should delegate network work to the network layer and persistence to `ConfigStore`.
 
@@ -16,7 +17,11 @@ Screens should not perform network I/O directly. They should delegate network wo
 ```text
 src/
 ├── main.cpp
+├── diagnostics/
+│   ├── DeviceInfo.h/.cpp
+│   └── DiagnosticLog.h/.cpp
 ├── network/
+│   ├── DiagnosticsServer.h/.cpp
 │   ├── MarantzClient.h/.cpp
 │   ├── ReceiverDiscovery.h/.cpp
 │   ├── ReceiverMonitor.h/.cpp
@@ -35,6 +40,7 @@ src/
         ├── HomeScreen.h/.cpp
         ├── SettingsScreen.h/.cpp
         ├── CurrentSettingsScreen.h/.cpp
+        ├── DiagnosticsScreen.h/.cpp
         ├── NetworkListScreen.h/.cpp
         ├── KeyboardScreen.h/.cpp
         ├── SetupStatusScreen.h/.cpp
@@ -49,11 +55,11 @@ Feature work may add classes inside these existing layer folders. New cross-laye
 
 ## Runtime Flow
 
-1. Boot initializes display, touch, and LittleFS-backed configuration storage, then attempts Wi-Fi auto-connect, applies any saved receiver IP, and restores the saved touch-calibration profile if it is usable.
+1. Boot initializes display, touch, and LittleFS-backed configuration storage, then attempts Wi-Fi auto-connect, applies any saved receiver IP, restores the saved touch-calibration profile if it is usable, and starts the diagnostics HTTP server. `WiFiManager` retries the saved network from the main loop whenever it stays disconnected.
 2. `HomeScreen` is the first screen and classifies the current state as Wi-Fi setup required, Wi-Fi connecting, receiver setup required, receiver unavailable, receiver off, or live.
 3. If Wi-Fi is not configured, the touchscreen flow branches through `NetworkListScreen`, `KeyboardScreen`, and `SetupStatusScreen` to collect and save credentials.
 4. If a receiver is not configured, the setup flow branches through `ReceiverListScreen`, `ReceiverIpScreen`, and `ReceiverStatusScreen` to discover or verify a receiver address before saving it.
-5. `SettingsScreen` provides access to `Current Settings`, `Volume Display Scale`, Wi-Fi setup, receiver setup, touch calibration, and `Reset To Defaults`, with pagination when all entries do not fit cleanly on one page.
+5. `SettingsScreen` provides access to `Current Settings`, `Volume Display Scale`, Wi-Fi setup, receiver setup, touch calibration, `Diagnostics`, and `Reset To Defaults`, with pagination when all entries do not fit cleanly on one page.
 6. `ReceiverMonitor` polls the saved receiver about once per second on a background FreeRTOS task, so slow or unreachable receivers never block touch handling. `HomeScreen` and `CurrentSettingsScreen` read its latest result on an approximately 1-second cadence while visible.
 7. The live Home Screen renders normalized volume (`receiver dB + 80`), source, listening mode, audio-family icons, and receiver-off blank/backlight behavior.
 8. `CalibrationScreen` owns the guided 9-point calibration session UI, while `TouchManager` owns runtime profile validation, mapping, and default-vs-active calibration application.
