@@ -26,6 +26,7 @@ std::vector<DiagnosticLog::Entry> DiagnosticLog::entries() {
 
     std::vector<Entry> result;
     result.reserve(count);
+    // cppcheck-suppress knownConditionTrueFalse ; cppcheck assumes _totalCount keeps its initial value.
     for (size_t i = 0; i < count; ++i) {
         result.push_back(_entries[(start + i) % Capacity]);
     }
