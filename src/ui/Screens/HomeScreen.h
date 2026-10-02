@@ -91,7 +91,6 @@ private:
     void clearReceiverOffWakeCandidate();
     bool updateReceiverOffWakeCandidate(uint32_t now);
     bool isReceiverOffTimerExpired(uint32_t now) const;
-    bool isReceiverOffDisplayState(DisplayState state) const;
     bool isCalibrationButtonPressed(TS_Point p) const;
     bool isSettingsButtonPressed(TS_Point p) const;
     bool isSettingsAccessible() const;

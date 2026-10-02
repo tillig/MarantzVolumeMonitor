@@ -14,9 +14,18 @@ public:
         return instance;
     }
 
+    struct Diagnostics {
+        String receiverIp;
+        bool hasStatus = false;
+        MarantzStatus status;
+        uint32_t lastPollAtMs = 0;
+        uint32_t consecutiveFailures = 0;
+    };
+
     void begin();
     void setReceiverIp(const String& ip);
     bool latestStatus(const String& receiverIp, MarantzStatus& status);
+    Diagnostics diagnostics();
 
 private:
     ReceiverMonitor() {}
@@ -29,6 +38,8 @@ private:
     String _receiverIp;
     MarantzStatus _status;
     bool _hasStatus = false;
+    uint32_t _lastPollAtMs = 0;
+    uint32_t _consecutiveFailures = 0;
 
     static void taskEntry(void* parameter);
     void run();
