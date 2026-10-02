@@ -75,10 +75,6 @@ private:
     ReceiverOffTimer _receiverOffTimer;
     ReceiverOffWakeCandidate _receiverOffWakeCandidate;
 
-    void drawVolume(float volume);
-    void drawSource(const String& source);
-    void drawMode(const String& mode);
-    void drawTiles(const String& mode);
     void drawSettingsButton();
     void drawAudioFamilyIcons();
     void drawSetupState();
@@ -137,9 +133,6 @@ private:
     void drawReceiverStatusState(const String& title, const String& message, MaterialStyle::StatusKind kind);
 
     // Layout-specific drawing
-    void drawLayoutClassic();
-    void drawLayoutModern();
-    void drawLayoutMinimal();
     void drawLayoutUnified();
 
     // Helper for Arc Gauge

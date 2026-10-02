@@ -30,7 +30,7 @@ public:
     TS_Point mapRawPoint(const TS_Point& rawPoint) const;
     bool applyCalibrationProfile(const CalibrationProfile& profile);
     void applyDefaultCalibration();
-    CalibrationProfile activeCalibrationProfile() const;
+    const CalibrationProfile& activeCalibrationProfile() const;
     static CalibrationProfile defaultCalibrationProfile();
     static bool isCalibrationProfileUsable(const CalibrationProfile& profile);
 
