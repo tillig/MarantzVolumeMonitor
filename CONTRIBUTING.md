@@ -54,6 +54,10 @@ To flash a connected ESP32, use PlatformIO's upload action or:
 platformio run --target upload
 ```
 
+## Releases
+
+Push a version tag such as `v2.1.0` to publish a release. `release.yml` builds the firmware and attaches `firmware.factory.bin` to a GitHub Release, and `pages.yml` redeploys the web flasher with that image. `scripts/version.py` stamps the tag into `FIRMWARE_VERSION`, which the diagnostics page reports.
+
 ## How to Contribute
 
 1. **Report Issues:** Use the GitHub issue tracker for bugs or feature requests.

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Flash the Marantz Volume Monitor</title>
+    <!--
+      ESP Web Tools flasher served from GitHub Pages. The manifest writes the merged factory image at 0x0; it ends
+      before the LittleFS partition, so the same image installs on a blank board and updates a configured one.
+    -->
+    <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 40rem;
+        margin: 0 auto;
+        padding: 2rem 1.5rem;
+        line-height: 1.5;
+        color: #1a1a1a;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+      .note {
+        background: #fff6e0;
+        border: 1px solid #e6cf8a;
+        border-radius: 6px;
+        padding: 0.8rem 1rem;
+        margin: 1.5rem 0;
+      }
+      ol {
+        padding-left: 1.2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Flash the Marantz Volume Monitor</h1>
+    <p>
+      This installs the latest firmware release onto an Elegoo ESP32 DevKit V1 directly from your browser. No build
+      tools or command line are needed.
+    </p>
+
+    <div class="note">
+      Use a desktop version of Chrome or Edge. This page relies on Web Serial, which Firefox, Safari, and mobile
+      browsers do not support.
+    </div>
+
+    <ol>
+      <li>Connect the ESP32 to this computer with a USB data cable.</li>
+      <li>Select <strong>Connect and Install</strong> and choose the ESP32's serial port when the browser asks.</li>
+      <li>
+        When asked whether to erase the device, leave <strong>Erase device</strong> unchecked to keep your Wi-Fi,
+        receiver, and touch calibration settings. Check it only to start over.
+      </li>
+      <li>Wait for the install to finish. The monitor restarts and shows setup on its touchscreen if it is new.</li>
+    </ol>
+
+    <p>
+      <esp-web-install-button manifest="./firmware-manifest.json">
+        <button slot="activate">Connect and Install</button>
+        <span slot="unsupported">Your browser does not support Web Serial. Use desktop Chrome or Edge.</span>
+        <span slot="not-allowed">Serial access was blocked. Allow it and reload the page.</span>
+      </esp-web-install-button>
+    </p>
+
+    <p>
+      See the <a href="https://github.com/tillig/MarantzVolumeMonitor#readme">project README</a> for hardware and
+      setup details.
+    </p>
+  </body>
+</html>

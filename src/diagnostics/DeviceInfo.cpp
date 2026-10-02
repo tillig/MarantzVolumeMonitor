@@ -3,7 +3,7 @@
 #include <esp_system.h>
 
 #ifndef FIRMWARE_VERSION
-#define FIRMWARE_VERSION "dev"
+#define FIRMWARE_VERSION "unknown"
 #endif
 
 namespace DeviceInfo {

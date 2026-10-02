@@ -22,6 +22,12 @@ Refer to [`docs/hardware.md`](docs/hardware.md) for detailed wiring, power, and 
 
 I [included the 3D models for the box I made, too](./assets/box/README.md), if you want to use that.
 
+## Install the Firmware
+
+The easiest way to install or update the firmware is the [web flasher](https://paraesthesia.com/MarantzVolumeMonitor/). It writes the most recent [release](https://github.com/tillig/MarantzVolumeMonitor/releases) to the ESP32 from desktop Chrome or Edge over USB, with no build tools. When the browser asks whether to erase the device, leave `Erase device` unchecked to keep your settings.
+
+To build from source instead, follow the steps below.
+
 ## Software Setup
 
 This project uses [PlatformIO](https://platformio.org/) for development and [Spec Kit](https://github.com/tillig/speckit) for project management.

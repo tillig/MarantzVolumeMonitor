@@ -1,0 +1,67 @@
+name: Deploy Web Flasher
+
+# Publishes web-flasher/ to GitHub Pages with the latest release firmware copied alongside it.
+#
+# This triggers on the tag rather than "release: published" because a release created with the default GITHUB_TOKEN starts no further workflows. The tag push starts this and release.yml together, so the download step waits for the asset. There is no "paths" filter because it would also filter out tag pushes.
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v6
+
+      # Release asset URLs redirect cross-origin, which the browser blocks, so the firmware is served from the Pages origin instead.
+      - name: Fetch release firmware into the flasher directory
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 40); do
+            if gh release download --repo "$GITHUB_REPOSITORY" \
+                 --pattern 'firmware.factory.bin' \
+                 --dir web-flasher --clobber; then
+              echo "Downloaded release firmware on attempt $attempt."
+              break
+            fi
+            if [ "$attempt" -eq 40 ]; then
+              echo "Release asset did not appear in time." >&2
+              exit 1
+            fi
+            echo "Asset not ready (attempt $attempt); waiting 15s."
+            sleep 15
+          done
+          ls -l web-flasher
+
+      - name: Upload flasher as Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: web-flasher
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
