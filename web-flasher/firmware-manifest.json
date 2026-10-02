@@ -1,0 +1,17 @@
+{
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "parts": [
+        {
+          "offset": 0,
+          "path": "./firmware.factory.bin"
+        }
+      ]
+    }
+  ],
+  "improv": false,
+  "name": "Marantz Volume Monitor",
+  "new_install_prompt_erase": true,
+  "version": "latest"
+}
