@@ -15,12 +15,21 @@ public:
         return instance;
     }
 
+    struct Diagnostics {
+        String receiverIp;
+        bool hasStatus = false;
+        MarantzStatus status;
+        uint32_t lastPollAtMs = 0;
+        uint32_t consecutiveFailures = 0;
+    };
+
     void begin();
     void setReceiverIp(const String& ip);
     // False until a poll of the current receiver completes. A result older than StaleAfterMs comes back invalid.
     bool latestStatus(MarantzStatus& status);
     // Changes whenever a poll completes, so readers can react to new results without polling the monitor's cadence.
     uint32_t statusSequence();
+    Diagnostics diagnostics();
 
 private:
     ReceiverMonitor() {}
@@ -39,6 +48,7 @@ private:
     uint32_t _statusSequence = 0;
     uint32_t _lastReadAtMs = 0;
     bool _polling = false;
+    uint32_t _consecutiveFailures = 0;
 
     static void taskEntry(void* parameter);
     void run();

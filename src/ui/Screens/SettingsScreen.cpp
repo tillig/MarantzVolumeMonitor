@@ -1,6 +1,7 @@
 #include "SettingsScreen.h"
 #include "CalibrationScreen.h"
 #include "CurrentSettingsScreen.h"
+#include "DiagnosticsScreen.h"
 #include "HomeScreen.h"
 #include "NetworkListScreen.h"
 #include "ResetDefaultsScreen.h"
@@ -97,6 +98,10 @@ void SettingsScreen::drawEntry(TFT_eSPI& tft, int entryIndex, int y) {
         primary = "Touch Calibration";
         secondary = "Align touch on the device";
     } else if (entryIndex == 5) {
+        icon = &Icons::SCAN;
+        primary = "Diagnostics";
+        secondary = "Recent events and web details";
+    } else if (entryIndex == 6) {
         icon = &Icons::WARNING;
         primary = "Reset To Defaults";
         secondary = "Reset Wi-Fi, receiver, or touch";
@@ -133,6 +138,9 @@ void SettingsScreen::openEntry(int entryIndex) {
             ScreenManager::getInstance().setScreen(new CalibrationScreen(ScreenReturnTarget::Settings));
             return;
         case 5:
+            ScreenManager::getInstance().setScreen(new DiagnosticsScreen());
+            return;
+        case 6:
             ScreenManager::getInstance().setScreen(new ResetDefaultsScreen());
             return;
         default:

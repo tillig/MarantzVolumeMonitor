@@ -1,6 +1,9 @@
 #include "ReceiverMonitor.h"
 
+#include <HTTPClient.h>
+
 #include "WiFiManager.h"
+#include "../diagnostics/DiagnosticLog.h"
 
 void ReceiverMonitor::begin() {
     if (_task != nullptr) {
@@ -22,7 +25,9 @@ void ReceiverMonitor::setReceiverIp(const String& ip) {
         _receiverIp = ip;
         _hasStatus = false;
         _statusSequence++;
+        _consecutiveFailures = 0;
     }
+    DiagnosticLog::getInstance().add("Receiver set to %s", ip.length() > 0 ? ip.c_str() : "(none)");
 
     // Poll the new receiver right away instead of waiting out the current interval.
     wake();
@@ -52,6 +57,17 @@ bool ReceiverMonitor::latestStatus(MarantzStatus& status) {
 uint32_t ReceiverMonitor::statusSequence() {
     std::lock_guard<std::mutex> lock(_mutex);
     return _statusSequence;
+}
+
+ReceiverMonitor::Diagnostics ReceiverMonitor::diagnostics() {
+    std::lock_guard<std::mutex> lock(_mutex);
+    Diagnostics result;
+    result.receiverIp = _receiverIp;
+    result.hasStatus = _hasStatus;
+    result.status = _status;
+    result.lastPollAtMs = _statusAtMs;
+    result.consecutiveFailures = _consecutiveFailures;
+    return result;
 }
 
 void ReceiverMonitor::taskEntry(void* parameter) {
@@ -87,6 +103,20 @@ void ReceiverMonitor::storeStatus(const String& receiverIp, const MarantzStatus&
         return;
     }
 
+    // Log only transitions so a receiver that stays down does not flush older events.
+    if (!status.isValid && _consecutiveFailures == 0) {
+        DiagnosticLog::getInstance().add("Receiver %s poll failed: %d %s",
+                                         receiverIp.c_str(),
+                                         status.httpCode,
+                                         status.httpCode < 0 ? HTTPClient::errorToString(status.httpCode).c_str()
+                                                             : "unexpected HTTP status");
+    } else if (status.isValid && _consecutiveFailures > 0) {
+        DiagnosticLog::getInstance().add("Receiver %s reachable again after %lu failed polls",
+                                         receiverIp.c_str(),
+                                         static_cast<unsigned long>(_consecutiveFailures));
+    }
+
+    _consecutiveFailures = status.isValid ? 0 : _consecutiveFailures + 1;
     _status = status;
     _hasStatus = true;
     _statusAtMs = millis();
