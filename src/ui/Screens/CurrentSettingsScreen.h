@@ -39,7 +39,6 @@ private:
                          const String& text,
                          MaterialStyle::ComponentState state,
                          uint8_t datum = TL_DATUM) const;
-    String wifiHeadlineText() const;
     String wifiDetailText() const;
     String receiverHeadlineText() const;
     String receiverDetailText() const;

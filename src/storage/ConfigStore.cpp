@@ -72,6 +72,7 @@ bool ConfigStore::loadConfig(DeviceConfig& config) {
     config.wifiPassword = doc["wifiPassword"] | "";
     config.receiverIp = doc["receiverIp"] | "";
     config.brightness = doc["brightness"] | 255;
+    // cppcheck-suppress badBitmaskCheck ; ArduinoJson overloads | to supply a default value.
     config.useDbScale = doc["useDbScale"] | false;
     config.touchCalibration = TouchCalibrationConfig();
 

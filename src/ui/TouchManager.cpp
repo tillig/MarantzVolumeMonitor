@@ -92,7 +92,7 @@ void TouchManager::applyDefaultCalibration() {
     _activeProfile = defaultCalibrationProfile();
 }
 
-TouchManager::CalibrationProfile TouchManager::activeCalibrationProfile() const {
+const TouchManager::CalibrationProfile& TouchManager::activeCalibrationProfile() const {
     return _activeProfile;
 }
 

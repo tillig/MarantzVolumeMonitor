@@ -214,10 +214,6 @@ void CurrentSettingsScreen::drawSummaryLine(TFT_eSPI& tft,
     tft.drawString(display, x, y, MaterialStyle::fontFor(MaterialStyle::TextRole::Body));
 }
 
-String CurrentSettingsScreen::wifiHeadlineText() const {
-    return _config.wifiSsid.length() > 0 ? _config.wifiSsid : "Unconfigured";
-}
-
 String CurrentSettingsScreen::wifiDetailText() const {
     if (_config.wifiSsid.length() == 0) {
         return "";

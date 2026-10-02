@@ -419,7 +419,7 @@ void HomeScreen::setDisplayState(DisplayState state, uint32_t now) {
     if (state != DisplayState::ReceiverOffBlank) {
         clearReceiverOffWakeCandidate();
     }
-    if (previousState != state && (isReceiverOffDisplayState(previousState) || isReceiverOffDisplayState(state))) {
+    if (isReceiverOffDisplayState(previousState) || isReceiverOffDisplayState(state)) {
         logDisplayStateTransition(previousState, state);
     }
 
@@ -429,7 +429,7 @@ void HomeScreen::setDisplayState(DisplayState state, uint32_t now) {
         stopReceiverOffTimer();
     }
 
-    if (previousState == DisplayState::Live && state != DisplayState::Live) {
+    if (previousState == DisplayState::Live) {
         stopVolumeAnimation();
     }
 }
@@ -653,11 +653,11 @@ void HomeScreen::redrawLiveVolumeFrame(bool forceFull) {
 
     drawVolumeArcDelta(tft, _volumeAnimation.lastRenderedVolume, _volumeAnimation.displayedVolume);
     String volumeText = formatVolume(_volumeAnimation.displayedVolume);
-    uint8_t font = volumeFont(volumeText);
-    drawVolumeValueTextDelta(tft, volumeText, font);
+    uint8_t valueFont = volumeFont(volumeText);
+    drawVolumeValueTextDelta(tft, volumeText, valueFont);
 
     _volumeAnimation.lastRenderedText = volumeText;
-    _volumeAnimation.lastRenderedFont = font;
+    _volumeAnimation.lastRenderedFont = valueFont;
     _volumeAnimation.lastRenderedHadNegativeSign = volumeHasNegativeSign(_volumeAnimation.displayedVolume);
     _volumeAnimation.lastRenderedVolume = _volumeAnimation.displayedVolume;
 }
@@ -726,8 +726,8 @@ void HomeScreen::renderLiveVolumeRegion(TFT_eSPI& target, int originX, int origi
     drawVolumeArc(target, centerX, centerY, ArcOuterRadius, _volumeAnimation.displayedVolume);
 
     String volumeText = formatVolume(_volumeAnimation.displayedVolume);
-    uint8_t font = volumeFont(volumeText);
-    drawVolumeValueText(target, volumeText, font, VolumeValueCenterX - originX, VolumeValueCenterY - originY);
+    uint8_t valueFont = volumeFont(volumeText);
+    drawVolumeValueText(target, volumeText, valueFont, VolumeValueCenterX - originX, VolumeValueCenterY - originY);
 
     target.setTextDatum(MC_DATUM);
     target.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
@@ -767,12 +767,12 @@ void HomeScreen::clearRect(const Rect& rect) {
 HomeScreen::Rect HomeScreen::volumeTextRegion(float volume) const {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
     String volumeText = formatVolume(volume);
-    uint8_t font = volumeFont(volumeText);
-    int textWidth = tft.textWidth(volumeText, font);
+    uint8_t valueFont = volumeFont(volumeText);
+    int textWidth = tft.textWidth(volumeText, valueFont);
     if (volumeHasNegativeSign(volume)) {
         textWidth += volumeNegativeSignWidth(tft);
     }
-    int textHeight = tft.fontHeight(font);
+    int textHeight = tft.fontHeight(valueFont);
     int left = VolumeValueCenterX - (textWidth / 2);
     int top = VolumeValueCenterY - (textHeight / 2);
 
@@ -989,38 +989,6 @@ void HomeScreen::drawVolumeArc(TFT_eSPI& target, int x, int y, int r, float volu
                           ArcCapRadius,
                           volumeArcColor(currentSweep));
     }
-}
-
-void HomeScreen::drawLayoutClassic() {
-    drawLayoutUnified();
-}
-
-void HomeScreen::drawLayoutModern() {
-    drawLayoutUnified();
-}
-
-void HomeScreen::drawLayoutMinimal() {
-    drawLayoutUnified();
-}
-
-void HomeScreen::drawVolume(float volume) {
-    syncDisplayedVolume(displayVolume(volume));
-    redrawLiveVolumeRegion();
-}
-
-void HomeScreen::drawSource(const String& source) {
-    _lastStatus.input = source;
-    redrawLiveMetadataRegion();
-}
-
-void HomeScreen::drawMode(const String& mode) {
-    _lastStatus.mode = mode;
-    redrawLiveMetadataRegion();
-}
-
-void HomeScreen::drawTiles(const String& mode) {
-    _lastStatus.mode = mode;
-    redrawLiveMetadataRegion();
 }
 
 void HomeScreen::drawSettingsButton() {
