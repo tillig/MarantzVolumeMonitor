@@ -6,8 +6,8 @@
 
 class ReceiverStatusScreen : public Screen {
 public:
-    ReceiverStatusScreen(const ReceiverCandidate& candidate,
-                         ScreenReturnTarget returnTarget = ScreenReturnTarget::Home);
+    explicit ReceiverStatusScreen(const ReceiverCandidate& candidate,
+                                  ScreenReturnTarget returnTarget = ScreenReturnTarget::Home);
     void draw() override;
     void update() override;
     void handleTouch(TS_Point p) override;

@@ -86,8 +86,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-platformio-${{ steps.python.outputs.python-version }}-
 
-      - name: Install PlatformIO Core
-        run: pip install --upgrade platformio
+      # The pioarduino fork of PlatformIO Core runs pio check with the platform's cppcheck.
+      - name: Install pioarduino Core
+        run: pip install --upgrade pioarduino
 
       - name: Run static analysis
         run: pio check --fail-on-defect=low

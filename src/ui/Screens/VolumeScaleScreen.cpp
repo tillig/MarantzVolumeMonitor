@@ -118,24 +118,24 @@ void VolumeScaleScreen::loadChoice() {
     _saveFailed = false;
 }
 
-bool VolumeScaleScreen::isNormalizedPressed(TS_Point p) const {
+bool VolumeScaleScreen::isNormalizedPressed(TS_Point p) {
     int y = choiceRowY(0);
     return p.x >= ChoiceRowX && p.x <= ChoiceRowX + ChoiceRowWidth && p.y >= y &&
            p.y <= y + MaterialStyle::ListRowHeight;
 }
 
-bool VolumeScaleScreen::isDbPressed(TS_Point p) const {
+bool VolumeScaleScreen::isDbPressed(TS_Point p) {
     int y = choiceRowY(1);
     return p.x >= ChoiceRowX && p.x <= ChoiceRowX + ChoiceRowWidth && p.y >= y &&
            p.y <= y + MaterialStyle::ListRowHeight;
 }
 
-bool VolumeScaleScreen::isCancelPressed(TS_Point p) const {
+bool VolumeScaleScreen::isCancelPressed(TS_Point p) {
     return p.x >= 44 && p.x <= 180 && p.y >= MaterialStyle::BottomActionY &&
            p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight;
 }
 
-bool VolumeScaleScreen::isOkPressed(TS_Point p) const {
+bool VolumeScaleScreen::isOkPressed(TS_Point p) {
     return p.x >= 300 && p.x <= 436 && p.y >= MaterialStyle::BottomActionY &&
            p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight;
 }
@@ -152,6 +152,6 @@ bool VolumeScaleScreen::persistChoice() {
     return true;
 }
 
-bool VolumeScaleScreen::useDbScaleFor(Choice choice) const {
+bool VolumeScaleScreen::useDbScaleFor(Choice choice) {
     return choice == Choice::Db;
 }

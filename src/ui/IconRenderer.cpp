@@ -9,7 +9,6 @@ bool iconPixelSet(const Icons::IconBitmap& icon, uint16_t x, uint16_t y) {
         return false;
     }
 
-    // cppcheck-suppress cstyleCast
     uint8_t value = pgm_read_byte(icon.data + byteIndex);
     return (value & (1 << (7 - (x % 8)))) != 0;
 }
@@ -24,7 +23,6 @@ void IconRenderer::draw(TFT_eSPI& tft, const Icons::IconBitmap& icon, int x, int
                 return;
             }
 
-            // cppcheck-suppress cstyleCast
             uint8_t value = pgm_read_byte(icon.data + byteIndex);
             if (value & (1 << (7 - (col % 8)))) {
                 tft.drawPixel(x + col, y + row, color);

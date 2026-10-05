@@ -5,7 +5,7 @@
 
 class ReceiverIpScreen : public Screen {
 public:
-    ReceiverIpScreen(ScreenReturnTarget returnTarget = ScreenReturnTarget::Home);
+    explicit ReceiverIpScreen(ScreenReturnTarget returnTarget = ScreenReturnTarget::Home);
     void draw() override;
     void update() override;
     void handleTouch(TS_Point p) override;
@@ -16,7 +16,7 @@ private:
     String _errorMessage;
 
     void drawInput(TFT_eSPI& tft);
-    void drawKeypad(TFT_eSPI& tft);
+    static void drawKeypad(TFT_eSPI& tft);
     void submit();
 };
 

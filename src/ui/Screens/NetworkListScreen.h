@@ -7,7 +7,7 @@
 
 class NetworkListScreen : public Screen {
 public:
-    NetworkListScreen(ScreenReturnTarget returnTarget = ScreenReturnTarget::Home);
+    explicit NetworkListScreen(ScreenReturnTarget returnTarget = ScreenReturnTarget::Home);
     void draw() override;
     void update() override;
     void handleTouch(TS_Point p) override;

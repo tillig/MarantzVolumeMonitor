@@ -178,7 +178,7 @@ void ReceiverDiscovery::parsePacket(const String& packet, const IPAddress& remot
     addOrUpdateCandidate(ReceiverCandidate(name, remoteIp.toString(), ReceiverSource::Discovered, millis()));
 }
 
-String ReceiverDiscovery::extractHeader(const String& packet, const String& headerName) const {
+String ReceiverDiscovery::extractHeader(const String& packet, const String& headerName) {
     String lowerPacket = packet;
     String lowerHeader = headerName;
     lowerPacket.toLowerCase();
@@ -210,7 +210,7 @@ String ReceiverDiscovery::extractHeader(const String& packet, const String& head
     return "";
 }
 
-String ReceiverDiscovery::extractXmlValue(const String& xml, const String& tagName) const {
+String ReceiverDiscovery::extractXmlValue(const String& xml, const String& tagName) {
     String lowerXml = xml;
     String lowerTagName = tagName;
     lowerXml.toLowerCase();
@@ -301,7 +301,7 @@ String ReceiverDiscovery::resolveDescriptionName(const String& location) {
     return "Marantz Receiver";
 }
 
-bool ReceiverDiscovery::isCompatibleResponse(const String& packet) const {
+bool ReceiverDiscovery::isCompatibleResponse(const String& packet) {
     String lowerPacket = packet;
     lowerPacket.toLowerCase();
     return lowerPacket.indexOf("marantz") >= 0 || lowerPacket.indexOf("denon") >= 0 ||

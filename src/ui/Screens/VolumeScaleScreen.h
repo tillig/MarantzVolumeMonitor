@@ -19,12 +19,12 @@ private:
     Choice _pendingChoice = Choice::Normalized;
 
     void loadChoice();
-    bool isNormalizedPressed(TS_Point p) const;
-    bool isDbPressed(TS_Point p) const;
-    bool isCancelPressed(TS_Point p) const;
-    bool isOkPressed(TS_Point p) const;
+    static bool isNormalizedPressed(TS_Point p);
+    static bool isDbPressed(TS_Point p);
+    static bool isCancelPressed(TS_Point p);
+    static bool isOkPressed(TS_Point p);
     bool persistChoice();
-    bool useDbScaleFor(Choice choice) const;
+    static bool useDbScaleFor(Choice choice);
 };
 
 #endif

@@ -15,11 +15,11 @@ private:
 
     int _pageIndex = 0;
 
-    void drawEntry(TFT_eSPI& tft, int entryIndex, int y);
-    void openEntry(int entryIndex);
-    int totalPages() const;
+    static void drawEntry(TFT_eSPI& tft, int entryIndex, int y);
+    static void openEntry(int entryIndex);
+    static int totalPages();
     int pageStartIndex() const;
-    bool isOkPressed(TS_Point p) const;
+    static bool isOkPressed(TS_Point p);
     bool isPaginationPressed(TS_Point p, bool& goPrev, bool& goNext) const;
     int touchedEntryIndex(TS_Point p) const;
 };

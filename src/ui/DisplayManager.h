@@ -11,7 +11,7 @@ public:
     }
 
     void begin();
-    void setBrightness(uint8_t brightness);
+    static void setBrightness(uint8_t brightness);
     void setBacklightEnabled(bool enabled, const char* reason = nullptr);
     bool isBacklightEnabled() const {
         return _backlightEnabled;

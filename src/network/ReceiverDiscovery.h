@@ -70,10 +70,10 @@ private:
     void sendSearchRequests();
     void sendSearchRequest(const char* searchTarget);
     void parsePacket(const String& packet, const IPAddress& remoteIp);
-    String extractHeader(const String& packet, const String& headerName) const;
-    String extractXmlValue(const String& xml, const String& tagName) const;
+    static String extractHeader(const String& packet, const String& headerName);
+    static String extractXmlValue(const String& xml, const String& tagName);
     String resolveDescriptionName(const String& location);
-    bool isCompatibleResponse(const String& packet) const;
+    static bool isCompatibleResponse(const String& packet);
     void addOrUpdateCandidate(const ReceiverCandidate& candidate);
 };
 

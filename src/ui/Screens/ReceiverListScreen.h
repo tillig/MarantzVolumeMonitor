@@ -6,7 +6,7 @@
 
 class ReceiverListScreen : public Screen {
 public:
-    ReceiverListScreen(ScreenReturnTarget returnTarget = ScreenReturnTarget::Home);
+    explicit ReceiverListScreen(ScreenReturnTarget returnTarget = ScreenReturnTarget::Home);
     void draw() override;
     void update() override;
     void handleTouch(TS_Point p) override;
@@ -18,11 +18,11 @@ private:
     uint8_t _progressFrame = 0;
     uint32_t _lastProgressAtMs = 0;
 
-    void drawHeader(TFT_eSPI& tft);
-    void drawActions(TFT_eSPI& tft);
-    void drawCandidateRow(TFT_eSPI& tft, const ReceiverCandidate& candidate, int index, int y);
+    static void drawHeader(TFT_eSPI& tft);
+    static void drawActions(TFT_eSPI& tft);
+    static void drawCandidateRow(TFT_eSPI& tft, const ReceiverCandidate& candidate, int index, int y);
     void startDiscovery();
-    int touchedCandidateIndex(TS_Point p) const;
+    static int touchedCandidateIndex(TS_Point p);
 };
 
 #endif

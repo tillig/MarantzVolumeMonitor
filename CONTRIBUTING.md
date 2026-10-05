@@ -5,7 +5,7 @@ Welcome! We appreciate your interest in contributing to the Marantz Volume Monit
 ## Development Environment
 
 - **Framework:** Arduino
-- **Platform:** [pioarduino Espressif 32](https://github.com/pioarduino/platform-espressif32) (Arduino-ESP32 3.x) on an Elegoo ESP32 DevKit V1, pinned in `platformio.ini` so local and CI builds match; requires PlatformIO Core 6.2 or later
+- **Platform:** [pioarduino Espressif 32](https://github.com/pioarduino/platform-espressif32) (Arduino-ESP32 3.x) on an Elegoo ESP32 DevKit V1, pinned in `platformio.ini` so local and CI builds match; requires [pioarduino Core](https://github.com/pioarduino/platformio-core) 6.2 or later, whose `pio check` uses the platform's cppcheck
 - **Tooling:** PlatformIO, [Spec Kit](https://github.com/tillig/speckit)
 - **Key Libraries:**
   - `TFT_eSPI`: High-performance graphics library.
@@ -24,7 +24,7 @@ Welcome! We appreciate your interest in contributing to the Marantz Volume Monit
 
 - **Validation:** All changes must pass `pre-commit` validation. Run `pre-commit run --all-files` before committing.
 - **Linting:** Markdown must pass `markdownlint` as configured in `.markdownlint.json`; C++ formatting must match `.clang-format`.
-- **Static Analysis:** PlatformIO static analysis must pass with the configured `cppcheck` checks.
+- **Static Analysis:** PlatformIO static analysis must pass with the configured `cppcheck` checks. Fix findings rather than suppressing them; when a finding is a false positive, suppress that line with `// cppcheck-suppress <id> ; reason`. cppcheck reports suppressions that no longer match anything.
 - **Firmware Build:** Run `platformio run` before finishing firmware changes.
 - **Continuous Integration:** GitHub Actions runs the same validation on pushes to `master`, `develop`, and `feature/*` branches, and on pull requests. If a `feature/*` branch already has an open pull request, the branch push build is skipped and the pull request build remains the authoritative CI result.
 

@@ -140,7 +140,7 @@ void SettingsScreen::openEntry(int entryIndex) {
     }
 }
 
-int SettingsScreen::totalPages() const {
+int SettingsScreen::totalPages() {
     return (EntryCount + ItemsPerPage - 1) / ItemsPerPage;
 }
 
@@ -148,7 +148,7 @@ int SettingsScreen::pageStartIndex() const {
     return _pageIndex * ItemsPerPage;
 }
 
-bool SettingsScreen::isOkPressed(TS_Point p) const {
+bool SettingsScreen::isOkPressed(TS_Point p) {
     return p.x >= 340 && p.x <= 456 && p.y >= MaterialStyle::BottomActionY &&
            p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight;
 }
