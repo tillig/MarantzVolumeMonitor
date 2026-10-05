@@ -4,7 +4,7 @@
 
 ## Summary
 
-Port the `somfy-matter-remote` release pipeline: `scripts/version.py` stamps the git tag into `FIRMWARE_VERSION`, `release.yml` attaches the pioarduino `firmware.factory.bin` to a release on `v*` tags, and `pages.yml` deploys `web-flasher/` with that image to GitHub Pages using ESP Web Tools.
+A version tag builds a release whose factory image the web flasher serves through ESP Web Tools on GitHub Pages, and the firmware reports the tag it was built from.
 
 ## Constitution Check
 
@@ -13,4 +13,4 @@ Port the `somfy-matter-remote` release pipeline: `scripts/version.py` stamps the
 
 ## Design Notes
 
-`somfy-matter-remote` needs a second app-only image because its factory image overwrites NVS. Here settings live in the LittleFS partition at `0x210000`, past the end of the factory image, so one manifest covers install and update. ESP Web Tools' erase prompt is the only way to clear settings.
+Settings live in the LittleFS partition, past the end of the factory image, so one image and one manifest cover both install and update. ESP Web Tools' erase prompt is the only way to clear settings.

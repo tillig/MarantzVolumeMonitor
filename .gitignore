@@ -33,6 +33,9 @@ Thumbs.db
 *.tmp
 .env*
 
+# Release images downloaded for the web flasher
+web-flasher/*.bin
+
 # Private files
 src/secrets.h
 data/secrets.json

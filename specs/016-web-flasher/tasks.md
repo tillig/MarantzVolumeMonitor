@@ -13,6 +13,6 @@
 
 ## Phase 2: Verification
 
-- [ ] V001 Enable GitHub Pages with the GitHub Actions source and allow `v*` tags to deploy to `github-pages`
+- [x] V001 Enable GitHub Pages with the GitHub Actions source and allow `v*` tags to deploy to `github-pages`
 - [ ] V002 Push a `v*` tag; confirm the release has `firmware.factory.bin` and the flasher page loads it
 - [ ] V003 Flash a configured monitor without erasing; confirm settings survive and the diagnostics page reports the tag

@@ -4,11 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Flash the Marantz Volume Monitor</title>
-    <!--
-      ESP Web Tools flasher served from GitHub Pages. The manifest writes the merged factory image at 0x0; it ends
-      before the LittleFS partition, so the same image installs on a blank board and updates a configured one.
-    -->
-    <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+    <!-- Pinned so the page only changes with a commit. -->
+    <script type="module" src="https://unpkg.com/esp-web-tools@10.4.0/dist/web/install-button.js?module"></script>
     <style>
       body {
         font-family: system-ui, sans-serif;

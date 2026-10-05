@@ -6,7 +6,7 @@
 
 **Status**: Implemented
 
-**Input**: [Issue #6](https://github.com/tillig/MarantzVolumeMonitor/issues/6): install the latest release from a browser, as `somfy-matter-remote` does.
+**Input**: [Issue #6](https://github.com/tillig/MarantzVolumeMonitor/issues/6): install the latest release from a browser.
 
 ## User Scenarios and Testing
 
