@@ -124,16 +124,7 @@ void logDisplayStateTransition(HomeScreen::DisplayState from, HomeScreen::Displa
 } // namespace
 
 HomeScreen::HomeScreen() {
-    _colorIndex = 0;
-    _currentLayout = Layout::Unified;
     _displayState = DisplayState::WifiSetupRequired;
-    _textColors[0] = TFT_WHITE;
-    _textColors[1] = TFT_GREEN;
-    _textColors[2] = TFT_BLUE;
-    _textColors[3] = TFT_RED;
-    _textColors[4] = TFT_YELLOW;
-    _textColors[5] = TFT_MAGENTA;
-    _textColors[6] = TFT_CYAN;
 
     refreshState();
     setDisplayState(classifyDisplayState(_lastStatus), millis());
@@ -156,15 +147,7 @@ void HomeScreen::draw() {
 
     switch (_displayState) {
         case DisplayState::Live:
-            switch (_currentLayout) {
-                case Layout::Classic:
-                case Layout::Modern:
-                case Layout::Minimal:
-                case Layout::Unified:
-                default:
-                    drawLayoutUnified();
-                    break;
-            }
+            drawLayoutUnified();
             drawSettingsButton();
             break;
         case DisplayState::ReceiverOffVisible:

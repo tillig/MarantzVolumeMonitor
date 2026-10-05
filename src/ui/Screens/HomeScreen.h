@@ -8,8 +8,6 @@
 
 class HomeScreen : public Screen {
 public:
-    enum class Layout { Classic, Modern, Minimal, Unified };
-
     enum class DisplayState {
         WifiSetupRequired,
         WifiConnecting,
@@ -62,9 +60,6 @@ private:
 
     MarantzStatus _lastStatus;
     DeviceConfig _config;
-    uint16_t _textColors[7];
-    int _colorIndex;
-    Layout _currentLayout;
     DisplayState _displayState;
     bool _hasWifiConfig = false;
     bool _hasReceiverConfig = false;
