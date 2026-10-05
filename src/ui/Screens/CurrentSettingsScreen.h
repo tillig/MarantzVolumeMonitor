@@ -29,17 +29,16 @@ private:
 
     void refreshState();
     void drawDynamicContent(TFT_eSPI& tft) const;
-    void clearCardBody(TFT_eSPI& tft, int cardY, int cardHeight) const;
+    static void clearCardBody(TFT_eSPI& tft, int cardY, int cardHeight);
     void drawWifiSummary(TFT_eSPI& tft) const;
     void drawReceiverSummary(TFT_eSPI& tft) const;
-    void drawSummaryLine(TFT_eSPI& tft,
-                         int x,
-                         int y,
-                         int maxWidth,
-                         const String& text,
-                         MaterialStyle::ComponentState state,
-                         uint8_t datum = TL_DATUM) const;
-    String wifiHeadlineText() const;
+    static void drawSummaryLine(TFT_eSPI& tft,
+                                int x,
+                                int y,
+                                int maxWidth,
+                                const String& text,
+                                MaterialStyle::ComponentState state,
+                                uint8_t datum = TL_DATUM);
     String wifiDetailText() const;
     String receiverHeadlineText() const;
     String receiverDetailText() const;
@@ -50,7 +49,7 @@ private:
     MaterialStyle::ComponentState receiverHeadlineState() const;
     MaterialStyle::ComponentState receiverDetailState() const;
     MaterialStyle::ComponentState receiverStatusState() const;
-    bool isOkPressed(TS_Point p) const;
+    static bool isOkPressed(TS_Point p);
 };
 
 #endif

@@ -124,16 +124,7 @@ void logDisplayStateTransition(HomeScreen::DisplayState from, HomeScreen::Displa
 } // namespace
 
 HomeScreen::HomeScreen() {
-    _colorIndex = 0;
-    _currentLayout = Layout::Unified;
     _displayState = DisplayState::WifiSetupRequired;
-    _textColors[0] = TFT_WHITE;
-    _textColors[1] = TFT_GREEN;
-    _textColors[2] = TFT_BLUE;
-    _textColors[3] = TFT_RED;
-    _textColors[4] = TFT_YELLOW;
-    _textColors[5] = TFT_MAGENTA;
-    _textColors[6] = TFT_CYAN;
 
     refreshState();
     setDisplayState(classifyDisplayState(_lastStatus), millis());
@@ -156,15 +147,7 @@ void HomeScreen::draw() {
 
     switch (_displayState) {
         case DisplayState::Live:
-            switch (_currentLayout) {
-                case Layout::Classic:
-                case Layout::Modern:
-                case Layout::Minimal:
-                case Layout::Unified:
-                default:
-                    drawLayoutUnified();
-                    break;
-            }
+            drawLayoutUnified();
             drawSettingsButton();
             break;
         case DisplayState::ReceiverOffVisible:
@@ -419,7 +402,7 @@ void HomeScreen::setDisplayState(DisplayState state, uint32_t now) {
     if (state != DisplayState::ReceiverOffBlank) {
         clearReceiverOffWakeCandidate();
     }
-    if (previousState != state && (isReceiverOffDisplayState(previousState) || isReceiverOffDisplayState(state))) {
+    if (isReceiverOffDisplayState(previousState) || isReceiverOffDisplayState(state)) {
         logDisplayStateTransition(previousState, state);
     }
 
@@ -429,7 +412,7 @@ void HomeScreen::setDisplayState(DisplayState state, uint32_t now) {
         stopReceiverOffTimer();
     }
 
-    if (previousState == DisplayState::Live && state != DisplayState::Live) {
+    if (previousState == DisplayState::Live) {
         stopVolumeAnimation();
     }
 }
@@ -496,16 +479,16 @@ bool HomeScreen::isReceiverOffTimerExpired(uint32_t now) const {
     return _receiverOffTimer.active && now - _receiverOffTimer.startedAtMs >= _receiverOffTimer.durationMs;
 }
 
-bool HomeScreen::isReceiverOffDisplayState(DisplayState state) const {
+bool HomeScreen::isReceiverOffDisplayState(DisplayState state) {
     return state == DisplayState::ReceiverOffVisible || state == DisplayState::ReceiverOffBlank;
 }
 
-bool HomeScreen::isCalibrationButtonPressed(TS_Point p) const {
+bool HomeScreen::isCalibrationButtonPressed(TS_Point p) {
     return p.x >= 300 && p.x <= 456 && p.y >= MaterialStyle::BottomActionY &&
            p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight;
 }
 
-bool HomeScreen::isSettingsButtonPressed(TS_Point p) const {
+bool HomeScreen::isSettingsButtonPressed(TS_Point p) {
     return p.x >= 426 && p.x <= 474 && p.y >= 12 && p.y <= 48;
 }
 
@@ -551,15 +534,15 @@ String HomeScreen::displayMode() const {
     return _lastStatus.mode;
 }
 
-float HomeScreen::displayVolume(float receiverVolume) const {
+float HomeScreen::displayVolume(float receiverVolume) {
     return constrain(receiverVolume + 80.0f, 0.0f, 100.0f);
 }
 
-float HomeScreen::volumeToPercent(float volume) const {
+float HomeScreen::volumeToPercent(float volume) {
     return constrain(volume / 100.0f, 0.0f, 1.0f);
 }
 
-uint8_t HomeScreen::volumeFont(const String& valueText) const {
+uint8_t HomeScreen::volumeFont(const String& valueText) {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
     if (tft.textWidth(valueText, 8) <= 206) {
         return 8;
@@ -570,7 +553,7 @@ uint8_t HomeScreen::volumeFont(const String& valueText) const {
     return 7;
 }
 
-uint32_t HomeScreen::animationDurationFor(float startVolume, float targetVolume) const {
+uint32_t HomeScreen::animationDurationFor(float startVolume, float targetVolume) {
     float distance = fabsf(targetVolume - startVolume);
     float scaled = constrain(distance / 18.0f, 0.0f, 1.0f);
     return MinAnimationDurationMs + static_cast<uint32_t>((MaxAnimationDurationMs - MinAnimationDurationMs) * scaled);
@@ -587,7 +570,7 @@ float HomeScreen::animationProgress(uint32_t now) const {
     return constrain(progress, 0.0f, 1.0f);
 }
 
-float HomeScreen::easedAnimationProgress(float progress) const {
+float HomeScreen::easedAnimationProgress(float progress) {
     float inverse = 1.0f - progress;
     return 1.0f - (inverse * inverse * inverse);
 }
@@ -653,11 +636,11 @@ void HomeScreen::redrawLiveVolumeFrame(bool forceFull) {
 
     drawVolumeArcDelta(tft, _volumeAnimation.lastRenderedVolume, _volumeAnimation.displayedVolume);
     String volumeText = formatVolume(_volumeAnimation.displayedVolume);
-    uint8_t font = volumeFont(volumeText);
-    drawVolumeValueTextDelta(tft, volumeText, font);
+    uint8_t valueFont = volumeFont(volumeText);
+    drawVolumeValueTextDelta(tft, volumeText, valueFont);
 
     _volumeAnimation.lastRenderedText = volumeText;
-    _volumeAnimation.lastRenderedFont = font;
+    _volumeAnimation.lastRenderedFont = valueFont;
     _volumeAnimation.lastRenderedHadNegativeSign = volumeHasNegativeSign(_volumeAnimation.displayedVolume);
     _volumeAnimation.lastRenderedVolume = _volumeAnimation.displayedVolume;
 }
@@ -726,8 +709,8 @@ void HomeScreen::renderLiveVolumeRegion(TFT_eSPI& target, int originX, int origi
     drawVolumeArc(target, centerX, centerY, ArcOuterRadius, _volumeAnimation.displayedVolume);
 
     String volumeText = formatVolume(_volumeAnimation.displayedVolume);
-    uint8_t font = volumeFont(volumeText);
-    drawVolumeValueText(target, volumeText, font, VolumeValueCenterX - originX, VolumeValueCenterY - originY);
+    uint8_t valueFont = volumeFont(volumeText);
+    drawVolumeValueText(target, volumeText, valueFont, VolumeValueCenterX - originX, VolumeValueCenterY - originY);
 
     target.setTextDatum(MC_DATUM);
     target.setTextColor(DisplayManager::COLOR_TEXT_DIMMED);
@@ -737,19 +720,19 @@ void HomeScreen::renderLiveVolumeRegion(TFT_eSPI& target, int originX, int origi
     }
 }
 
-HomeScreen::Rect HomeScreen::liveGaugeRegion() const {
+HomeScreen::Rect HomeScreen::liveGaugeRegion() {
     return {92, 6, 296, 204};
 }
 
-HomeScreen::Rect HomeScreen::liveSourceRegion() const {
+HomeScreen::Rect HomeScreen::liveSourceRegion() {
     return {28, 226, 212, 44};
 }
 
-HomeScreen::Rect HomeScreen::liveModeRegion() const {
+HomeScreen::Rect HomeScreen::liveModeRegion() {
     return {280, 226, 172, 44};
 }
 
-HomeScreen::Rect HomeScreen::liveAudioIconsRegion() const {
+HomeScreen::Rect HomeScreen::liveAudioIconsRegion() {
     return {20, 270, 440, 42};
 }
 
@@ -767,27 +750,27 @@ void HomeScreen::clearRect(const Rect& rect) {
 HomeScreen::Rect HomeScreen::volumeTextRegion(float volume) const {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
     String volumeText = formatVolume(volume);
-    uint8_t font = volumeFont(volumeText);
-    int textWidth = tft.textWidth(volumeText, font);
+    uint8_t valueFont = volumeFont(volumeText);
+    int textWidth = tft.textWidth(volumeText, valueFont);
     if (volumeHasNegativeSign(volume)) {
         textWidth += volumeNegativeSignWidth(tft);
     }
-    int textHeight = tft.fontHeight(font);
+    int textHeight = tft.fontHeight(valueFont);
     int left = VolumeValueCenterX - (textWidth / 2);
     int top = VolumeValueCenterY - (textHeight / 2);
 
     return {left - 3, top - 2, textWidth + 8, textHeight + 4};
 }
 
-int HomeScreen::volumeNegativeSignWidth(TFT_eSPI& target) const {
+int HomeScreen::volumeNegativeSignWidth(TFT_eSPI& target) {
     return target.textWidth("-", VolumeSignFont) + 6;
 }
 
-int HomeScreen::volumeSweep(float volume) const {
+int HomeScreen::volumeSweep(float volume) {
     return constrain(static_cast<int>(lroundf(volumeToPercent(volume) * ArcSweepDegrees)), 0, ArcSweepDegrees);
 }
 
-uint16_t HomeScreen::volumeArcColor(int sweep) const {
+uint16_t HomeScreen::volumeArcColor(int sweep) {
     TFT_eSPI& tft = DisplayManager::getInstance().getTft();
     float p = static_cast<float>(sweep) / ArcSweepDegrees;
     p = constrain(p, 0.0f, 1.0f);
@@ -989,38 +972,6 @@ void HomeScreen::drawVolumeArc(TFT_eSPI& target, int x, int y, int r, float volu
                           ArcCapRadius,
                           volumeArcColor(currentSweep));
     }
-}
-
-void HomeScreen::drawLayoutClassic() {
-    drawLayoutUnified();
-}
-
-void HomeScreen::drawLayoutModern() {
-    drawLayoutUnified();
-}
-
-void HomeScreen::drawLayoutMinimal() {
-    drawLayoutUnified();
-}
-
-void HomeScreen::drawVolume(float volume) {
-    syncDisplayedVolume(displayVolume(volume));
-    redrawLiveVolumeRegion();
-}
-
-void HomeScreen::drawSource(const String& source) {
-    _lastStatus.input = source;
-    redrawLiveMetadataRegion();
-}
-
-void HomeScreen::drawMode(const String& mode) {
-    _lastStatus.mode = mode;
-    redrawLiveMetadataRegion();
-}
-
-void HomeScreen::drawTiles(const String& mode) {
-    _lastStatus.mode = mode;
-    redrawLiveMetadataRegion();
 }
 
 void HomeScreen::drawSettingsButton() {

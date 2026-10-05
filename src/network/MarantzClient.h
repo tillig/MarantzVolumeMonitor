@@ -34,7 +34,7 @@ private:
     String _receiverIp;
 
     MarantzStatus fetchStatus(const String& ip);
-    String extractValue(const String& xml, const String& tag);
+    static String extractValue(const String& xml, const String& tag);
     String extractStatusValue(const String& xml, const String& tag);
     String extractPreferredStatusValue(const String& xml,
                                        const String& tag,

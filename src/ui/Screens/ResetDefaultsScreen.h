@@ -19,16 +19,16 @@ private:
     ResetType _selectedType = ResetType::Wifi;
     bool _applyFailed = false;
 
-    void drawSelection(TFT_eSPI& tft);
+    static void drawSelection(TFT_eSPI& tft);
     void drawConfirmation(TFT_eSPI& tft);
-    void drawCompleted(TFT_eSPI& tft);
-    bool isChoicePressed(TS_Point p, int index) const;
+    static void drawCompleted(TFT_eSPI& tft);
+    static bool isChoicePressed(TS_Point p, int index);
     bool isCancelPressed(TS_Point p) const;
-    bool isResetPressed(TS_Point p) const;
-    bool isOkPressed(TS_Point p) const;
-    const char* labelFor(ResetType type) const;
-    const char* detailFor(ResetType type) const;
-    ConfigStore::ResetTarget configTargetFor(ResetType type) const;
+    static bool isResetPressed(TS_Point p);
+    static bool isOkPressed(TS_Point p);
+    static const char* labelFor(ResetType type);
+    static const char* detailFor(ResetType type);
+    static ConfigStore::ResetTarget configTargetFor(ResetType type);
     void applyReset();
 };
 

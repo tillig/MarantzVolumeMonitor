@@ -82,7 +82,6 @@ void SettingsScreen::drawEntry(TFT_eSPI& tft, int entryIndex, int y) {
     const char* secondary = "View Wi-Fi and receiver state";
 
     if (entryIndex == 1) {
-        icon = &Icons::SETTINGS;
         primary = "Volume Display Scale";
         secondary = "Choose 0-100 or dB";
     } else if (entryIndex == 2) {
@@ -141,7 +140,7 @@ void SettingsScreen::openEntry(int entryIndex) {
     }
 }
 
-int SettingsScreen::totalPages() const {
+int SettingsScreen::totalPages() {
     return (EntryCount + ItemsPerPage - 1) / ItemsPerPage;
 }
 
@@ -149,7 +148,7 @@ int SettingsScreen::pageStartIndex() const {
     return _pageIndex * ItemsPerPage;
 }
 
-bool SettingsScreen::isOkPressed(TS_Point p) const {
+bool SettingsScreen::isOkPressed(TS_Point p) {
     return p.x >= 340 && p.x <= 456 && p.y >= MaterialStyle::BottomActionY &&
            p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight;
 }
@@ -157,6 +156,7 @@ bool SettingsScreen::isOkPressed(TS_Point p) const {
 bool SettingsScreen::isPaginationPressed(TS_Point p, bool& goPrev, bool& goNext) const {
     goPrev = false;
     goNext = false;
+    // cppcheck-suppress knownConditionTrueFalse ; EntryCount is a constant today but may shrink.
     if (totalPages() <= 1 || p.y < 230 || p.y > 262) {
         return false;
     }

@@ -234,12 +234,12 @@ void CalibrationScreen::setStatus(const String& title, const String& message, Ma
     _statusState = state;
 }
 
-bool CalibrationScreen::isCancelPressed(TS_Point p) const {
+bool CalibrationScreen::isCancelPressed(TS_Point p) {
     return p.x >= CancelButtonX && p.x <= CancelButtonX + CancelButtonWidth && p.y >= CancelButtonY &&
            p.y <= CancelButtonY + MaterialStyle::ButtonHeight;
 }
 
-bool CalibrationScreen::isOkPressed(TS_Point p) const {
+bool CalibrationScreen::isOkPressed(TS_Point p) {
     return p.x >= 182 && p.x <= 298 && p.y >= MaterialStyle::BottomActionY &&
            p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight;
 }
@@ -290,7 +290,7 @@ bool CalibrationScreen::solveLeastSquaresAxis(const float* rawX,
                                               size_t count,
                                               float& fromRawX,
                                               float& fromRawY,
-                                              float& offset) const {
+                                              float& offset) {
     float sumXX = 0.0f;
     float sumXY = 0.0f;
     float sumYY = 0.0f;

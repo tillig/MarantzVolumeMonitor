@@ -138,7 +138,7 @@ void ReceiverListScreen::startDiscovery() {
     _lastProgressAtMs = millis();
 }
 
-int ReceiverListScreen::touchedCandidateIndex(TS_Point p) const {
+int ReceiverListScreen::touchedCandidateIndex(TS_Point p) {
     if (p.x < 24 || p.x > 456) {
         return -1;
     }

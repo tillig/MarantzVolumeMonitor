@@ -11,12 +11,12 @@ public:
         return instance;
     }
 
-    void startConnect(const String& ssid, const String& password);
-    wl_status_t getConnectStatus();
-    bool connect(const String& ssid, const String& password);
-    bool isConnected();
-    String getIPAddress();
-    int32_t getSignalStrength();
+    static void startConnect(const String& ssid, const String& password);
+    static wl_status_t getConnectStatus();
+    static bool connect(const String& ssid, const String& password);
+    static bool isConnected();
+    static String getIPAddress();
+    static int32_t getSignalStrength();
     static uint8_t signalLevelForRssi(int32_t rssi);
 
     struct NetworkInfo {
@@ -25,10 +25,10 @@ public:
         uint8_t encryptionType;
     };
 
-    void startScan();
-    int16_t getScanStatus();
-    std::vector<NetworkInfo> getScanResults();
-    std::vector<NetworkInfo> scanNetworks(); // Existing for backward compatibility if needed
+    static void startScan();
+    static int16_t getScanStatus();
+    static std::vector<NetworkInfo> getScanResults();
+    static std::vector<NetworkInfo> scanNetworks(); // Existing for backward compatibility if needed
 
 private:
     WiFiManager() {}

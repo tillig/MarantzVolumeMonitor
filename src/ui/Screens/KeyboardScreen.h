@@ -8,7 +8,7 @@ class KeyboardScreen : public Screen {
 public:
     enum class Mode { Lowercase, Uppercase, Symbols };
 
-    KeyboardScreen(const String& ssid, ScreenReturnTarget returnTarget = ScreenReturnTarget::Home);
+    explicit KeyboardScreen(const String& ssid, ScreenReturnTarget returnTarget = ScreenReturnTarget::Home);
     void draw() override;
     void update() override;
     void handleTouch(TS_Point p) override;

@@ -8,8 +8,6 @@
 
 class HomeScreen : public Screen {
 public:
-    enum class Layout { Classic, Modern, Minimal, Unified };
-
     enum class DisplayState {
         WifiSetupRequired,
         WifiConnecting,
@@ -62,9 +60,6 @@ private:
 
     MarantzStatus _lastStatus;
     DeviceConfig _config;
-    uint16_t _textColors[7];
-    int _colorIndex;
-    Layout _currentLayout;
     DisplayState _displayState;
     bool _hasWifiConfig = false;
     bool _hasReceiverConfig = false;
@@ -75,14 +70,10 @@ private:
     ReceiverOffTimer _receiverOffTimer;
     ReceiverOffWakeCandidate _receiverOffWakeCandidate;
 
-    void drawVolume(float volume);
-    void drawSource(const String& source);
-    void drawMode(const String& mode);
-    void drawTiles(const String& mode);
-    void drawSettingsButton();
+    static void drawSettingsButton();
     void drawAudioFamilyIcons();
     void drawSetupState();
-    void drawCalibrationButton();
+    static void drawCalibrationButton();
     void loadStoredConfig();
     void refreshState();
     DisplayState classifyDisplayState(const MarantzStatus& status) const;
@@ -94,9 +85,9 @@ private:
     void clearReceiverOffWakeCandidate();
     bool updateReceiverOffWakeCandidate(uint32_t now);
     bool isReceiverOffTimerExpired(uint32_t now) const;
-    bool isReceiverOffDisplayState(DisplayState state) const;
-    bool isCalibrationButtonPressed(TS_Point p) const;
-    bool isSettingsButtonPressed(TS_Point p) const;
+    static bool isReceiverOffDisplayState(DisplayState state);
+    static bool isCalibrationButtonPressed(TS_Point p);
+    static bool isSettingsButtonPressed(TS_Point p);
     bool isSettingsAccessible() const;
     int activeAudioFamilyIndex() const;
     String formatVolume(float volume) const;
@@ -104,12 +95,12 @@ private:
     bool volumeHasNegativeSign(float normalizedVolume) const;
     String displaySource() const;
     String displayMode() const;
-    float displayVolume(float receiverVolume) const;
-    float volumeToPercent(float volume) const;
-    uint8_t volumeFont(const String& valueText) const;
-    uint32_t animationDurationFor(float startVolume, float targetVolume) const;
+    static float displayVolume(float receiverVolume);
+    static float volumeToPercent(float volume);
+    static uint8_t volumeFont(const String& valueText);
+    static uint32_t animationDurationFor(float startVolume, float targetVolume);
     float animationProgress(uint32_t now) const;
-    float easedAnimationProgress(float progress) const;
+    static float easedAnimationProgress(float progress);
     void syncDisplayedVolume(float volume);
     void retargetVolumeAnimation(float targetVolume);
     void stopVolumeAnimation();
@@ -118,31 +109,28 @@ private:
     void redrawLiveMetadataRegion();
     bool tickVolumeAnimation(uint32_t now);
     void renderLiveVolumeRegion(TFT_eSPI& target, int originX, int originY);
-    Rect liveGaugeRegion() const;
-    Rect liveSourceRegion() const;
-    Rect liveModeRegion() const;
-    Rect liveAudioIconsRegion() const;
+    static Rect liveGaugeRegion();
+    static Rect liveSourceRegion();
+    static Rect liveModeRegion();
+    static Rect liveAudioIconsRegion();
     Rect volumeTextRegion(float volume) const;
-    int volumeNegativeSignWidth(TFT_eSPI& target) const;
-    int volumeSweep(float volume) const;
-    uint16_t volumeArcColor(int sweep) const;
-    void drawVolumeArcDelta(TFT_eSPI& target, float previousVolume, float currentVolume);
-    void drawVolumeArcSegment(TFT_eSPI& target, int x, int y, int r, int startSweep, int endSweep, bool colored);
-    void drawVolumeCap(TFT_eSPI& target, int x, int y, int r, int sweep, uint16_t color);
+    static int volumeNegativeSignWidth(TFT_eSPI& target);
+    static int volumeSweep(float volume);
+    static uint16_t volumeArcColor(int sweep);
+    static void drawVolumeArcDelta(TFT_eSPI& target, float previousVolume, float currentVolume);
+    static void drawVolumeArcSegment(TFT_eSPI& target, int x, int y, int r, int startSweep, int endSweep, bool colored);
+    static void drawVolumeCap(TFT_eSPI& target, int x, int y, int r, int sweep, uint16_t color);
     void drawVolumeValueText(TFT_eSPI& target, const String& valueText, uint8_t font, int centerX, int centerY);
-    void drawVolumeNegativeSign(TFT_eSPI& target, int x, int centerY);
+    static void drawVolumeNegativeSign(TFT_eSPI& target, int x, int centerY);
     void drawVolumeValueTextDelta(TFT_eSPI& target, const String& valueText, uint8_t font);
-    void drawVolumeTextAt(TFT_eSPI& target, const String& text, int x, int y, uint8_t font);
-    void clearRect(const Rect& rect);
-    void drawReceiverStatusState(const String& title, const String& message, MaterialStyle::StatusKind kind);
+    static void drawVolumeTextAt(TFT_eSPI& target, const String& text, int x, int y, uint8_t font);
+    static void clearRect(const Rect& rect);
+    static void drawReceiverStatusState(const String& title, const String& message, MaterialStyle::StatusKind kind);
 
     // Layout-specific drawing
-    void drawLayoutClassic();
-    void drawLayoutModern();
-    void drawLayoutMinimal();
     void drawLayoutUnified();
 
     // Helper for Arc Gauge
-    void drawVolumeArc(TFT_eSPI& target, int x, int y, int r, float volume);
+    static void drawVolumeArc(TFT_eSPI& target, int x, int y, int r, float volume);
 };
 #endif

@@ -116,7 +116,7 @@ void CurrentSettingsScreen::drawDynamicContent(TFT_eSPI& tft) const {
     drawReceiverSummary(tft);
 }
 
-void CurrentSettingsScreen::clearCardBody(TFT_eSPI& tft, int cardY, int cardHeight) const {
+void CurrentSettingsScreen::clearCardBody(TFT_eSPI& tft, int cardY, int cardHeight) {
     tft.fillRect(CardX + 8,
                  cardY + CardBodyTopInset,
                  CardWidth - 16,
@@ -200,22 +200,13 @@ void CurrentSettingsScreen::drawReceiverSummary(TFT_eSPI& tft) const {
                     TL_DATUM);
 }
 
-void CurrentSettingsScreen::drawSummaryLine(TFT_eSPI& tft,
-                                            int x,
-                                            int y,
-                                            int maxWidth,
-                                            const String& text,
-                                            MaterialStyle::ComponentState state,
-                                            uint8_t datum) const {
+void CurrentSettingsScreen::drawSummaryLine(
+    TFT_eSPI& tft, int x, int y, int maxWidth, const String& text, MaterialStyle::ComponentState state, uint8_t datum) {
     String display =
         MaterialStyle::truncateToWidth(tft, text, maxWidth, MaterialStyle::fontFor(MaterialStyle::TextRole::Body));
     tft.setTextDatum(datum);
     tft.setTextColor(MaterialStyle::textColorFor(MaterialStyle::TextRole::Body, state), DisplayManager::COLOR_PANEL);
     tft.drawString(display, x, y, MaterialStyle::fontFor(MaterialStyle::TextRole::Body));
-}
-
-String CurrentSettingsScreen::wifiHeadlineText() const {
-    return _config.wifiSsid.length() > 0 ? _config.wifiSsid : "Unconfigured";
 }
 
 String CurrentSettingsScreen::wifiDetailText() const {
@@ -291,7 +282,7 @@ MaterialStyle::ComponentState CurrentSettingsScreen::receiverStatusState() const
     return _receiverStatus.power ? MaterialStyle::ComponentState::Success : MaterialStyle::ComponentState::Warning;
 }
 
-bool CurrentSettingsScreen::isOkPressed(TS_Point p) const {
+bool CurrentSettingsScreen::isOkPressed(TS_Point p) {
     return p.x >= 182 && p.x <= 298 && p.y >= MaterialStyle::BottomActionY &&
            p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight;
 }

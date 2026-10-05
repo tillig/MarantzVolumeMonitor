@@ -156,7 +156,7 @@ void ResetDefaultsScreen::drawCompleted(TFT_eSPI& tft) {
                                       MaterialStyle::ComponentState::Success);
 }
 
-bool ResetDefaultsScreen::isChoicePressed(TS_Point p, int index) const {
+bool ResetDefaultsScreen::isChoicePressed(TS_Point p, int index) {
     int y = rowY(index);
     return p.x >= RowX && p.x <= RowX + RowWidth && p.y >= y && p.y <= y + MaterialStyle::ListRowHeight;
 }
@@ -171,17 +171,17 @@ bool ResetDefaultsScreen::isCancelPressed(TS_Point p) const {
            p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight;
 }
 
-bool ResetDefaultsScreen::isResetPressed(TS_Point p) const {
+bool ResetDefaultsScreen::isResetPressed(TS_Point p) {
     return p.x >= 300 && p.x <= 436 && p.y >= MaterialStyle::BottomActionY &&
            p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight;
 }
 
-bool ResetDefaultsScreen::isOkPressed(TS_Point p) const {
+bool ResetDefaultsScreen::isOkPressed(TS_Point p) {
     return p.x >= 182 && p.x <= 298 && p.y >= MaterialStyle::BottomActionY &&
            p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight;
 }
 
-const char* ResetDefaultsScreen::labelFor(ResetType type) const {
+const char* ResetDefaultsScreen::labelFor(ResetType type) {
     switch (type) {
         case ResetType::Wifi:
             return "Wi-Fi";
@@ -193,7 +193,7 @@ const char* ResetDefaultsScreen::labelFor(ResetType type) const {
     }
 }
 
-const char* ResetDefaultsScreen::detailFor(ResetType type) const {
+const char* ResetDefaultsScreen::detailFor(ResetType type) {
     switch (type) {
         case ResetType::Wifi:
             return "Clear saved network credentials";
@@ -205,7 +205,7 @@ const char* ResetDefaultsScreen::detailFor(ResetType type) const {
     }
 }
 
-ConfigStore::ResetTarget ResetDefaultsScreen::configTargetFor(ResetType type) const {
+ConfigStore::ResetTarget ResetDefaultsScreen::configTargetFor(ResetType type) {
     switch (type) {
         case ResetType::Wifi:
             return ConfigStore::ResetTarget::Wifi;

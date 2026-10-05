@@ -6,7 +6,7 @@
 
 class CalibrationScreen : public Screen {
 public:
-    CalibrationScreen(ScreenReturnTarget returnTarget = ScreenReturnTarget::Home);
+    explicit CalibrationScreen(ScreenReturnTarget returnTarget = ScreenReturnTarget::Home);
     void draw() override;
     void update() override;
     void handleTouch(TS_Point p) override;
@@ -56,18 +56,18 @@ private:
 
     void resetSession();
     void setStatus(const String& title, const String& message, MaterialStyle::ComponentState state);
-    bool isCancelPressed(TS_Point p) const;
-    bool isOkPressed(TS_Point p) const;
+    static bool isCancelPressed(TS_Point p);
+    static bool isOkPressed(TS_Point p);
     bool isWithinActiveTarget(const TS_Point& mappedPoint) const;
     bool isSuspiciousDuplicate(const TS_Point& rawPoint) const;
     bool computeCalibrationProfile(TouchManager::CalibrationProfile& profile) const;
-    bool solveLeastSquaresAxis(const float* rawX,
-                               const float* rawY,
-                               const float* targets,
-                               size_t count,
-                               float& fromRawX,
-                               float& fromRawY,
-                               float& offset) const;
+    static bool solveLeastSquaresAxis(const float* rawX,
+                                      const float* rawY,
+                                      const float* targets,
+                                      size_t count,
+                                      float& fromRawX,
+                                      float& fromRawY,
+                                      float& offset);
     bool validateCalibrationProfile(const TouchManager::CalibrationProfile& profile);
     bool saveCalibrationProfile(const TouchManager::CalibrationProfile& profile);
     void exitScreen() const;
