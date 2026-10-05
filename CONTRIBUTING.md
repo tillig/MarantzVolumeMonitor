@@ -26,7 +26,7 @@ Welcome! We appreciate your interest in contributing to the Marantz Volume Monit
 - **Linting:** Markdown must pass `markdownlint` as configured in `.markdownlint.json`; C++ formatting must match `.clang-format`.
 - **Static Analysis:** PlatformIO static analysis must pass with the configured `cppcheck` checks.
 - **Firmware Build:** Run `platformio run` before finishing firmware changes.
-- **Continuous Integration:** GitHub Actions runs the same validation on pushes to `main`, `develop`, and `feature/*` branches, and on pull requests. If a `feature/*` branch already has an open pull request, the branch push build is skipped and the pull request build remains the authoritative CI result.
+- **Continuous Integration:** GitHub Actions runs the same validation on pushes to `master`, `develop`, and `feature/*` branches, and on pull requests. If a `feature/*` branch already has an open pull request, the branch push build is skipped and the pull request build remains the authoritative CI result.
 
 ## Build And Validation
 
