@@ -22,3 +22,4 @@
 - [ ] V003 Browse to the monitor's IP address and confirm status and log refresh
 - [ ] V004 Open `Settings` > `Diagnostics` and confirm the newest event is first and the web address is shown
 - [ ] V005 Confirm the Home Screen stays responsive while a browser polls the diagnostics page
+- [ ] V006 Reset Wi-Fi from `Reset To Defaults`, then restart the access point; the monitor stays on `Unconfigured` and does not rejoin
