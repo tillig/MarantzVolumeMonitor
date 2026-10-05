@@ -38,7 +38,7 @@ platformio check --fail-on-defect=low
 platformio run
 ```
 
-CI runs pre-commit and static analysis before the firmware build so formatting, metadata, and code-quality checks fail before compilation.
+CI runs pre-commit first so formatting and metadata problems fail before compilation. Static analysis runs after the firmware build, which installs the platform's cppcheck.
 
 If you change icon source artwork in `assets/icons/source/`, regenerate firmware icon masks before building:
 

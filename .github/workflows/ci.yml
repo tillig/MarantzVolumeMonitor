@@ -90,12 +90,9 @@ jobs:
       - name: Install pioarduino Core
         run: pip install --upgrade pioarduino
 
-      # The platform fetches the cppcheck binary only once its installer package is present.
-      - name: Install platform packages
-        run: pio pkg install
+      # The build also installs the platform's cppcheck, which pio check alone does not.
+      - name: Build firmware
+        run: pio run
 
       - name: Run static analysis
         run: pio check --fail-on-defect=low
-
-      - name: Build firmware
-        run: pio run
