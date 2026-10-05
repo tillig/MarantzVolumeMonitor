@@ -10,6 +10,7 @@
 #include "../ScreenManager.h"
 #include "../TouchManager.h"
 #include "../assets/IconBitmaps.h"
+#include "../../diagnostics/DiagnosticLog.h"
 #include "../../network/ReceiverMonitor.h"
 #include "../../network/WiFiManager.h"
 
@@ -118,11 +119,30 @@ void logReceiverOffWakeRejected(const char* reason,
     printPointDetails(mappedPoint, rawPoint);
 }
 
-void logDisplayStateTransition(HomeScreen::DisplayState from, HomeScreen::DisplayState to) {
-    Serial.print("HOME_DISPLAY_STATE ");
-    Serial.print(displayStateName(from));
-    Serial.print(" -> ");
-    Serial.println(displayStateName(to));
+void logDisplayState(HomeScreen::DisplayState state) {
+    // Home is recreated whenever Settings closes, so remember the last state across instances.
+    static bool hasLoggedState = false;
+    static HomeScreen::DisplayState lastLoggedState;
+    if (hasLoggedState && state == lastLoggedState) {
+        return;
+    }
+
+    hasLoggedState = true;
+    lastLoggedState = state;
+    DiagnosticLog::getInstance().add("Home state %s", displayStateName(state));
+}
+
+void logBlankHold(HomeScreen::DisplayState classifiedState) {
+    // The blank screen only wakes for Live, so record other states it is hiding.
+    static HomeScreen::DisplayState lastHeldState = HomeScreen::DisplayState::ReceiverOffVisible;
+    if (classifiedState == lastHeldState) {
+        return;
+    }
+
+    lastHeldState = classifiedState;
+    if (classifiedState != HomeScreen::DisplayState::ReceiverOffVisible) {
+        DiagnosticLog::getInstance().add("Home stays blank while state is %s", displayStateName(classifiedState));
+    }
 }
 } // namespace
 
@@ -131,6 +151,8 @@ HomeScreen::HomeScreen() {
 
     refreshState();
     setDisplayState(classifyDisplayState(_lastStatus), millis());
+    // setDisplayState skips logging when the first state matches the placeholder above.
+    logDisplayState(_displayState);
     if (_displayState == DisplayState::Live) {
         syncDisplayedVolume(displayVolume(_lastStatus.volume));
     } else {
@@ -206,6 +228,8 @@ void HomeScreen::update() {
         DisplayState classifiedState = classifyDisplayState(_lastStatus);
         DisplayState resolvedState = resolveDisplayState(classifiedState);
         setDisplayState(resolvedState, millis());
+        logBlankHold(_displayState == DisplayState::ReceiverOffBlank ? classifiedState
+                                                                     : DisplayState::ReceiverOffVisible);
         now = millis();
 
         bool requiresFullRedraw = previousDisplayState != _displayState || previousHasWifiConfig != _hasWifiConfig ||
@@ -418,9 +442,7 @@ void HomeScreen::setDisplayState(DisplayState state, uint32_t now) {
     if (state != DisplayState::ReceiverOffBlank) {
         clearReceiverOffWakeCandidate();
     }
-    if (isReceiverOffDisplayState(previousState) || isReceiverOffDisplayState(state)) {
-        logDisplayStateTransition(previousState, state);
-    }
+    logDisplayState(state);
 
     if (state == DisplayState::ReceiverOffVisible) {
         startReceiverOffTimer(now);
@@ -493,10 +515,6 @@ bool HomeScreen::updateReceiverOffWakeCandidate(uint32_t now) {
 
 bool HomeScreen::isReceiverOffTimerExpired(uint32_t now) const {
     return _receiverOffTimer.active && now - _receiverOffTimer.startedAtMs >= _receiverOffTimer.durationMs;
-}
-
-bool HomeScreen::isReceiverOffDisplayState(DisplayState state) {
-    return state == DisplayState::ReceiverOffVisible || state == DisplayState::ReceiverOffBlank;
 }
 
 bool HomeScreen::isCalibrationButtonPressed(TS_Point p) {

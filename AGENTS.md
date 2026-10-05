@@ -72,5 +72,5 @@ When reviewing Markdown, check for:
 When you flag an issue, explain the accessibility or readability impact and keep the recommendation specific and actionable.
 
 <!-- SPECKIT START -->
-For additional context about technologies to be used, project structure, shell commands, and other important information, read the current plan: [specs/014-background-receiver-polling/plan.md](specs/014-background-receiver-polling/plan.md)
+For additional context about technologies to be used, project structure, shell commands, and other important information, read the current plan: [specs/015-wifi-resilience-diagnostics/plan.md](specs/015-wifi-resilience-diagnostics/plan.md)
 <!-- SPECKIT END -->

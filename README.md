@@ -40,7 +40,7 @@ Upon first boot, use the on-screen menus to:
 1. Connect to your Wi-Fi network.
 2. Select your Marantz receiver with auto-discovery or enter its IPv4 address manually.
 
-After setup, tap the small gear icon in the top-right corner of the Home Screen to reopen Settings. Settings provides a read-only `Current Settings` overview, a `Volume Display Scale` setting, Wi-Fi setup, receiver setup, touch calibration, and `Reset To Defaults`. Use the Settings OK button to return to the Home Screen.
+After setup, tap the small gear icon in the top-right corner of the Home Screen to reopen Settings. Settings provides a read-only `Current Settings` overview, a `Volume Display Scale` setting, Wi-Fi setup, receiver setup, touch calibration, `Diagnostics`, and `Reset To Defaults`. Use the Settings OK button to return to the Home Screen.
 
 ![Settings menu](./assets/images/settings_menu.jpg)
 
@@ -48,11 +48,18 @@ After setup, tap the small gear icon in the top-right corner of the Home Screen 
 - `Volume Display Scale` lets you choose whether the Home Screen number shows the normalized `0.0` to `100.0` scale used by the firmware (`receiver dB + 80`) or the raw receiver `dB` value. The gauge always stays on the normalized scale.
 - `Wi-Fi Setup` lets you scan for a Wi-Fi network or enter network information manually.
 - `Receiver Setup` lets you scan for a Marantz receiver on the local network via SSDP/UPnP multicast. You may also manually enter your receiver IP address. If a receiver is not discovered, confirm the ESP32 and receiver are on the same subnet and that the router allows multicast between clients. Standby discovery may also require the receiver's network/IP control standby setting to be enabled.
+- `Diagnostics` lists recent Wi-Fi, receiver, and display events, newest first, and shows the monitor's web address. The web page has no login, so anyone on your local network can see it, including your network name and the receiver's address.
 - `Touch Calibration` lets you manually calibrate your touch screen for improved precision. The firmware ships with a measured default affine profile for the canonical hardware build, so a fresh device remains usable even if calibration has never been run. Use this if the touch accuracy feels off.
 
 If you need to recover from a bad saved profile or clear setup state, open `Settings` > `Reset To Defaults`, choose `Wi-Fi`, `Receiver`, or `Calibration`, then confirm with `Reset`.
 
 If the receiver is reachable but powered off, the Home Screen shows `Receiver off` instead of the last live volume. Both powered-off and unavailable receiver states keep the top-right Settings path available so Wi-Fi or receiver setup can be reopened without restarting the device. When powered-off status remains confirmed, `Receiver off` stays visible for about 3 seconds and then the Home Screen blanks to a quiet black screen until the receiver becomes active again or the screen is long-tapped (hold down for a second). A wake tap only restores the Home Screen; opening Settings still requires a separate tap on the visible gear icon.
+
+## Troubleshooting
+
+If Wi-Fi drops, the monitor retries the saved network on its own, waiting up to a minute between attempts. When a setup attempt fails, the error screen shows the reason and code the Wi-Fi driver reported. The driver uses the same codes for a wrong password and for a signal too weak to finish connecting.
+
+While the monitor is on Wi-Fi, browse to `http://<monitor IP address>/` for firmware version, reset reason, Wi-Fi signal and last disconnect reason, receiver polling results, and the recent event log. The same data is available as JSON at `/api/status` and as text at `/api/log`; include both when filing an issue. The log is kept in memory, so it starts over when the monitor restarts.
 
 ## Project Structure
 
