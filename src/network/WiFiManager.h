@@ -13,20 +13,20 @@ public:
         return instance;
     }
 
-    void begin();
+    static void begin();
     void update();
     void startConnect(const String& ssid, const String& password);
     void stopConnecting();
-    wl_status_t getConnectStatus();
+    static wl_status_t getConnectStatus();
     uint8_t lastDisconnectReason() const;
     uint32_t disconnectCount() const;
     uint32_t retryCount() const;
     static String disconnectReasonName(uint8_t reason);
     static String describeDisconnectReason(uint8_t reason);
-    bool connect(const String& ssid, const String& password);
-    bool isConnected();
-    String getIPAddress();
-    int32_t getSignalStrength();
+    static bool connect(const String& ssid, const String& password);
+    static bool isConnected();
+    static String getIPAddress();
+    static int32_t getSignalStrength();
     static uint8_t signalLevelForRssi(int32_t rssi);
 
     struct NetworkInfo {

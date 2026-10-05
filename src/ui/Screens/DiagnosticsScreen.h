@@ -17,8 +17,8 @@ private:
     String _drawnSubtitle;
 
     void drawLog(TFT_eSPI& tft);
-    String subtitleText() const;
-    bool isOkPressed(TS_Point p) const;
+    static String subtitleText();
+    static bool isOkPressed(TS_Point p);
 };
 
 #endif

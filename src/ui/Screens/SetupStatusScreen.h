@@ -25,7 +25,7 @@ private:
     uint8_t _progressFrame = 0;
     uint32_t _lastProgressAtMs = 0;
 
-    void restoreSavedConnection();
+    static void restoreSavedConnection();
 };
 
 #endif

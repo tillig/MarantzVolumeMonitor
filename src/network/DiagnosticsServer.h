@@ -27,7 +27,7 @@ private:
     void handleStatus();
     void handleLog();
     String statusJson();
-    String logText();
+    static String logText();
 };
 
 #endif

@@ -80,14 +80,14 @@ void DiagnosticsScreen::drawLog(TFT_eSPI& tft) {
     }
 }
 
-String DiagnosticsScreen::subtitleText() const {
+String DiagnosticsScreen::subtitleText() {
     if (!WiFiManager::getInstance().isConnected()) {
         return "Wi-Fi offline; web details unavailable";
     }
     return "Full details at http://" + WiFiManager::getInstance().getIPAddress() + "/";
 }
 
-bool DiagnosticsScreen::isOkPressed(TS_Point p) const {
+bool DiagnosticsScreen::isOkPressed(TS_Point p) {
     return p.x >= 182 && p.x <= 298 && p.y >= MaterialStyle::BottomActionY &&
            p.y <= MaterialStyle::BottomActionY + MaterialStyle::ButtonHeight;
 }
