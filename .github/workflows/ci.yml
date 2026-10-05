@@ -90,6 +90,10 @@ jobs:
       - name: Install pioarduino Core
         run: pip install --upgrade pioarduino
 
+      # The platform fetches the cppcheck binary only once its installer package is present.
+      - name: Install platform packages
+        run: pio pkg install
+
       - name: Run static analysis
         run: pio check --fail-on-defect=low
 
