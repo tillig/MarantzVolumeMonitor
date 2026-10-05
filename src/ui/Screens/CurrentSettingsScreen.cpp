@@ -6,6 +6,7 @@
 #include "../ScreenManager.h"
 #include "../assets/IconBitmaps.h"
 #include "../../network/ReceiverDiscovery.h"
+#include "../../network/ReceiverMonitor.h"
 #include "../../network/WiFiManager.h"
 
 namespace {
@@ -95,9 +96,9 @@ void CurrentSettingsScreen::refreshState() {
     _wifiRssi = _hasWifiSignal ? WiFiManager::getInstance().getSignalStrength() : 0;
 
     _receiverStatus = MarantzStatus();
+    ReceiverMonitor::getInstance().setReceiverIp(_config.receiverIp);
     if (_wifiConnected && _config.receiverIp.length() > 0) {
-        MarantzClient::getInstance().setReceiverIp(_config.receiverIp);
-        _receiverStatus = MarantzClient::getInstance().getStatus();
+        ReceiverMonitor::getInstance().latestStatus(_receiverStatus);
     }
 
     if (_wifiConnected && _config.receiverIp.length() > 0 && !_receiverIdentityAttempted) {

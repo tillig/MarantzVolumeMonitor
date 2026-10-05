@@ -91,14 +91,6 @@ float parseReceiverVolume(const String& rawValue, bool* hasValue) {
 }
 } // namespace
 
-void MarantzClient::setReceiverIp(const String& ip) {
-    _receiverIp = ip;
-}
-
-MarantzStatus MarantzClient::getStatus() {
-    return fetchStatus(_receiverIp);
-}
-
 bool MarantzClient::verifyReceiver(const String& ip, MarantzStatus* verifiedStatus) {
     MarantzStatus status = fetchStatus(ip);
     if (verifiedStatus != nullptr) {

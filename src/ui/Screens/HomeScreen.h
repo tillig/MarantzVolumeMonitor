@@ -12,6 +12,7 @@ public:
         WifiSetupRequired,
         WifiConnecting,
         ReceiverSetupRequired,
+        ReceiverConnecting,
         ReceiverUnavailable,
         ReceiverOffVisible,
         ReceiverOffBlank,
@@ -64,6 +65,8 @@ private:
     bool _hasWifiConfig = false;
     bool _hasReceiverConfig = false;
     bool _isWifiConnected = false;
+    bool _hasReceiverStatus = false;
+    uint32_t _receiverStatusSequence = 0;
     String _ipAddress;
     uint32_t _lastRefreshMs = 0;
     VolumeAnimation _volumeAnimation;
