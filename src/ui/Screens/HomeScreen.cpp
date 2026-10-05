@@ -68,6 +68,8 @@ const char* displayStateName(HomeScreen::DisplayState state) {
             return "WifiConnecting";
         case HomeScreen::DisplayState::ReceiverSetupRequired:
             return "ReceiverSetupRequired";
+        case HomeScreen::DisplayState::ReceiverConnecting:
+            return "ReceiverConnecting";
         case HomeScreen::DisplayState::ReceiverUnavailable:
             return "ReceiverUnavailable";
         case HomeScreen::DisplayState::ReceiverOffVisible:
@@ -159,6 +161,12 @@ void HomeScreen::draw() {
         case DisplayState::ReceiverOffBlank:
             display.setBacklightEnabled(false, "HomeScreen::draw receiver off blank");
             break;
+        case DisplayState::ReceiverConnecting:
+            drawReceiverStatusState("Connecting to receiver",
+                                    "Open Settings to change receiver setup.",
+                                    MaterialStyle::StatusKind::Loading);
+            drawSettingsButton();
+            break;
         case DisplayState::ReceiverUnavailable:
             drawReceiverStatusState("Receiver unavailable",
                                     "Open Settings to change receiver setup.",
@@ -181,7 +189,9 @@ void HomeScreen::update() {
         return;
     }
 
-    if (now - _lastRefreshMs >= RefreshIntervalMs) {
+    // Refresh as soon as a new receiver status lands so volume changes aren't held back by the refresh cadence.
+    if (now - _lastRefreshMs >= RefreshIntervalMs ||
+        ReceiverMonitor::getInstance().statusSequence() != _receiverStatusSequence) {
         MarantzStatus previousStatus = _lastStatus;
         DisplayState previousDisplayState = _displayState;
         bool previousHasWifiConfig = _hasWifiConfig;
@@ -352,10 +362,12 @@ void HomeScreen::refreshState() {
 
     _lastStatus = MarantzStatus();
     _hasReceiverStatus = false;
-    ReceiverMonitor::getInstance().setReceiverIp(_config.receiverIp);
+    ReceiverMonitor& monitor = ReceiverMonitor::getInstance();
+    monitor.setReceiverIp(_config.receiverIp);
+    _receiverStatusSequence = monitor.statusSequence();
 
     if (_hasWifiConfig && _hasReceiverConfig && _isWifiConnected) {
-        _hasReceiverStatus = ReceiverMonitor::getInstance().latestStatus(_config.receiverIp, _lastStatus);
+        _hasReceiverStatus = monitor.latestStatus(_lastStatus);
     }
 }
 
@@ -370,8 +382,8 @@ HomeScreen::DisplayState HomeScreen::classifyDisplayState(const MarantzStatus& s
         return DisplayState::ReceiverSetupRequired;
     }
     if (!_hasReceiverStatus) {
-        // The first poll after Wi-Fi connects is still in flight.
-        return DisplayState::WifiConnecting;
+        // The first poll of this receiver is still in flight.
+        return DisplayState::ReceiverConnecting;
     }
     if (status.isValid && status.powerKnown && !status.power) {
         return DisplayState::ReceiverOffVisible;
@@ -498,7 +510,7 @@ bool HomeScreen::isSettingsButtonPressed(TS_Point p) {
 
 bool HomeScreen::isSettingsAccessible() const {
     return _displayState == DisplayState::Live || _displayState == DisplayState::ReceiverOffVisible ||
-           _displayState == DisplayState::ReceiverUnavailable;
+           _displayState == DisplayState::ReceiverConnecting || _displayState == DisplayState::ReceiverUnavailable;
 }
 
 String HomeScreen::formatVolume(float volume) const {

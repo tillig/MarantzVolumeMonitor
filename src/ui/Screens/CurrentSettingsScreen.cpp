@@ -98,7 +98,7 @@ void CurrentSettingsScreen::refreshState() {
     _receiverStatus = MarantzStatus();
     ReceiverMonitor::getInstance().setReceiverIp(_config.receiverIp);
     if (_wifiConnected && _config.receiverIp.length() > 0) {
-        ReceiverMonitor::getInstance().latestStatus(_config.receiverIp, _receiverStatus);
+        ReceiverMonitor::getInstance().latestStatus(_receiverStatus);
     }
 
     if (_wifiConnected && _config.receiverIp.length() > 0 && !_receiverIdentityAttempted) {

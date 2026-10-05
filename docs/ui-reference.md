@@ -43,7 +43,7 @@ The main UI is optimized for a 15-foot viewing distance. It uses a high-contrast
 ### Settings Entry
 
 - A small bitmap settings icon in the top-right corner opens Settings from the normal Home Screen.
-- The same settings icon remains available from powered-off and receiver-unavailable home states so receiver setup can be changed without rebooting.
+- The same settings icon remains available from powered-off, receiver-connecting, and receiver-unavailable home states so receiver setup can be changed without rebooting.
 - Confirmed powered-off receiver state first shows `Receiver off`, then the Home Screen blanks after 3 seconds so no idle status remains visible in the room.
 - With the receiver-off backlight circuit documented in `docs/hardware.md` wired and validated, the same 3-second transition also turns off the TFT `LED/BL` backlight. TFT logic, touch, receiver polling, and Settings recovery remain active.
 - While the Home Screen is blank because receiver-off was confirmed, touch wake remains active and the first tap wakes only. A separate visible tap on the settings icon is still required to open Settings.

@@ -50,11 +50,11 @@ Feature work may add classes inside these existing layer folders. New cross-laye
 ## Runtime Flow
 
 1. Boot initializes display, touch, and LittleFS-backed configuration storage, then attempts Wi-Fi auto-connect, applies any saved receiver IP, and restores the saved touch-calibration profile if it is usable.
-2. `HomeScreen` is the first screen and classifies the current state as Wi-Fi setup required, Wi-Fi connecting, receiver setup required, receiver unavailable, receiver off, or live.
+2. `HomeScreen` is the first screen and classifies the current state as Wi-Fi setup required, Wi-Fi connecting, receiver setup required, receiver connecting, receiver unavailable, receiver off, or live.
 3. If Wi-Fi is not configured, the touchscreen flow branches through `NetworkListScreen`, `KeyboardScreen`, and `SetupStatusScreen` to collect and save credentials.
 4. If a receiver is not configured, the setup flow branches through `ReceiverListScreen`, `ReceiverIpScreen`, and `ReceiverStatusScreen` to discover or verify a receiver address before saving it.
 5. `SettingsScreen` provides access to `Current Settings`, `Volume Display Scale`, Wi-Fi setup, receiver setup, touch calibration, and `Reset To Defaults`, with pagination when all entries do not fit cleanly on one page.
-6. `ReceiverMonitor` polls the saved receiver about once per second on a background FreeRTOS task, so slow or unreachable receivers never block touch handling. `HomeScreen` and `CurrentSettingsScreen` read its latest result on an approximately 1-second cadence while visible.
+6. `ReceiverMonitor` polls the saved receiver about once per second on a background FreeRTOS task, so status fetches never block the UI loop, and pauses when no screen has read status for a few seconds. `HomeScreen` redraws as soon as a new result lands, and `CurrentSettingsScreen` reads it about once per second. Identity lookups in `CurrentSettingsScreen` and receiver verification still run on the UI loop.
 7. The live Home Screen renders normalized volume (`receiver dB + 80`), source, listening mode, audio-family icons, and receiver-off blank/backlight behavior.
 8. `CalibrationScreen` owns the guided 9-point calibration session UI, while `TouchManager` owns runtime profile validation, mapping, and default-vs-active calibration application.
 9. `ResetDefaultsScreen` owns the selective reset confirmation UI, while `ConfigStore` owns the actual config mutations for `Wi-Fi`, `Receiver`, and `Calibration`.
