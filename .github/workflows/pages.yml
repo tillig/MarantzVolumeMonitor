@@ -1,0 +1,74 @@
+name: Deploy Web Flasher
+
+# Publishes web-flasher/ to GitHub Pages with a release's firmware copied alongside it. release.yml calls this after publishing a release; pushes to master and manual runs redeploy the latest release.
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      tag:
+        description: Release tag to deploy. Empty deploys the latest release.
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v6
+
+      # Release asset URLs redirect cross-origin, which the browser blocks, so the firmware is served from the Pages origin instead.
+      - name: Fetch release firmware into the flasher directory
+        id: firmware
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          if ! gh release download ${TAG:+"$TAG"} --repo "$GITHUB_REPOSITORY" \
+               --pattern 'firmware.factory.bin' --dir web-flasher --clobber; then
+            if [ -n "$TAG" ]; then
+              exit 1
+            fi
+            echo "::notice::The latest release has no firmware.factory.bin, so there is nothing to deploy."
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Show the release being installed instead of the manifest's placeholder.
+          version=$(gh release view ${TAG:+"$TAG"} --repo "$GITHUB_REPOSITORY" --json tagName --jq .tagName)
+          jq --arg version "$version" '.version = $version' web-flasher/firmware-manifest.json > manifest.json
+          mv manifest.json web-flasher/firmware-manifest.json
+          echo "found=true" >> "$GITHUB_OUTPUT"
+
+      - name: Upload flasher as Pages artifact
+        if: steps.firmware.outputs.found == 'true'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: web-flasher
+
+      - name: Deploy to GitHub Pages
+        if: steps.firmware.outputs.found == 'true'
+        id: deployment
+        uses: actions/deploy-pages@v5

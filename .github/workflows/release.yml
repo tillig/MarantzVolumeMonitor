@@ -1,0 +1,77 @@
+name: Release
+
+# Pushing a version tag such as v2.1.0 builds the firmware, attaches the factory image to a GitHub Release, and deploys the web flasher with it. A tag with a hyphen, such as v2.2.0-rc1, publishes a prerelease and leaves the flasher alone.
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions: {}
+
+jobs:
+  release:
+    name: Build and publish firmware
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          # scripts/version.py runs "git describe --tags", which needs the tags a shallow checkout leaves out.
+          fetch-depth: 0
+          # The build runs platform and library scripts, which shouldn't be able to read a write token.
+          persist-credentials: false
+
+      - name: Check the firmware version matches the tag
+        run: |
+          version=$(git describe --tags --always --dirty)
+          if [ "$version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::The firmware would report $version instead of $GITHUB_REF_NAME."
+            exit 1
+          fi
+
+      - name: Set up Python
+        id: python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.x"
+
+      # Matches ci.yml so a release restores the cache that master builds save.
+      - name: Cache PlatformIO
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.platformio
+            .pio
+          key: ${{ runner.os }}-platformio-${{ steps.python.outputs.python-version }}-${{ hashFiles('platformio.ini') }}
+          restore-keys: |
+            ${{ runner.os }}-platformio-${{ steps.python.outputs.python-version }}-
+
+      - name: Install pioarduino Core
+        run: pip install --upgrade pioarduino
+
+      - name: Build firmware
+        run: pio run
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v3
+        with:
+          files: .pio/build/esp32dev/firmware.factory.bin
+          generate_release_notes: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
+
+  pages:
+    name: Deploy web flasher
+    needs: release
+    if: ${{ !contains(github.ref_name, '-') }}
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/pages.yml
+    with:
+      tag: ${{ github.ref_name }}
