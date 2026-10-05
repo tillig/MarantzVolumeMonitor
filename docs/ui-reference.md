@@ -48,7 +48,7 @@ The main UI is optimized for a 15-foot viewing distance. It uses a high-contrast
 - With the receiver-off backlight circuit documented in `docs/hardware.md` wired and validated, the same 3-second transition also turns off the TFT `LED/BL` backlight. TFT logic, touch, receiver polling, and Settings recovery remain active.
 - While the Home Screen is blank because receiver-off was confirmed, touch wake remains active and the first tap wakes only. A separate visible tap on the settings icon is still required to open Settings.
 - A non-Settings tap on visible `Receiver off` restarts the 3-second timer and keeps the message visible briefly.
-- Settings exposes `Current Settings`, `Volume Display Scale`, Wi-Fi setup, receiver setup, `Touch Calibration`, and `Reset To Defaults`.
+- Settings exposes `Current Settings`, `Volume Display Scale`, Wi-Fi setup, receiver setup, `Touch Calibration`, `Diagnostics`, and `Reset To Defaults`.
 - Flows launched from Settings should return to Settings when complete; the Settings OK button returns to the Home Screen.
 - Returning Home while the receiver is still confirmed off shows `Receiver off` again and restarts the 3-second blanking timer. Settings and settings-launched setup flows stay visible while active.
 - Setup/boot states expose a bottom-right `Calibrate` maintenance action using the shared bottom action button size, position, and icon-with-text treatment.
@@ -94,7 +94,7 @@ The firmware build uses checked-in generated masks and does not decode SVG or PN
 
 - Settings navigation rows use the same rounded selection-row treatment as setup selection lists.
 - Row labels remain visible, supporting text clarifies the destination, and touch targets remain at least 40 px high.
-- Settings order is `Current Settings`, `Volume Display Scale`, `Wi-Fi Setup`, `Receiver Setup`, `Touch Calibration`, then `Reset To Defaults`. `Reset To Defaults` must remain last.
+- Settings order is `Current Settings`, `Volume Display Scale`, `Wi-Fi Setup`, `Receiver Setup`, `Touch Calibration`, `Diagnostics`, then `Reset To Defaults`. `Reset To Defaults` must remain last.
 - `Current Settings` opens a read-only overview screen for saved and live monitor state; it does not launch setup or editing directly.
 - `Volume Display Scale` opens a dedicated single-choice screen with `0-100` and `dB` options, explicit `OK` and `Cancel` actions, and a visible selected-state indicator that does not rely on color alone.
 - If all settings destinations do not fit cleanly on one screen with the standard row treatment, Settings uses labeled `PREV` and `NEXT` pagination controls above the bottom `OK` action rather than switching to icon-only navigation.

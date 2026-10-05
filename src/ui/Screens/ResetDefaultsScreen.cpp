@@ -6,6 +6,7 @@
 #include "../ScreenManager.h"
 #include "../TouchManager.h"
 #include "../assets/IconBitmaps.h"
+#include "../../network/WiFiManager.h"
 
 namespace {
 constexpr int RowX = 20;
@@ -223,7 +224,10 @@ void ResetDefaultsScreen::applyReset() {
         return;
     }
 
-    if (_selectedType == ResetType::Calibration) {
+    if (_selectedType == ResetType::Wifi) {
+        // Otherwise the retry loop keeps rejoining the network that was just forgotten.
+        WiFiManager::getInstance().stopConnecting();
+    } else if (_selectedType == ResetType::Calibration) {
         TouchManager::getInstance().applyDefaultCalibration();
     }
 

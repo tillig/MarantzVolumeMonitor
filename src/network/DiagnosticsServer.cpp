@@ -53,7 +53,11 @@ void DiagnosticsServer::begin() {
     _server.begin();
 
     // Serve from a separate task so a slow browser cannot stall the UI loop.
-    xTaskCreate(taskEntry, "diagnostics-http", TaskStackBytes, this, 1, &_task);
+    if (xTaskCreate(taskEntry, "diagnostics-http", TaskStackBytes, this, 1, &_task) != pdPASS) {
+        _task = nullptr;
+        _server.stop();
+        DiagnosticLog::getInstance().add("Diagnostics server task creation failed");
+    }
 }
 
 void DiagnosticsServer::taskEntry(void* parameter) {
@@ -108,11 +112,14 @@ String DiagnosticsServer::statusJson() {
     receiver["hasStatus"] = monitor.hasStatus;
     receiver["consecutiveFailures"] = monitor.consecutiveFailures;
     if (monitor.hasStatus) {
-        receiver["lastPollAgeMs"] = now - monitor.lastPollAtMs;
+        // Read the clock after the snapshot, or a poll finishing in between makes the age wrap.
+        receiver["lastPollAgeMs"] = millis() - monitor.lastPollAtMs;
         receiver["httpCode"] = monitor.status.httpCode;
         receiver["valid"] = monitor.status.isValid;
         receiver["power"] = monitor.status.power;
-        receiver["volumeDb"] = monitor.status.volume;
+        if (monitor.status.hasVolume) {
+            receiver["volumeDb"] = monitor.status.volume;
+        }
         receiver["input"] = monitor.status.input;
         receiver["mode"] = monitor.status.mode;
     }

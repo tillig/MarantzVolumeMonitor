@@ -32,11 +32,15 @@ void WiFiManager::update() {
     _retryAttempt++;
     _retryCount++;
     uint8_t reason = _lastDisconnectReason;
-    DiagnosticLog::getInstance().add("Wi-Fi retry %lu for %s, last reason %u %s",
-                                     static_cast<unsigned long>(_retryAttempt),
-                                     _targetSsid.c_str(),
-                                     reason,
-                                     disconnectReasonName(reason).c_str());
+    // Log the first retry and reason changes only, so a long outage doesn't push out the events that explain it.
+    if (_retryAttempt == 1 || reason != _lastLoggedRetryReason) {
+        _lastLoggedRetryReason = reason;
+        DiagnosticLog::getInstance().add("Wi-Fi retry %lu for %s, last reason %u %s",
+                                         static_cast<unsigned long>(_retryAttempt),
+                                         _targetSsid.c_str(),
+                                         reason,
+                                         disconnectReasonName(reason).c_str());
+    }
     beginConnectAttempt();
 }
 
@@ -60,7 +64,9 @@ void WiFiManager::stopConnecting() {
 void WiFiManager::beginConnectAttempt() {
     _lastProgressMs = millis();
     // Restart the radio so a stuck connection attempt cannot reject the new one.
-    WiFi.disconnect(true);
+    if (!WiFi.disconnect(true)) {
+        DiagnosticLog::getInstance().add("Wi-Fi radio restart failed");
+    }
     if (WiFi.begin(_targetSsid.c_str(), _targetPassword.c_str()) == WL_CONNECT_FAILED) {
         DiagnosticLog::getInstance().add("Wi-Fi driver rejected connection request");
     }
@@ -89,7 +95,10 @@ void WiFiManager::handleEvent(arduino_event_id_t event, arduino_event_info_t inf
                 break;
             }
             uint8_t previousReason = _lastDisconnectReason.exchange(reason);
-            _disconnectCount++;
+            // Count lost connections, not each of the driver's own failed reconnect attempts.
+            if (wasConnected) {
+                _disconnectCount++;
+            }
             // The driver retries rapidly on its own; only log when something changes.
             if (wasConnected || reason != previousReason) {
                 DiagnosticLog::getInstance().add("Wi-Fi disconnected: reason %u %s, RSSI %d dBm",

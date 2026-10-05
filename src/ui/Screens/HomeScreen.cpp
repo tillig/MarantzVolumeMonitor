@@ -151,6 +151,8 @@ HomeScreen::HomeScreen() {
 
     refreshState();
     setDisplayState(classifyDisplayState(_lastStatus), millis());
+    // setDisplayState skips logging when the first state matches the placeholder above.
+    logDisplayState(_displayState);
     if (_displayState == DisplayState::Live) {
         syncDisplayedVolume(displayVolume(_lastStatus.volume));
     } else {

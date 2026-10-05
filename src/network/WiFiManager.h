@@ -53,6 +53,7 @@ private:
     String _targetPassword;
     uint32_t _lastProgressMs = 0;
     uint32_t _retryAttempt = 0;
+    uint8_t _lastLoggedRetryReason = 0;
     std::atomic<uint8_t> _lastDisconnectReason{0};
     std::atomic<uint32_t> _disconnectCount{0};
     std::atomic<uint32_t> _retryCount{0};

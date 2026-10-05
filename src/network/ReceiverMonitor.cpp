@@ -41,7 +41,8 @@ bool ReceiverMonitor::latestStatus(MarantzStatus& status) {
         uint32_t now = millis();
         _lastReadAtMs = now;
         wasIdle = !_polling;
-        hasStatus = _hasStatus;
+        // An idle monitor's last result is too old to show, so readers wait for a fresh poll.
+        hasStatus = _hasStatus && !wasIdle;
         if (hasStatus) {
             // A fetch stuck on an unresponsive receiver must not keep its last answer on screen.
             status = now - _statusAtMs > StaleAfterMs ? MarantzStatus() : _status;
@@ -78,10 +79,13 @@ void ReceiverMonitor::run() {
     for (;;) {
         String receiverIp;
         bool polling = beginCycle(receiverIp);
-        if (polling && receiverIp.length() > 0 && WiFiManager::getInstance().isConnected()) {
-            storeStatus(receiverIp, MarantzClient::getInstance().fetchStatus(receiverIp));
-        } else {
-            clearStatus();
+        // While idle, the last result stays in place for diagnostics.
+        if (polling) {
+            if (receiverIp.length() > 0 && WiFiManager::getInstance().isConnected()) {
+                storeStatus(receiverIp, MarantzClient::getInstance().fetchStatus(receiverIp));
+            } else {
+                clearStatus();
+            }
         }
 
         // While idle, sleep until a reader or a receiver change wakes the task.
@@ -92,7 +96,13 @@ void ReceiverMonitor::run() {
 bool ReceiverMonitor::beginCycle(String& receiverIp) {
     std::lock_guard<std::mutex> lock(_mutex);
     receiverIp = _receiverIp;
+    bool resuming = !_polling;
     _polling = millis() - _lastReadAtMs < IdleAfterMs;
+    if (_polling && resuming && _hasStatus) {
+        // The result from before the pause is too old to show; readers wait for this poll instead.
+        _hasStatus = false;
+        _statusSequence++;
+    }
     return _polling;
 }
 
@@ -108,8 +118,9 @@ void ReceiverMonitor::storeStatus(const String& receiverIp, const MarantzStatus&
         DiagnosticLog::getInstance().add("Receiver %s poll failed: %d %s",
                                          receiverIp.c_str(),
                                          status.httpCode,
-                                         status.httpCode < 0 ? HTTPClient::errorToString(status.httpCode).c_str()
-                                                             : "unexpected HTTP status");
+                                         status.httpCode < 0    ? HTTPClient::errorToString(status.httpCode).c_str()
+                                         : status.httpCode == 0 ? "request not sent"
+                                                                : "unexpected HTTP status");
     } else if (status.isValid && _consecutiveFailures > 0) {
         DiagnosticLog::getInstance().add("Receiver %s reachable again after %lu failed polls",
                                          receiverIp.c_str(),

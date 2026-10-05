@@ -48,7 +48,7 @@ After setup, tap the small gear icon in the top-right corner of the Home Screen 
 - `Volume Display Scale` lets you choose whether the Home Screen number shows the normalized `0.0` to `100.0` scale used by the firmware (`receiver dB + 80`) or the raw receiver `dB` value. The gauge always stays on the normalized scale.
 - `Wi-Fi Setup` lets you scan for a Wi-Fi network or enter network information manually.
 - `Receiver Setup` lets you scan for a Marantz receiver on the local network via SSDP/UPnP multicast. You may also manually enter your receiver IP address. If a receiver is not discovered, confirm the ESP32 and receiver are on the same subnet and that the router allows multicast between clients. Standby discovery may also require the receiver's network/IP control standby setting to be enabled.
-- `Diagnostics` lists recent Wi-Fi, receiver, and display events, newest first, and shows the monitor's web address.
+- `Diagnostics` lists recent Wi-Fi, receiver, and display events, newest first, and shows the monitor's web address. The web page has no login, so anyone on your local network can see it, including your network name and the receiver's address.
 - `Touch Calibration` lets you manually calibrate your touch screen for improved precision. The firmware ships with a measured default affine profile for the canonical hardware build, so a fresh device remains usable even if calibration has never been run. Use this if the touch accuracy feels off.
 
 If you need to recover from a bad saved profile or clear setup state, open `Settings` > `Reset To Defaults`, choose `Wi-Fi`, `Receiver`, or `Calibration`, then confirm with `Reset`.
