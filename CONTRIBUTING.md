@@ -56,7 +56,9 @@ platformio run --target upload
 
 ## Releases
 
-Push a version tag such as `v2.1.0` to publish a release and redeploy the web flasher with it. A tag with a hyphen, such as `v2.2.0-rc1`, publishes a prerelease and leaves the flasher alone. The firmware reports the tag it was built from on the diagnostics page.
+Fast-forward `master` to `develop`, push it, then push a version tag such as `v2.1.0` on that commit to publish a release and redeploy the web flasher with it. A tag with a hyphen, such as `v2.2.0-rc1`, publishes a prerelease and leaves the flasher alone. The firmware reports the tag it was built from on the diagnostics page.
+
+Versions follow what users of the device see: bump the minor version for new capabilities and the patch version for fixes. Reserve the major version for rewrites such as v2.0.0, the move to the ESP32; toolchain and internal changes don't justify one.
 
 ## How to Contribute
 
