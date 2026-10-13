@@ -82,7 +82,14 @@ void ReceiverMonitor::run() {
         // While idle, the last result stays in place for diagnostics.
         if (polling) {
             if (receiverIp.length() > 0 && WiFiManager::getInstance().isConnected()) {
-                storeStatus(receiverIp, MarantzClient::getInstance().fetchStatus(receiverIp));
+                uint32_t startedAtMs = millis();
+                MarantzStatus status = MarantzClient::getInstance().fetchStatus(receiverIp);
+                if (status.httpCode == HTTPC_ERROR_CONNECTION_REFUSED) {
+                    // Refusals are often momentary; retry once before counting a failure.
+                    vTaskDelay(pdMS_TO_TICKS(RetryDelayMs));
+                    status = MarantzClient::getInstance().fetchStatus(receiverIp);
+                }
+                storeStatus(receiverIp, status, millis() - startedAtMs);
             } else {
                 clearStatus();
             }
@@ -106,7 +113,7 @@ bool ReceiverMonitor::beginCycle(String& receiverIp) {
     return _polling;
 }
 
-void ReceiverMonitor::storeStatus(const String& receiverIp, const MarantzStatus& status) {
+void ReceiverMonitor::storeStatus(const String& receiverIp, const MarantzStatus& status, uint32_t pollMs) {
     std::lock_guard<std::mutex> lock(_mutex);
     // Drop results for a receiver that was replaced while the request was in flight.
     if (receiverIp != _receiverIp) {
@@ -115,12 +122,15 @@ void ReceiverMonitor::storeStatus(const String& receiverIp, const MarantzStatus&
 
     // Log only transitions so a receiver that stays down does not flush older events.
     if (!status.isValid && _consecutiveFailures == 0) {
-        DiagnosticLog::getInstance().add("Receiver %s poll failed: %d %s",
+        DiagnosticLog::getInstance().add("Receiver %s poll failed: %d %s (%lu ms, RSSI %d dBm, heap %lu)",
                                          receiverIp.c_str(),
                                          status.httpCode,
                                          status.httpCode < 0    ? HTTPClient::errorToString(status.httpCode).c_str()
                                          : status.httpCode == 0 ? "request not sent"
-                                                                : "unexpected HTTP status");
+                                                                : "unexpected HTTP status",
+                                         static_cast<unsigned long>(pollMs),
+                                         static_cast<int>(WiFiManager::getInstance().getSignalStrength()),
+                                         static_cast<unsigned long>(ESP.getFreeHeap()));
     } else if (status.isValid && _consecutiveFailures > 0) {
         DiagnosticLog::getInstance().add("Receiver %s reachable again after %lu failed polls",
                                          receiverIp.c_str(),
@@ -128,9 +138,15 @@ void ReceiverMonitor::storeStatus(const String& receiverIp, const MarantzStatus&
     }
 
     _consecutiveFailures = status.isValid ? 0 : _consecutiveFailures + 1;
+
+    uint32_t now = millis();
+    if (!status.isValid && _hasStatus && _status.isValid && now - _statusAtMs <= StaleAfterMs) {
+        // Hold the last good result through brief failures.
+        return;
+    }
     _status = status;
     _hasStatus = true;
-    _statusAtMs = millis();
+    _statusAtMs = now;
     _statusSequence++;
 }
 
