@@ -1,10 +1,8 @@
 name: Deploy Web Flasher
 
-# Publishes web-flasher/ to GitHub Pages with a release's firmware copied alongside it. release.yml calls this after publishing a release; pushes to master and manual runs redeploy the latest release.
+# Publishes web-flasher/ to GitHub Pages with a release's firmware copied alongside it. release.yml calls this after publishing a release; manual runs redeploy the latest release.
+# There is no push trigger: Pages ignores a second deployment of the same commit, so a master push deploying first would block the release's deploy of that commit.
 on:
-  push:
-    branches:
-      - master
   workflow_dispatch:
   workflow_call:
     inputs:
